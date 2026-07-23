@@ -107,8 +107,10 @@ function ConvergingGallery() {
     const section = sectionRef.current;
     if (!section) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      section.style.setProperty("--rail-top", "-2%");
-      section.style.setProperty("--rail-bottom", "-2%");
+      section.style.setProperty("--rail-top", "-.35rem");
+      section.style.setProperty("--rail-bottom", ".35rem");
+      section.style.setProperty("--rail-top-tilt", "-.7deg");
+      section.style.setProperty("--rail-bottom-tilt", ".7deg");
       section.style.setProperty("--rail-focus", "1");
       return;
     }
@@ -129,10 +131,12 @@ function ConvergingGallery() {
       const encounter = encounterProgress * encounterProgress * (3 - 2 * encounterProgress);
       const dissolveProgress = Math.min(1, Math.max(0, (eased - .56) / .44));
       const dissolve = dissolveProgress * dissolveProgress * (3 - 2 * dissolveProgress);
-      section.style.setProperty("--rail-top", `${-22 + encounter * 38}%`);
-      section.style.setProperty("--rail-bottom", `${16 - encounter * 38}%`);
-      section.style.setProperty("--rail-focus", String(1 - dissolve * .82));
-      section.style.setProperty("--rail-blur", `${(dissolve * 5).toFixed(2)}px`);
+      section.style.setProperty("--rail-top", `${(-1.8 + encounter * 1.45).toFixed(2)}rem`);
+      section.style.setProperty("--rail-bottom", `${(1.8 - encounter * 1.45).toFixed(2)}rem`);
+      section.style.setProperty("--rail-top-tilt", `${(-2.4 + encounter * 1.55).toFixed(2)}deg`);
+      section.style.setProperty("--rail-bottom-tilt", `${(2.4 - encounter * 1.55).toFixed(2)}deg`);
+      section.style.setProperty("--rail-focus", String(.82 + encounter * .18));
+      section.style.setProperty("--rail-glow", String(.18 + encounter * .42 - dissolve * .1));
     };
 
     const animate = (time: number) => {
@@ -175,11 +179,23 @@ function ConvergingGallery() {
       </div>
       <div className="converging-rails" aria-label="Duas galerias horizontais Helena Joias">
         <div className="gallery-rail gallery-rail-top">
-          {topGallery.map((image) => <figure key={image.src}><img src={image.src} alt={image.alt} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+          <div className="gallery-rail-track">
+            {[0, 1].map((copy) => (
+              <div className="gallery-rail-set" key={copy} aria-hidden={copy === 1 ? "true" : undefined}>
+                {topGallery.map((image) => <figure key={`${copy}-${image.src}`}><img src={image.src} alt={copy === 0 ? image.alt : ""} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="rail-meeting" aria-hidden="true"><ButterflyLoop className="link-butterfly-meeting" /></div>
         <div className="gallery-rail gallery-rail-bottom">
-          {bottomGallery.map((image) => <figure key={image.src}><img src={image.src} alt={image.alt} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+          <div className="gallery-rail-track">
+            {[0, 1].map((copy) => (
+              <div className="gallery-rail-set" key={copy} aria-hidden={copy === 1 ? "true" : undefined}>
+                {bottomGallery.map((image) => <figure key={`${copy}-${image.src}`}><img src={image.src} alt={copy === 0 ? image.alt : ""} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <p className="link-gallery-note" data-link-reveal>Role devagar: as duas seleções se aproximam, se atravessam e abrem espaço para a próxima descoberta.</p>

@@ -282,12 +282,14 @@ function ScrollGallery({
   images: GalleryImage[];
   tone: "rose" | "gold" | "night";
 }) {
-  const [active, setActive] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const counterRef = useRef<HTMLElement>(null);
+  const activeIndexRef = useRef(0);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    const slides = Array.from(section.querySelectorAll<HTMLElement>(".gallery-slide"));
     let frame = 0;
     let targetProgress = 0;
     let currentProgress = 0;
@@ -305,6 +307,18 @@ function ScrollGallery({
       const phase = nextActive === images.length - 1 ? Math.min(1, stepped - nextActive) : stepped - nextActive;
       const blend = phase * phase * phase * (phase * (phase * 6 - 15) + 10);
 
+      if (activeIndexRef.current !== nextActive) {
+        slides.forEach((slide, index) => {
+          slide.classList.toggle("is-past", index < nextActive);
+          slide.classList.toggle("is-active", index === nextActive);
+          slide.classList.toggle("is-next", index === nextActive + 1);
+          slide.classList.toggle("is-future", index > nextActive + 1);
+          slide.setAttribute("aria-hidden", String(index !== nextActive));
+        });
+        activeIndexRef.current = nextActive;
+        if (counterRef.current) counterRef.current.textContent = String(nextActive + 1).padStart(2, "0");
+      }
+
       section.style.setProperty("--story-progress", String(progress));
       section.style.setProperty("--story-blend", String(blend));
       section.style.setProperty("--story-next-opacity", String(blend));
@@ -312,7 +326,6 @@ function ScrollGallery({
       section.style.setProperty("--story-active-lift", `${blend * -.45}%`);
       section.style.setProperty("--story-active-saturation", String(.96 + blend * .04));
       section.style.setProperty("--story-next-scale", String(1.035 - blend * .015));
-      setActive((current) => current === nextActive ? current : nextActive);
     };
 
     const animate = (time: number) => {
@@ -362,13 +375,13 @@ function ScrollGallery({
         <div className="gallery-viewport" aria-label={`Galeria ${title}, conduzida pela rolagem.`}>
           {images.map((image, index) => (
             <figure
-              className={`gallery-slide ${index < active ? "is-past" : index === active ? "is-active" : index === active + 1 ? "is-next" : "is-future"}`}
+              className={`gallery-slide ${index === 0 ? "is-active" : index === 1 ? "is-next" : "is-future"}`}
               key={image.src}
-              aria-hidden={index !== active}
+              aria-hidden={index !== 0}
             >
               <img
                 src={image.src}
-                alt={index === active ? image.alt : ""}
+                alt={image.alt}
                 width="1170"
                 height="1560"
                 loading="lazy"
@@ -378,7 +391,7 @@ function ScrollGallery({
             </figure>
           ))}
           <span className="gallery-sheen" aria-hidden="true" />
-          <p className="gallery-counter" aria-live="polite"><b>{String(active + 1).padStart(2, "0")}</b><span />{String(images.length).padStart(2, "0")}</p>
+          <p className="gallery-counter" aria-live="polite"><b ref={counterRef}>01</b><span />{String(images.length).padStart(2, "0")}</p>
           <p className="gallery-scroll-label" aria-hidden="true">Role para transformar <i>↓</i></p>
         </div>
 
