@@ -12,7 +12,7 @@ Referências informadas no escopo:
 - SOS Ótica: proposta comercial direta, WhatsApp em primeiro plano, rota, vídeo de loja e CTA flutuante.
 - ZEISS: hierarquia editorial premium, vitrine horizontal, links numerados, ambiente, tecnologia e fechamento com localização.
 
-Para a Helena foram aproveitados os princípios de apresentação antes dos links, hierarquia comercial clara, CTA de contato evidente e convite à visita. A execução usa uma linguagem própria — rosé, bronze, formas líquidas, tipografia editorial e três atos de descoberta — sem importar identidade, conteúdo ou componentes das óticas.
+Para a Helena foram aplicados diretamente os padrões estruturais recorrentes: identificação curta da marca, vitrine imediatamente visível, links empilhados com WhatsApp e rota primeiro, mídia em movimento e fechamento simples. A execução permanece própria — rosé, bronze, tipografia editorial, duas faixas que convergem e a borboleta como assinatura — sem importar identidade ou fatos comerciais das óticas.
 
 ## Limite de reprodução
 

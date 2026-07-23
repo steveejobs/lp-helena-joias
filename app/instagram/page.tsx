@@ -2,36 +2,216 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-function LiquidLink({ href, children, detail, external = false, primary = false }: { href: string; children: React.ReactNode; detail: string; external?: boolean; primary?: boolean }) {
+type ProfileLinkProps = {
+  number: string;
+  title: string;
+  detail: string;
+  href?: string;
+  external?: boolean;
+  primary?: boolean;
+  disabled?: boolean;
+};
+
+const topGallery = [
+  { src: "/media/gallery-1-1.jpg", alt: "Composição Helena Joias com colares e pulseiras" },
+  { src: "/media/gallery-1-2.jpg", alt: "Camadas delicadas de joias Helena" },
+  { src: "/media/gallery-1-3.jpg", alt: "Anéis e pulseiras Helena em detalhe" },
+  { src: "/media/gallery-1-4.jpg", alt: "Retrato com brincos e colares Helena" },
+];
+
+const bottomGallery = [
+  { src: "/media/gallery-2-1.jpg", alt: "Joias douradas de formas marcantes" },
+  { src: "/media/gallery-2-2.jpg", alt: "Composição dourada Helena Joias" },
+  { src: "/media/gallery-2-3.jpg", alt: "Colar e bracelete esculturais Helena" },
+  { src: "/media/gallery-2-4.jpg", alt: "Seleção dourada Helena Joias" },
+];
+
+function ProfileLink({ number, title, detail, href, external = false, primary = false, disabled = false }: ProfileLinkProps) {
+  const className = `profile-link ${primary ? "profile-link-primary" : ""}`;
+
+  if (disabled) {
+    return (
+      <button className={className} type="button" disabled aria-label={`${title} — indisponível até os dados serem cadastrados`}>
+        <span className="profile-link-number">{number}</span>
+        <span className="profile-link-copy"><strong>{title}</strong><small>{detail}</small></span>
+        <i aria-hidden="true">↗</i>
+      </button>
+    );
+  }
+
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (external || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     document.documentElement.classList.add("is-leaving");
-    window.setTimeout(() => { window.location.href = href; }, 420);
+    window.setTimeout(() => { window.location.href = href ?? "/"; }, 380);
   };
 
   return (
-    <a
-      className={`liquid-link ${primary ? "liquid-link-primary" : ""}`}
-      href={href}
-      onClick={handleClick}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
-    >
-      <span><strong>{children}</strong><small>{detail}</small></span><i aria-hidden="true">{external ? "↗︎" : "→"}</i>
+    <a className={className} href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined} onClick={handleClick}>
+      <span className="profile-link-number">{number}</span>
+      <span className="profile-link-copy"><strong>{title}</strong><small>{detail}</small></span>
+      <i aria-hidden="true">↗</i>
     </a>
   );
 }
 
-function WhatsAppButton({ compact = false }: { compact?: boolean }) {
+function ButterflyLoop({ className = "" }: { className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const sprite = new window.Image();
+    let request = 0;
+    let lastFrame = -1;
+
+    const draw = (frame: number) => {
+      if (frame === lastFrame) return;
+      const column = frame % 4;
+      const row = Math.floor(frame / 4);
+      context.clearRect(0, 0, 256, 256);
+      context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+      lastFrame = frame;
+    };
+
+    const animate = (time: number) => {
+      draw(Math.floor(time / 92) % 16);
+      request = window.requestAnimationFrame(animate);
+    };
+
+    sprite.onload = () => {
+      draw(0);
+      if (!reduced && !connection?.saveData) request = window.requestAnimationFrame(animate);
+    };
+    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+
+    return () => {
+      if (request) window.cancelAnimationFrame(request);
+    };
+  }, []);
+
+  return <span className={`link-butterfly ${className}`} aria-hidden="true"><canvas ref={canvasRef} width="256" height="256" /></span>;
+}
+
+function ConvergingGallery() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      section.style.setProperty("--rail-top", "-2%");
+      section.style.setProperty("--rail-bottom", "-2%");
+      section.style.setProperty("--rail-focus", "1");
+      return;
+    }
+    let frame = 0;
+    let target = 0;
+    let current = 0;
+    let previous = performance.now();
+
+    const read = () => {
+      const rect = section.getBoundingClientRect();
+      const range = Math.max(rect.height + window.innerHeight, 1);
+      return Math.min(1, Math.max(0, (window.innerHeight - rect.top) / range));
+    };
+
+    const paint = (progress: number) => {
+      const eased = progress * progress * (3 - 2 * progress);
+      const encounterProgress = Math.min(1, eased / .68);
+      const encounter = encounterProgress * encounterProgress * (3 - 2 * encounterProgress);
+      const dissolveProgress = Math.min(1, Math.max(0, (eased - .56) / .44));
+      const dissolve = dissolveProgress * dissolveProgress * (3 - 2 * dissolveProgress);
+      section.style.setProperty("--rail-top", `${-22 + encounter * 38}%`);
+      section.style.setProperty("--rail-bottom", `${16 - encounter * 38}%`);
+      section.style.setProperty("--rail-focus", String(1 - dissolve * .82));
+      section.style.setProperty("--rail-blur", `${(dissolve * 5).toFixed(2)}px`);
+    };
+
+    const animate = (time: number) => {
+      const delta = Math.min(48, time - previous);
+      previous = time;
+      const desiredStep = (target - current) * (1 - Math.exp(-delta / 190));
+      const maxStep = delta / 1300;
+      current += Math.max(-maxStep, Math.min(maxStep, desiredStep));
+      if (Math.abs(target - current) < .0003) current = target;
+      paint(current);
+      if (current !== target) frame = window.requestAnimationFrame(animate);
+      else frame = 0;
+    };
+
+    const update = () => {
+      target = read();
+      if (!frame) {
+        previous = performance.now();
+        frame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    target = read();
+    current = target;
+    paint(current);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
-    <button className={`liquid-whatsapp ${compact ? "liquid-whatsapp-compact" : ""}`} type="button" disabled aria-label="Falar no WhatsApp — número ainda não cadastrado">
-      <span className="whatsapp-icon" aria-hidden="true">◌</span>
-      <span><strong>Falar no WhatsApp</strong><small>Canal pronto para receber o número</small></span>
-      <i aria-hidden="true">→</i>
-    </button>
+    <section className="link-gallery" ref={sectionRef} aria-labelledby="link-gallery-title">
+      <div className="link-gallery-heading" data-link-reveal>
+        <p>Seleções Helena</p>
+        <h2 id="link-gallery-title">Duas leituras.<br /><em>Um mesmo encontro.</em></h2>
+      </div>
+      <div className="converging-rails" aria-label="Duas galerias horizontais Helena Joias">
+        <div className="gallery-rail gallery-rail-top">
+          {topGallery.map((image) => <figure key={image.src}><img src={image.src} alt={image.alt} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+        </div>
+        <div className="rail-meeting" aria-hidden="true"><ButterflyLoop className="link-butterfly-meeting" /></div>
+        <div className="gallery-rail gallery-rail-bottom">
+          {bottomGallery.map((image) => <figure key={image.src}><img src={image.src} alt={image.alt} width="1170" height="1560" loading="lazy" decoding="async" /></figure>)}
+        </div>
+      </div>
+      <p className="link-gallery-note" data-link-reveal>Role devagar: as duas seleções se aproximam, se atravessam e abrem espaço para a próxima descoberta.</p>
+    </section>
+  );
+}
+
+function LinkVideo({ src, poster, label }: { src: string; poster: string; label: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio > .45 && !reduced) void video.play().catch(() => undefined);
+      else video.pause();
+    }, { threshold: [0, .45, .8] });
+    observer.observe(video);
+    return () => {
+      observer.disconnect();
+      video.pause();
+    };
+  }, []);
+
+  return (
+    <figure className="link-video-card">
+      <video ref={videoRef} muted playsInline loop preload="metadata" poster={poster} aria-label={label}>
+        <source src={src} type="video/mp4" />
+      </video>
+      <figcaption>{label}</figcaption>
+    </figure>
   );
 }
 
@@ -46,7 +226,7 @@ export default function InstagramLinks() {
           observer.unobserve(entry.target);
         }
       });
-    }, { rootMargin: "0px 0px -10%", threshold: .14 });
+    }, { rootMargin: "0px 0px -8%", threshold: .12 });
     revealItems.forEach((item) => observer.observe(item));
 
     const update = () => {
@@ -64,94 +244,61 @@ export default function InstagramLinks() {
 
   return (
     <main className="link-page">
-      <div className="intro-curtain" aria-hidden="true"><span className="intro-mark">HELENA</span></div>
+      <div className="link-intro-curtain" aria-hidden="true"><span>HELENA</span></div>
       <div className="exit-curtain" aria-hidden="true" />
       <div className="link-progress" aria-hidden="true" />
 
       <header className="link-header">
-        <Link href="/" className="link-home" aria-label="Voltar para Helena Joias" onClick={(event) => {
+        <Link href="/" className="link-home" aria-label="Abrir o site completo da Helena Joias" onClick={(event) => {
           event.preventDefault();
           document.documentElement.classList.add("is-leaving");
-          window.setTimeout(() => { window.location.href = "/"; }, 420);
+          window.setTimeout(() => { window.location.href = "/"; }, 380);
         }}><span aria-hidden="true">←</span> Site completo</Link>
-        <p>Helena <i /> beleza <i /> presença</p>
+        <span>@helenaajoias</span>
       </header>
 
-      <section className="link-hero" aria-labelledby="link-title">
-        <div className="liquid-orb liquid-orb-one" aria-hidden="true" />
-        <div className="liquid-orb liquid-orb-two" aria-hidden="true" />
-        <div className="link-hero-inner">
-          <div className="link-brand-mark">
-            <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" fetchPriority="high" decoding="async" />
-          </div>
-          <p className="link-handle">@helenaajoias · um novo conceito em joias</p>
-          <h1 id="link-title">Entre para conhecer.<br /><em>Fique para encontrar o seu brilho.</em></h1>
-          <p className="link-deck">A Helena é uma experiência de descoberta: joias, detalhes e composições para olhar de perto, combinar e escolher do seu jeito.</p>
+      <section className="profile-hero" aria-labelledby="link-title">
+        <div className="profile-glow" aria-hidden="true" />
+        <ButterflyLoop className="link-butterfly-hero" />
+        <div className="profile-brand">
+          <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" fetchPriority="high" decoding="async" />
+        </div>
+        <p className="profile-kicker">Um novo conceito em joias</p>
+        <h1 id="link-title">Seu brilho<br /><em>começa aqui.</em></h1>
+        <p className="profile-deck">Conheça a Helena, explore as coleções e escolha o próximo passo.</p>
 
-          <nav className="liquid-links" aria-label="Links principais da Helena Joias">
-            <LiquidLink href="/#colecoes" detail="Veja as três experiências visuais" primary>Explorar as coleções</LiquidLink>
-            <LiquidLink href="https://www.instagram.com/helenaajoias/" detail="Acompanhe novidades e inspirações" external>Ver Instagram</LiquidLink>
-            <WhatsAppButton />
-            <button className="liquid-route" type="button" disabled aria-label="Traçar rota — endereço ainda não cadastrado">
-              <span><strong>Traçar rota</strong><small>Endereço a confirmar</small></span><i aria-hidden="true">⌖</i>
-            </button>
-          </nav>
-          <a className="link-scroll-cue" href="#encontre">Descubra a Helena <span aria-hidden="true">↓</span></a>
+        <nav className="profile-links" aria-label="Links principais da Helena Joias">
+          <ProfileLink number="01" title="Falar no WhatsApp" detail="Atendimento direto" primary disabled />
+          <ProfileLink number="02" title="Traçar rota" detail="Encontre a Helena" disabled />
+          <ProfileLink number="03" title="Ver Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
+          <ProfileLink number="04" title="Site completo" detail="Viva a experiência Helena" href="/" />
+        </nav>
+
+        <div className="profile-hours" aria-label="Horário de funcionamento">
+          <span>Seg–Sex <b>08h–18h</b></span><i /><span>Sáb <b>08h–12h</b></span>
         </div>
       </section>
 
-      <section className="link-discovery" id="encontre" aria-labelledby="discovery-title">
-        <div className="link-section-heading" data-link-reveal>
-          <p>O que você encontra aqui</p>
-          <h2 id="discovery-title">Uma loja para descobrir<br /><em>novas formas de brilhar.</em></h2>
-        </div>
-        <div className="discovery-grid">
-          <article className="discovery-card discovery-card-one" data-link-reveal>
-            <span>01</span><i aria-hidden="true" />
-            <h3>Detalhes que aproximam</h3>
-            <p>Joias para observar de perto e perceber o desenho, o brilho e a presença de cada composição.</p>
-          </article>
-          <article className="discovery-card discovery-card-two" data-link-reveal>
-            <span>02</span><i aria-hidden="true" />
-            <h3>Combinações com intenção</h3>
-            <p>Camadas, volumes e pontos de luz para criar um jeito de usar que conversa com você.</p>
-          </article>
-          <article className="discovery-card discovery-card-three" data-link-reveal>
-            <span>03</span><i aria-hidden="true" />
-            <h3>Escolhas para cada momento</h3>
-            <p>Peças que acompanham o cotidiano, marcam encontros e dão uma nova leitura ao look.</p>
-          </article>
-        </div>
-      </section>
+      <ConvergingGallery />
 
-      <section className="link-ritual" aria-labelledby="ritual-title">
-        <div className="ritual-orbit" aria-hidden="true"><i /><i /><i /></div>
-        <div className="ritual-copy" data-link-reveal>
-          <p>O ritual Helena</p>
-          <h2 id="ritual-title">Ver.<br />Combinar.<br /><em>Escolher.</em></h2>
+      <section className="link-motion" aria-labelledby="link-motion-title">
+        <div className="link-motion-copy" data-link-reveal>
+          <p>Por dentro da Helena</p>
+          <h2 id="link-motion-title">O brilho muda<br /><em>quando você se move.</em></h2>
         </div>
-        <p className="ritual-note" data-link-reveal>Não é só sobre encontrar uma joia. É sobre reconhecer o detalhe que muda a composição — e faz você querer olhar outra vez.</p>
-      </section>
-
-      <section className="link-visit" aria-labelledby="visit-title">
-        <div className="link-liquid-jewel" aria-hidden="true" />
-        <div className="visit-copy" data-link-reveal>
-          <p>Venha viver de perto</p>
-          <h2 id="visit-title">A Helena espera<br /><em>pelo seu encontro.</em></h2>
-          <p>Segunda a sexta, das 08h às 18h.<br />Sábado, das 08h às 12h.</p>
+        <div className="link-video-pair" data-link-reveal>
+          <LinkVideo src="/media/atelier-1.mp4" poster="/media/atelier-1-poster.jpg" label="Joias no look" />
+          <LinkVideo src="/media/atelier-2.mp4" poster="/media/atelier-2-poster.jpg" label="Seleção de peças" />
         </div>
-        <div className="visit-actions" data-link-reveal>
-          <WhatsAppButton compact />
-          <LiquidLink href="https://www.instagram.com/helenaajoias/" detail="@helenaajoias" external primary>Acompanhar no Instagram</LiquidLink>
-          <button className="liquid-route" type="button" disabled aria-label="Traçar rota — endereço ainda não cadastrado">
-            <span><strong>Traçar rota</strong><small>Será ativada com o endereço</small></span><i aria-hidden="true">⌖</i>
-          </button>
+        <div className="link-final-links" data-link-reveal>
+          <ProfileLink number="→" title="Falar no WhatsApp" detail="Atendimento direto" primary disabled />
+          <ProfileLink number="↗" title="Acompanhar no Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
         </div>
       </section>
 
       <footer className="link-footer">
         <span>Helena Joias</span><span>Beleza · brilho · exclusividade</span>
-        <Link href="/">Ver experiência completa <span aria-hidden="true">↗︎</span></Link>
+        <Link href="/">Experiência completa <span aria-hidden="true">↗︎</span></Link>
       </footer>
     </main>
   );

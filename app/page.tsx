@@ -289,33 +289,58 @@ function ScrollGallery({
     const section = sectionRef.current;
     if (!section) return;
     let frame = 0;
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let previousTime = performance.now();
 
-    const update = () => {
-      frame = 0;
+    const readProgress = () => {
       const rect = section.getBoundingClientRect();
       const range = Math.max(section.offsetHeight - window.innerHeight, 1);
-      const progress = Math.min(1, Math.max(0, -rect.top / range));
+      return Math.min(1, Math.max(0, -rect.top / range));
+    };
+
+    const paint = (progress: number) => {
       const stepped = progress * images.length;
       const nextActive = Math.min(images.length - 1, Math.floor(stepped));
       const phase = nextActive === images.length - 1 ? Math.min(1, stepped - nextActive) : stepped - nextActive;
+      const blend = phase * phase * phase * (phase * (phase * 6 - 15) + 10);
 
       section.style.setProperty("--story-progress", String(progress));
-      section.style.setProperty("--story-phase", String(phase));
-      section.style.setProperty("--story-reveal", `${100 - phase * 100}%`);
-      section.style.setProperty("--story-circle", `${phase * 74}%`);
-      section.style.setProperty("--story-active-scale", String(1.13 - phase * .09));
-      section.style.setProperty("--story-active-lift", `${phase * -1.6}%`);
-      section.style.setProperty("--story-active-saturation", String(.88 + phase * .12));
-      section.style.setProperty("--story-next-scale", String(1.18 - phase * .16));
-      section.style.setProperty("--story-next-rotate", `${(1 - phase) * 1.2}deg`);
+      section.style.setProperty("--story-blend", String(blend));
+      section.style.setProperty("--story-next-opacity", String(blend));
+      section.style.setProperty("--story-active-scale", String(1.055 - blend * .025));
+      section.style.setProperty("--story-active-lift", `${blend * -.45}%`);
+      section.style.setProperty("--story-active-saturation", String(.96 + blend * .04));
+      section.style.setProperty("--story-next-scale", String(1.035 - blend * .015));
       setActive((current) => current === nextActive ? current : nextActive);
     };
 
-    const requestUpdate = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
+    const animate = (time: number) => {
+      const delta = Math.min(48, time - previousTime);
+      previousTime = time;
+      const smoothing = 1 - Math.exp(-delta / 185);
+      const desiredStep = (targetProgress - currentProgress) * smoothing;
+      const maxStep = delta / 1350;
+      currentProgress += Math.max(-maxStep, Math.min(maxStep, desiredStep));
+
+      if (Math.abs(targetProgress - currentProgress) < .00025) currentProgress = targetProgress;
+      paint(currentProgress);
+
+      if (currentProgress !== targetProgress) frame = window.requestAnimationFrame(animate);
+      else frame = 0;
     };
 
-    update();
+    const requestUpdate = () => {
+      targetProgress = readProgress();
+      if (!frame) {
+        previousTime = performance.now();
+        frame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    targetProgress = readProgress();
+    currentProgress = targetProgress;
+    paint(currentProgress);
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
     return () => {
@@ -408,7 +433,7 @@ function ExperienceBridge({
             </button>
             {showRoute ? (
               <button className="route-pending" type="button" disabled aria-label="Traçar rota — endereço ainda não cadastrado">
-                <span>Traçar rota</span><small>endereço a confirmar</small>
+                <span>Traçar rota</span><small>Como chegar</small>
               </button>
             ) : null}
           </div>
@@ -554,7 +579,7 @@ export default function Home() {
         id="visite"
         eyebrow="A próxima escolha começa aqui"
         title={<>Venha viver<br /><em>a Helena.</em></>}
-        description="De segunda a sexta, das 08h às 18h. Aos sábados, das 08h às 12h. A rota será ativada assim que o endereço for confirmado."
+        description="De segunda a sexta, das 08h às 18h. Aos sábados, das 08h às 12h. Um convite para ver cada detalhe de perto e escolher sem pressa."
         variant="orbit"
         showRoute
       />

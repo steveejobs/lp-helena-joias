@@ -17,3 +17,11 @@
 ## Movimento transversal da borboleta
 
 A borboleta reaparece somente depois da primeira dobra. Seus 16 quadros são escolhidos pela posição de rolagem: ela para quando o usuário para, muda de pose ao avançar e nunca funciona como autoplay. A posição varia poucos pixels, a opacidade é limitada, o contraste alterna entre `multiply` e `screen`, e o elemento não recebe eventos de ponteiro. A presença é removida antes do rodapé e completamente desativada em reduced motion ou economia de dados.
+
+## Sistema mobile da rota `/instagram`
+
+| Bloco | Função | Movimento | CTA |
+|---|---|---|---|
+| Perfil + links | cumprir a função de Linktree na primeira dobra | loop discreto da borboleta | WhatsApp, rota, Instagram e site |
+| Galerias convergentes | entregar uma assinatura visual curta | duas faixas horizontais opostas, máscara central e borboleta no encontro | — |
+| Em movimento | provar a experiência com mídia real | dois vídeos com reprodução contextual | WhatsApp e Instagram |

@@ -18,7 +18,7 @@
 | RQ-014 | Reduced motion mantém conteúdo e funções | todas | todos | P0 | accessibility | aprovado | CSS de fallback sem ocultar conteúdo |
 | RQ-015 | Nenhum fato comercial não confirmado | todas | todos | P0 | content | aprovado | revisão contra source-of-truth |
 | RQ-016 | Galerias avançam exclusivamente pelo scroll, sem botões ou autoplay | `/` | todos | P0 | interaction | aprovado | sticky stories e progresso ligado à rolagem |
-| RQ-017 | Nenhuma fotografia editorial é repetida entre rotas ou seções | todas | todos | P0 | content | aprovado | inventário automatizado de `gallery-*.jpg` |
+| RQ-017 | Nenhuma fotografia editorial é repetida dentro da mesma rota | todas | todos | P0 | content | aprovado | inventário automatizado por rota; a rota social reutiliza séries da home por pedido posterior |
 | RQ-018 | Remover a seção e os ornamentos tipográficos “HJ” | todas | todos | P0 | visual | aprovado | busca de código e inspeção visual |
 | RQ-019 | Exibir WhatsApp como indisponível até haver número confirmado | todas | todos | P0 | conversion + content | aprovado | botões `disabled`, sem `href` |
 | RQ-020 | Usar a sequência `frames logo` na ordem visual, independentemente dos saltos na numeração dos arquivos | `/` | todos | P0 | content + technical | aprovado | 122 quadros ordenados e processados sem lacunas visuais |
@@ -31,4 +31,10 @@
 | RQ-027 | Distribuir CTAs ao longo da home | `/` | todos | P0 | conversion | aprovado | hero, três galerias, três pontes e rodapé |
 | RQ-028 | Encurtar as galerias e inserir experiências distintas entre elas | `/` | todos | P0 | UX + narrative | aprovado | nova fórmula de altura e três `ExperienceBridge` |
 | RQ-029 | Preparar CTA de rota sem inventar endereço ou coordenadas | todas | todos | P0 | conversion + content | aprovado | botões de rota desativados e rotulados como pendentes |
-| RQ-030 | Transformar `/instagram` em apresentação comercial da loja inspirada nas referências | `/instagram` | todos | P0 | content + conversion | aprovado | hero, descoberta, ritual, visita e links prioritários |
+| RQ-030 | Transformar `/instagram` em Linktree personalizado inspirado nas referências | `/instagram` | todos | P0 | content + conversion | aprovado | perfil curto, links prioritários, vitrine horizontal, vídeos e fechamento |
+| RQ-031 | Tornar a troca das imagens uniforme e independente da velocidade do scroll | `/` | todos | P0 | interaction + UX | aprovado | alvo interpolado em 185 ms com velocidade máxima limitada por tempo |
+| RQ-032 | Priorizar a experiência mobile da home e da rota social | todas | mobile | P0 | responsive + UX | aprovado | primeira dobra compacta, CTAs em grade, stories 54/46 e página social limitada a 46 rem |
+| RQ-033 | Exibir na rota social duas galerias horizontais sobrepostas que convergem e desaparecem no centro | `/instagram` | mobile | P0 | interaction + visual | aprovado | séries 1 e 2 em faixas opostas, máscara central e interpolação de 170 ms |
+| RQ-034 | Reutilizar os dois vídeos na rota social em uma seção curta | `/instagram` | mobile | P0 | media | aprovado | reprodução contextual e pausa fora da viewport |
+| RQ-035 | Usar o loop da borboleta de forma criativa na rota social | `/instagram` | mobile | P0 | brand + motion | aprovado | sprite animado no perfil e no encontro das faixas |
+| RQ-036 | Preparar e publicar as duas rotas no projeto Vercel existente | todas | todos | P0 | deployment | aprovado | build Next estático e alias de produção validados com HTTP 200 |

@@ -3,7 +3,7 @@
 | Rota | Público | Origem | Ofertas obrigatórias | CTA primário | CTA secundário | Mídia obrigatória |
 |---|---|---|---|---|---|---|
 | `/` | público geral | busca, direto e social | marca, loja, três coleções, experiências, horários | descobrir a loja | WhatsApp/rota pendentes + Instagram | 11 fotos + 2 vídeos + logo HQ |
-| `/instagram` | público social | Instagram/QR/mensagem | marca, proposta da loja, descoberta em três atos, horários | explorar coleções | WhatsApp/rota pendentes + Instagram/home | logo + esculturas líquidas em CSS |
+| `/instagram` | público social | Instagram/QR/mensagem | marca, links concentrados, duas vitrines, horários | WhatsApp pendente | rota pendente + Instagram/home | logo + 8 fotos + 2 vídeos + loop da borboleta |
 
 | ID | Requisito | Fonte | Rotas obrigatórias | Primeira dobra | Componente | Status | Evidência |
 |---|---|---|---|---|---|---|---|

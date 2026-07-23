@@ -62,26 +62,31 @@ test("renders the branded links route", async () => {
   const html = await response.text();
 
   assert.equal(response.status, 200);
-  assert.match(html, /Entre para conhecer/);
-  assert.match(html, /O que você encontra aqui/);
-  assert.match(html, /Explorar as coleções/);
+  assert.match(html, /Seu brilho/);
+  assert.match(html, /Duas leituras/);
+  assert.match(html, /Duas galerias horizontais/);
   assert.match(html, /Ver Instagram/);
   assert.match(html, /Falar no WhatsApp/);
   assert.match(html, /Traçar rota/);
+  assert.match(html, /atelier-1\.mp4/);
+  assert.match(html, /atelier-2\.mp4/);
   assert.match(html, /https:\/\/www\.instagram\.com\/helenaajoias\//);
-  assert.doesNotMatch(html, /gallery-1-3\.jpg/);
+  assert.match(html, /gallery-1-3\.jpg/);
+  assert.match(html, /gallery-2-4\.jpg/);
 });
 
-test("uses every editorial photograph only once and removes the HJ ornament", async () => {
+test("uses every editorial photograph only once per route and removes the HJ ornament", async () => {
   const [home, links] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/instagram/page.tsx", import.meta.url), "utf8"),
   ]);
-  const source = `${home}\n${links}`;
-  const photographs = source.match(/\/media\/gallery-[1-3]-[1-4]\.jpg/g) ?? [];
+  const homePhotographs = home.match(/\/media\/gallery-[1-3]-[1-4]\.jpg/g) ?? [];
+  const linkPhotographs = links.match(/\/media\/gallery-[1-3]-[1-4]\.jpg/g) ?? [];
 
-  assert.equal(photographs.length, new Set(photographs).size);
-  assert.doesNotMatch(source, />HJ</);
+  assert.equal(homePhotographs.length, new Set(homePhotographs).size);
+  assert.equal(linkPhotographs.length, new Set(linkPhotographs).size);
+  assert.equal(linkPhotographs.length, 8);
+  assert.doesNotMatch(`${home}\n${links}`, />HJ</);
 });
 
 test("ships the high-resolution logo formation and scroll-driven butterfly assets", async () => {
@@ -112,4 +117,8 @@ test("keeps contact CTAs prominent but inactive until data is confirmed", async 
   assert.match(source, /Traçar rota/);
   assert.doesNotMatch(source, /wa\.me|api\.whatsapp\.com|google\.com\/maps\/dir/);
   assert.doesNotMatch(source, /images\.length \+ \.85/);
+  assert.match(home, /Math\.exp\(-delta \/ 185\)/);
+  assert.match(home, /const maxStep = delta \/ 1350/);
+  assert.match(links, /Math\.exp\(-delta \/ 190\)/);
+  assert.match(links, /const maxStep = delta \/ 1300/);
 });

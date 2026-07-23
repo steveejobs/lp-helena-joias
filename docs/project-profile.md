@@ -6,16 +6,16 @@ primary_goal: branding + store presentation + visit intent + contact
 primary_route: "/"
 secondary_routes:
   - "/instagram"
-primary_device: balanced
+primary_device: mobile-first em `/instagram`; responsivo equilibrado em `/`
 traffic_origin: mixed, com prioridade social em "/instagram"
 motion_level: expressive
-carousel_policy: autoplay com interação manual e pausa contextual
+carousel_policy: home dirigida por scroll suavizado; `/instagram` com duas faixas horizontais convergentes
 video_policy: simultaneous-visible apenas quando ambos estiverem na viewport
 content_source: static, fornecido pelo Google Drive
 conversion_action: loja + instagram + WhatsApp pendente + rota pendente
 performance_priority: visual-first com limites de carregamento
 accessibility_level: wcag-aa
-deployment_policy: preview-first
+deployment_policy: Vercel production + local validation
 ```
 
 ## Tese criativa
@@ -25,7 +25,7 @@ deployment_policy: preview-first
 ## Arquitetura
 
 - `/`: apresentação da loja, dois vídeos reais, três galerias independentes mais compactas, experiências entre galerias, horários e CTAs distribuídos.
-- `/instagram`: landing social Liquid3 com apresentação da loja, descoberta em três atos, horários, coleções, home, Instagram oficial e contatos preparados.
+- `/instagram`: Linktree editorial mobile-first com identidade, quatro links na abertura, duas galerias horizontais convergentes, loop da borboleta, dois vídeos e fechamento social.
 
 ## Vocabulário de motion
 

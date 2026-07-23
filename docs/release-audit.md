@@ -2,10 +2,10 @@
 
 | Rota | Viewport | Ambiente | Build | Resultado | Evidência |
 |---|---|---|---|---|---|
-| `/` | desktop | build + contrato | local validado | aprovado estruturalmente | formação HQ, CTAs, galerias compactas, três pontes e borboleta por scroll |
-| `/instagram` | desktop | build + contrato | local validado | aprovado estruturalmente | apresentação da loja, descoberta, ritual, visita e contatos pendentes |
-| `/` | mobile | regras responsivas | build validado | aprovado com CSS responsivo | breakpoints, galerias mais curtas, pontes em pilha e CTAs evidentes |
-| `/instagram` | mobile | regras responsivas | build validado | aprovado com CSS responsivo | links em pilha, seções editoriais, safe areas e touch targets |
+| `/` | desktop | Vercel produção | build validado | aprovado | formação HQ, CTAs, galerias compactas e transição limitada por tempo |
+| `/instagram` | desktop | Vercel produção | build validado | aprovado | canvas centralizado, links prioritários, galeria convergente e vídeos |
+| `/` | 390 × 844 | emulação touch + produção | build validado | aprovado | hero sem cortes, galeria 54/46, CTAs evidentes e transições uniformes |
+| `/instagram` | 390 × 844 | emulação touch + produção | build validado | aprovado | quatro links imediatos, oito fotos, dois vídeos, duas borboletas e safe areas |
 
 ## Validações executadas
 
@@ -16,16 +16,21 @@
 - O fundo verde foi removido com reconstrução pelo quadro-base, matte suave, despill e reposição de bronze nas bordas. A sequência final foi revisada em pranchas sobre fundo rosé e escuro.
 - A abertura mantém o hero e suas letras pausados até o evento de conclusão; depois, cabeçalho, tipografia e fotografia iniciam suas próprias entradas.
 - A borboleta do scroll foi verificada com opacidade progressiva, troca de contraste entre superfícies claras/escuras, ausência de captura de ponteiro e fade total antes do rodapé.
-- As três galerias preservam suas séries e efeitos — recorte vertical, recorte lateral e expansão circular — com altura reduzida de cerca de 43% no desktop e 45% no mobile.
+- As galerias da home preservam suas séries com interpolação temporal de 185 ms, `smootherstep` e velocidade máxima limitada; a apresentação não depende da força do gesto.
+- No mobile, a composição sticky da home usa divisão aproximada de 54/46 entre imagem e narrativa, reservando mais espaço para leitura e ação.
 - Três pontes comerciais diferentes foram incluídas entre e após as galerias; todas possuem entrada de seção e CTAs intermediários.
 - Botões manuais e autoplay foram removidos das galerias; zoom, corte e progresso são derivados da posição de rolagem.
 - A seção/ornamentos “HJ” permanecem removidos. O WhatsApp ganhou alto contraste e continua semanticamente desativado nas duas rotas; a rota também permanece desativada sem endereço confirmado.
-- As três referências `/instagram` foram abertas e comparadas; a Helena usa seus princípios de hierarquia e conversão sem copiar identidade ou fatos comerciais.
+- As três referências `/instagram` foram reabertas e comparadas nesta iteração; a Helena aplica a apresentação curta, vitrine imediata, hierarquia de links e fechamento audiovisual sem copiar identidade ou fatos comerciais.
+- O `/instagram` foi reduzido a um Linktree editorial mobile-first: quatro links aparecem na primeira dobra, seguidos por duas galerias horizontais que avançam em sentidos opostos, convergem e desaparecem por máscara central.
+- A galeria convergente usa oito fotografias, interpolação de 190 ms, velocidade limitada, dissolução progressiva e uma borboleta discreta no encontro. Os dois vídeos existentes compõem o fechamento da experiência.
+- Os CTAs pendentes mantêm aparência ativa e alto contraste, mas permanecem semanticamente desativados e sem destinos inventados.
 - Navegação com cortina de saída entre `/instagram` e `/` concluída.
 - DOM contém um único H1 por rota, headings ordenados, links reais, botões reais e textos alternativos.
 - Conteúdo revisto contra `source-of-truth.md`; nenhum número de WhatsApp foi inventado e o CTA permanece inativo.
-- Lint, build de produção, manifesto Sites e `git diff --check` aprovados.
+- Lint da aplicação, TypeScript, build Next/Vercel e `git diff --check` aprovados.
+- Produção Vercel publicada no projeto existente e validada com HTTP 200 em `/`, `/instagram`, fotografia e vídeo.
 
 ## Limitações verificadas
 
-- A prévia local iniciou e permaneceu saudável, mas o navegador controlado bloqueou o endereço interno antes de carregar a página. Por isso, esta revisão não possui nova captura física das rotas; a validação final desta iteração é estrutural, de build, contrato e QA separado dos assets transparentes.
+- O identificador salvo em `.openai/hosting.json` não foi encontrado pelo conector Sites; a publicação solicitada foi concluída pelo projeto Vercel já existente.
