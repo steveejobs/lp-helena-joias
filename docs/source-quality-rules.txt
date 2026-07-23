@@ -1,0 +1,2445 @@
+O erro recorrente não foi falta de técnica. Foi **ausência de memória operacional**: cada rodada tratou o pedido atual como isolado, sem carregar requisitos anteriores como contrato permanente. A skill que você já tinha acerta ao exigir escopo estreito, mobile-first, performance e validação visual, mas faltava o mecanismo que impede regressão: **registro de requisitos, matriz de impacto, critérios de aceite e prova obrigatória por mudança**.  
+
+Uma skill também precisa ser acionável, ter escopo claro e carregar instruções profundas apenas quando a tarefa exigir.  
+
+Salve o conteúdo abaixo como `SKILL.md`.
+
+````md
+---
+name: web-experience-quality-control
+description: Planeja, cria, revisa, corrige e valida landing pages, páginas institucionais, páginas de bio, vitrines digitais e experiências web responsivas, prevenindo regressões de layout, copy, mídia, motion, performance, acessibilidade e deployment.
+---
+
+# Web Experience Quality Control
+
+## 1. Objetivo
+
+Esta skill existe para impedir que projetos web entrem no ciclo de:
+
+1. corrigir um problema;
+2. quebrar outro;
+3. repetir uma solicitação já feita;
+4. criar remendos sucessivos;
+5. terminar com uma página tecnicamente funcional, porém incoerente.
+
+Ela deve ser usada em:
+
+- landing pages;
+- sites institucionais;
+- páginas de campanha;
+- páginas de bio;
+- vitrines de produtos;
+- páginas locais;
+- portfólios;
+- páginas com galerias;
+- páginas com vídeos;
+- páginas com carrosséis;
+- páginas com conteúdo remoto;
+- projetos mobile-first;
+- refinamentos visuais;
+- auditorias pré-deploy;
+- limpeza final de projeto.
+
+Esta skill não assume que todos os projetos precisam de:
+
+- autoplay;
+- carrossel;
+- vídeos simultâneos;
+- WebGL;
+- 3D;
+- página de bio;
+- notícias;
+- marcas;
+- prova social;
+- WhatsApp;
+- motion expressivo.
+
+Essas decisões devem ser declaradas no perfil de cada projeto.
+
+---
+
+# 2. Princípio central
+
+Premium não significa adicionar mais elementos.
+
+Premium significa:
+
+- decisão clara;
+- direção coerente;
+- proporção;
+- hierarquia;
+- ritmo;
+- acabamento;
+- estabilidade;
+- desempenho;
+- intenção.
+
+Uma página pode ter 3D e continuar parecendo genérica.
+
+Uma página pode ser visualmente simples e parecer extremamente sofisticada.
+
+O agente deve perguntar:
+
+1. O que esta página precisa fazer?
+2. Para quem?
+3. Em qual dispositivo?
+4. Qual ação deve acontecer?
+5. Qual elemento deve ser lembrado?
+6. O que precisa permanecer estável?
+7. Qual custo técnico a solução cria?
+8. O ganho visual justifica esse custo?
+
+---
+
+# 3. Regra de ouro: requisitos são contratos
+
+Nenhum requisito aprovado pode ser esquecido em rodadas posteriores.
+
+Antes de implementar qualquer alteração, criar ou atualizar:
+
+`docs/requirements-ledger.md`
+
+Formato obrigatório:
+
+| ID | Requisito | Rota | Dispositivo | Prioridade | Status | Evidência | Commit |
+|---|---|---|---|---|---|---|---|
+| RQ-001 | CTA principal visível na primeira dobra | `/` | mobile | P0 | aprovado | screenshot | hash |
+| RQ-002 | Galeria avança automaticamente | `/colecao` | todos | P1 | aprovado | gravação | hash |
+| RQ-003 | Vídeos pausam fora da viewport | todas | todos | P0 | aprovado | teste browser | hash |
+
+Status permitidos:
+
+- pendente;
+- em implementação;
+- aprovado;
+- reprovado;
+- bloqueado;
+- substituído.
+
+Um requisito só pode ser marcado como aprovado com evidência.
+
+Nunca aceitar:
+
+- “funciona”;
+- “parece correto”;
+- “QA passou”;
+- “sem erros”.
+
+Exigir:
+
+- screenshot;
+- gravação;
+- DOM;
+- console;
+- network;
+- teste automatizado;
+- resultado reproduzível.
+
+---
+
+# 4. Perfil obrigatório do projeto
+
+Antes de desenhar ou alterar qualquer coisa, registrar:
+
+`docs/project-profile.md`
+
+```yaml
+project_type:
+  landing | institutional | bio | ecommerce | campaign | portfolio | other
+
+primary_goal:
+  lead | sale | contact | booking | navigation | branding | education
+
+primary_route:
+  "/"
+
+secondary_routes:
+  - "/example"
+
+primary_device:
+  mobile | desktop | balanced
+
+traffic_origin:
+  instagram | google | ads | direct | mixed | unknown
+
+motion_level:
+  none | subtle | editorial | expressive
+
+carousel_policy:
+  none | manual | autoplay | infinite-loop
+
+video_policy:
+  none | single-active | simultaneous-visible
+
+content_source:
+  static | cms | external-api | mixed
+
+conversion_action:
+  whatsapp | form | checkout | booking | route | other
+
+performance_priority:
+  strict | balanced | visual-first
+
+accessibility_level:
+  baseline | wcag-aa
+
+deployment_policy:
+  preview-first | production-direct
+````
+
+Nenhuma decisão específica de um projeto deve virar regra universal.
+
+Exemplos:
+
+* páginas vindas do Instagram tendem a exigir prioridade mobile;
+* páginas corporativas B2B podem ter desktop relevante;
+* vídeos simultâneos podem ser aceitáveis em um projeto e péssimos em outro;
+* autoplay pode valorizar uma vitrine e prejudicar uma página informativa;
+* uma bio page pode ser curta ou editorial, conforme a função.
+
+---
+
+# 5. Fonte única da verdade
+
+Criar:
+
+`docs/source-of-truth.md`
+
+Separar:
+
+## Fatos confirmados
+
+* nome;
+* localização;
+* contatos;
+* serviços;
+* produtos;
+* marcas;
+* preços;
+* prazos;
+* garantias;
+* avaliações;
+* horários;
+* certificações;
+* domínios;
+* links oficiais.
+
+## Fatos não confirmados
+
+Tudo que não estiver confirmado deve ser tratado como proibido.
+
+Nunca inventar:
+
+* avaliações;
+* disponibilidade;
+* estoque;
+* prazos;
+* promoções;
+* endereço;
+* garantias;
+* resultados;
+* certificações;
+* parcerias;
+* exclusividade;
+* depoimentos;
+* estatísticas.
+
+## Claims permitidos
+
+Toda afirmação comercial deve estar ligada a:
+
+* fato comprovado;
+* benefício plausível;
+* linguagem não enganosa.
+
+---
+
+# 6. Inventário e semântica dos assets
+
+Criar:
+
+`docs/assets-manifest.md`
+
+Para cada arquivo registrar:
+
+| Arquivo | Tipo | Dimensões | Peso | Série | Conteúdo | Uso | Status |
+| ------- | ---- | --------: | ---: | ----- | -------- | --- | ------ |
+
+## Regra crítica sobre nomes
+
+Não assumir que arquivos numerados são independentes.
+
+Exemplos:
+
+* `1 (1)`, `1 (2)`, `1 (3)`;
+* `look-a-01`, `look-a-02`;
+* `produto-x-frente`, `produto-x-lado`.
+
+Esses nomes podem representar:
+
+* mesma coleção;
+* mesmo ensaio;
+* mesma pessoa;
+* mesma sessão;
+* sequência narrativa;
+* variações independentes.
+
+O agente deve:
+
+1. inspecionar visualmente;
+2. identificar padrões;
+3. registrar a relação;
+4. preservar a ordem quando existir sequência;
+5. não misturar séries sem intenção.
+
+Nunca montar uma galeria usando “uma imagem de cada pasta” apenas para gerar variedade.
+
+Variedade sem coerência vira banco de imagens.
+
+---
+
+# 7. Referências visuais
+
+Referências servem para definir:
+
+* nível de acabamento;
+* ritmo;
+* densidade;
+* composição;
+* uso de mídia;
+* comportamento;
+* sensação;
+* qualidade.
+
+Referências não servem para copiar:
+
+* layout;
+* copy;
+* cores;
+* componentes;
+* animações;
+* identidade;
+* ordem das seções.
+
+Antes de implementar, registrar:
+
+`docs/reference-analysis.md`
+
+Para cada referência:
+
+* o que funciona;
+* o que não funciona;
+* o que é compatível com o projeto;
+* o que deve ser evitado;
+* como o resultado será diferente.
+
+Não usar referências apenas como links jogados no prompt.
+
+---
+
+# 8. Direção criativa
+
+Antes de construir a página inteira, definir uma tese.
+
+Formato:
+
+> A experiência será organizada como ________, traduzindo ________ através de ________.
+
+Exemplo genérico:
+
+> A experiência será organizada como um arquivo editorial vivo, traduzindo precisão e descoberta através de camadas, foco e ritmo.
+
+A tese deve orientar:
+
+* hero;
+* tipografia;
+* mídia;
+* motion;
+* transições;
+* CTAs;
+* microinterações.
+
+## Prova visual obrigatória
+
+Antes de redesenhar tudo:
+
+1. implementar apenas hero;
+2. implementar um exemplo do motion principal;
+3. validar mobile e desktop;
+4. gerar screenshot e gravação;
+5. reprovar se continuar genérico.
+
+Não gastar seis horas redesenhando tudo para descobrir no final que a ideia era fraca.
+
+## Critério de parada
+
+Parar antes da implementação completa quando:
+
+* o hero parece template;
+* o motion é só fade-up;
+* o efeito não tem relação com a marca;
+* o mobile perde a ideia;
+* o custo técnico supera o ganho;
+* o resultado depende de explicação para parecer interessante.
+
+---
+
+# 9. Fases obrigatórias
+
+Não misturar todas as frentes.
+
+## Fase 0 — Diagnóstico
+
+* perfil do projeto;
+* fonte da verdade;
+* inventário de assets;
+* análise das referências;
+* requisitos;
+* riscos;
+* arquitetura.
+
+## Fase 1 — Copy
+
+* proposta de valor;
+* H1;
+* subtítulo;
+* CTAs;
+* microcopy;
+* hierarquia verbal;
+* fatos.
+
+Não alterar layout nesta fase, salvo quebra inevitável.
+
+## Fase 2 — Direção visual
+
+* tokens;
+* tipografia;
+* composição;
+* hero;
+* prova de motion;
+* comportamento mobile.
+
+## Fase 3 — Implementação estrutural
+
+* seções;
+* componentes;
+* mídia;
+* navegação;
+* dados;
+* responsividade básica.
+
+## Fase 4 — Motion e interação
+
+* carrosséis;
+* vídeos;
+* hover;
+* touch;
+* scroll;
+* reduced motion.
+
+## Fase 5 — Responsividade
+
+* mobile real;
+* tablets;
+* desktop;
+* orientação;
+* safe areas;
+* texto ampliado.
+
+## Fase 6 — QA
+
+* visual;
+* funcional;
+* acessibilidade;
+* performance;
+* conteúdo;
+* rede;
+* console.
+
+## Fase 7 — Limpeza
+
+Somente depois da aprovação visual.
+
+## Fase 8 — Deployment
+
+Preview limpo antes de produção.
+
+---
+
+# 10. Escopo por rodada
+
+Cada rodada deve ter:
+
+* objetivo;
+* rotas;
+* componentes;
+* arquivos permitidos;
+* arquivos proibidos;
+* critérios de aceite;
+* testes;
+* evidência;
+* condição de parada.
+
+Formato correto:
+
+> Corrigir exclusivamente o carrossel de marcas no mobile, mantendo layout, copy e desktop inalterados.
+
+Formato errado:
+
+> Revise tudo e deixe premium.
+
+O agente não pode usar uma correção localizada como desculpa para redesenhar a página.
+
+---
+
+# 11. Copy
+
+A copy deve responder:
+
+1. O que é?
+2. Para quem?
+3. Por que importa?
+4. O que fazer agora?
+
+## Hero
+
+O H1 deve:
+
+* ser compreendido rapidamente;
+* comunicar valor;
+* ter força;
+* funcionar no mobile;
+* evitar clichê;
+* não parecer SEO bruto;
+* não depender de adjetivos vazios.
+
+Reprovar frases que poderiam servir para:
+
+* moda;
+* beleza;
+* joalheria;
+* móveis;
+* qualquer marca genérica.
+
+## CTA
+
+CTA deve indicar ação.
+
+Ruim:
+
+* saiba mais;
+* conheça;
+* clique aqui.
+
+Melhor:
+
+* ver coleção;
+* pedir atendimento;
+* reservar horário;
+* traçar rota;
+* falar com especialista.
+
+## Copy premium
+
+Premium não é usar palavras como:
+
+* exclusivo;
+* extraordinário;
+* sofisticado;
+* experiência única;
+* excelência.
+
+Premium é demonstrado por:
+
+* precisão;
+* seleção;
+* clareza;
+* confiança;
+* detalhe;
+* ritmo;
+* prova.
+
+## Controle factual
+
+Toda copy alterada deve passar por:
+
+* revisão de fatos;
+* revisão de promessas;
+* revisão de tom;
+* revisão de repetição;
+* revisão mobile.
+
+---
+
+# 12. Mobile-first
+
+Mobile não é desktop empilhado.
+
+A ordem mobile deve seguir prioridade narrativa, não coordenadas do desktop.
+
+Validar no mínimo:
+
+* 360×800;
+* 375×812;
+* 390×844;
+* 412×915;
+* 430×932.
+
+## Critérios mobile
+
+* CTA acessível;
+* botão com área tocável adequada;
+* sem overflow;
+* sem texto espremido;
+* sem imagens cortadas sem intenção;
+* sem seção gigante;
+* sem espaço morto;
+* sem hover obrigatório;
+* sem layout pulando;
+* sem controles minúsculos;
+* sem mídia 0×0;
+* sem conteúdo crítico abaixo de uma mídia enorme.
+
+## Rotas mobile-priority
+
+Quando uma rota for acessada majoritariamente por Instagram, QR Code ou mensagem:
+
+* declarar `primary_device: mobile`;
+* desenhar primeiro em 390×844;
+* validar toque real;
+* priorizar CTA;
+* reduzir peso inicial;
+* evitar estrutura de mini-home longa sem necessidade.
+
+## Safe areas
+
+Considerar:
+
+* `env(safe-area-inset-top)`;
+* `env(safe-area-inset-bottom)`;
+* `100svh`;
+* `100dvh`;
+* Safari iOS;
+* Chrome Android;
+* barras do navegador;
+* notch.
+
+---
+
+# 13. Imagens
+
+## Regras
+
+* usar dimensões responsivas;
+* declarar `sizes`;
+* reservar proporção;
+* evitar CLS;
+* usar placeholder coerente;
+* não deixar fundo branco;
+* não esticar imagem;
+* não cortar rosto ou produto sem intenção;
+* usar `contain` quando o objeto precisa aparecer inteiro;
+* usar `cover` quando o enquadramento foi aprovado;
+* configurar `object-position`.
+
+## Prioridade
+
+Usar prioridade apenas em mídia realmente crítica.
+
+Nunca aplicar `priority` em:
+
+* todas as imagens;
+* toda a galeria;
+* conteúdo abaixo da dobra;
+* imagens ocultas.
+
+## Galerias
+
+Preparar:
+
+* imagem atual;
+* próxima;
+* anterior quando necessário.
+
+Não baixar toda a galeria agressivamente sem motivo.
+
+---
+
+# 14. Galerias e carrosséis
+
+Antes de implementar, declarar:
+
+```yaml
+carousel_mode:
+  static | manual | autoplay | infinite-loop
+
+interaction:
+  none | swipe | drag | keyboard | mixed
+
+autoplay_interval:
+  number | none
+
+pause_policy:
+  interaction: true
+  offscreen: true
+  hidden_tab: true
+
+resume_after_interaction:
+  true | false
+```
+
+## Autoplay
+
+Se exigido:
+
+* começar somente quando visível;
+* pausar durante gesto;
+* retomar naturalmente;
+* pausar fora da viewport;
+* pausar com aba oculta;
+* respeitar reduced motion;
+* não trocar antes da próxima imagem carregar.
+
+## Loop infinito
+
+Para loop visual:
+
+* evitar salto;
+* evitar espaço vazio;
+* evitar duas cópias idênticas lado a lado na emenda;
+* medir a largura real;
+* não depender de valores mágicos frágeis;
+* usar clones somente quando necessário.
+
+Clones devem:
+
+* ter `aria-hidden="true"`;
+* não receber foco;
+* não duplicar conteúdo para leitores de tela;
+* não duplicar IDs.
+
+## Galeria por séries
+
+Quando imagens pertencem à mesma série:
+
+* manter juntas;
+* manter ordem;
+* usar transição interna suave;
+* diferenciar transição entre séries;
+* não intercalar ensaios aleatoriamente.
+
+---
+
+# 15. Vídeos
+
+A política deve ser declarada.
+
+## `single-active`
+
+Usar quando:
+
+* performance é prioridade;
+* vídeos são grandes;
+* mobile é crítico;
+* várias reproduções competiriam por atenção.
+
+## `simultaneous-visible`
+
+Usar quando:
+
+* a composição depende de vários vídeos;
+* o usuário pediu explicitamente;
+* os vídeos são curtos;
+* todos estão visíveis;
+* o custo foi medido.
+
+## Regras gerais
+
+* `muted`;
+* `playsInline`;
+* `loop`;
+* poster;
+* `preload="metadata"`;
+* pausar fora da viewport;
+* pausar com aba oculta;
+* evitar controles nativos;
+* não renderizar vídeos invisíveis;
+* não duplicar vídeo como fundo;
+* não manter vídeo 0×0.
+
+## Economia de dados
+
+Quando possível:
+
+* detectar `saveData`;
+* reduzir autoplay;
+* usar poster;
+* não baixar vídeos secundários cedo.
+
+## Reduced motion
+
+O projeto deve declarar se reduced motion:
+
+* pausa todos os vídeos;
+* mantém vídeos sem motion adicional;
+* troca por poster.
+
+---
+
+# 16. Motion
+
+Motion precisa cumprir uma função:
+
+* orientar;
+* revelar;
+* explicar;
+* reforçar hierarquia;
+* conectar seções;
+* criar profundidade;
+* dar feedback.
+
+Não usar motion apenas para provar capacidade técnica.
+
+## Evitar
+
+* fade-up em tudo;
+* bounce;
+* glow forte;
+* blur animado pesado;
+* parallax agressivo;
+* animação em `top`, `left`, `margin`;
+* vários sistemas concorrendo;
+* movimento que esconde conteúdo;
+* transição longa;
+* efeito que depende de hover no mobile.
+
+## Preferir
+
+* `transform`;
+* `opacity`;
+* `translate3d`;
+* máscaras controladas;
+* CSS;
+* RAF apenas quando necessário;
+* IntersectionObserver;
+* fallback estático.
+
+## 3D e WebGL
+
+Só usar quando:
+
+* existe tese clara;
+* melhora a narrativa;
+* funciona no mobile;
+* existe fallback;
+* o custo é aceitável;
+* não atrapalha conversão.
+
+“Premium” não é justificativa suficiente para WebGL.
+
+---
+
+# 17. Marcas e logos
+
+## Normalização óptica
+
+Logos não devem ser dimensionados apenas pela caixa do arquivo.
+
+Ajustar:
+
+* escala;
+* largura;
+* altura;
+* alinhamento;
+* peso visual;
+* contraste.
+
+## Mobile
+
+No mobile:
+
+* logos não podem ficar ilegíveis;
+* rail não pode parecer linha de miniaturas;
+* aumentar presença sem transformar em cards gigantes;
+* evitar sombras pesadas.
+
+## Halo e sombra
+
+A sombra da logo deve:
+
+* dar contraste;
+* permanecer subordinada;
+* não parecer mancha;
+* não ter corte;
+* não ter borda;
+* não ter ponta;
+* não competir com a marca.
+
+Reprovar quando o usuário percebe primeiro o efeito e depois a logo.
+
+---
+
+# 18. Conteúdo remoto
+
+Para notícias, CMS, feeds ou APIs:
+
+* validar fonte;
+* validar hostname;
+* limitar quantidade;
+* remover duplicados;
+* tratar imagem ausente;
+* tratar timeout;
+* tratar resposta vazia;
+* usar cache;
+* usar revalidate;
+* não bloquear conteúdo crítico.
+
+## Fallback
+
+O fallback deve:
+
+* preservar estrutura;
+* não criar card falso;
+* não reservar espaço branco;
+* não inventar conteúdo;
+* manter CTA quando fizer sentido.
+
+## Semântica
+
+Não renderizar conteúdo duplicado no servidor e no cliente.
+
+Verificar:
+
+* headings duplicados;
+* cards duplicados;
+* skeleton anunciado por leitor de tela;
+* clones de carrossel;
+* conteúdo oculto ainda semântico.
+
+---
+
+# 19. Performance
+
+Página bonita que parece lenta está errada.
+
+Auditar:
+
+* LCP;
+* CLS;
+* INP;
+* imagens;
+* vídeos;
+* JavaScript;
+* CSS;
+* fontes;
+* sombras;
+* blur;
+* DOM duplicado;
+* carrosséis simultâneos;
+* mídia offscreen;
+* requests duplicados.
+
+## Regras
+
+* reservar proporções;
+* lazy load abaixo da dobra;
+* prioridade apenas no essencial;
+* não carregar mídia oculta;
+* não duplicar arquivos;
+* não usar biblioteca pesada para efeito pequeno;
+* não importar componente client sem necessidade;
+* não usar JS frame a frame quando CSS resolve;
+* não enviar screenshots e artefatos de QA no build.
+
+## Percepção de carregamento
+
+Além da velocidade real:
+
+* usar cor derivada da mídia;
+* blur;
+* poster;
+* skeleton estável;
+* evitar fundo branco;
+* evitar mudança de tamanho;
+* manter conteúdo inicial útil.
+
+---
+
+# 20. Acessibilidade
+
+Obrigatório:
+
+* H1 único;
+* headings em ordem;
+* foco visível;
+* botões reais;
+* links reais;
+* labels claros;
+* alt coerente;
+* ícones decorativos com `aria-hidden`;
+* controles por teclado;
+* contraste;
+* touch targets;
+* reduced motion;
+* clones ocultos semanticamente;
+* conteúdo sem depender de JavaScript para existir.
+
+Não usar:
+
+* `div` clicável;
+* texto minúsculo;
+* instrução apenas por cor;
+* autoplay impossível de pausar quando há controles necessários;
+* elemento invisível recebendo foco.
+
+---
+
+# 21. Matriz de impacto
+
+Antes de alterar um componente, criar:
+
+`docs/change-impact.md`
+
+| Arquivo alterado | Componentes | Rotas afetadas | Requisitos afetados | Testes obrigatórios |
+| ---------------- | ----------- | -------------- | ------------------- | ------------------- |
+
+Exemplo:
+
+| `components/brand-rail.tsx` | BrandRail | `/`, `/bio` | RQ-021, RQ-025 | loop, mobile, aria |
+
+Toda mudança deve rerodar os testes dos requisitos afetados.
+
+Isso impede corrigir a home e quebrar a bio.
+
+---
+
+# 22. Protocolo de correção de bug
+
+Cada bug deve ter:
+
+## Reprodução
+
+* rota;
+* viewport;
+* navegador;
+* estado;
+* passos;
+* resultado atual;
+* resultado esperado.
+
+## Causa raiz
+
+Não aceitar:
+
+* “CSS quebrado”;
+* “problema de responsividade”;
+* “timing”.
+
+Explicar:
+
+* regra conflitante;
+* container;
+* estado;
+* observer;
+* coordenação global;
+* carregamento;
+* dimensão;
+* stacking context;
+* condição de corrida.
+
+## Correção mínima
+
+Corrigir a causa, não esconder o sintoma.
+
+## Teste de regressão
+
+Adicionar evidência que falharia antes da correção.
+
+## Verificação cruzada
+
+Testar rotas e componentes que reutilizam a mesma lógica.
+
+---
+
+# 23. Erros recorrentes e remediação
+
+## Imagem cortada no mobile
+
+Verificar:
+
+* proporção do container;
+* `object-fit`;
+* `object-position`;
+* altura fixa;
+* overflow;
+* breakpoint;
+* conteúdo absoluto.
+
+Não resolver apenas aumentando a seção.
+
+## Galeria para após swipe
+
+Verificar:
+
+* timer cancelado;
+* estado de interação;
+* cleanup;
+* retomada;
+* visibilidade;
+* aba oculta.
+
+Criar teste de 30 segundos após interação.
+
+## Vídeos não tocam simultaneamente
+
+Verificar:
+
+* coordenador global;
+* pause automático;
+* observer compartilhado;
+* política `single-active`;
+* bloqueio do navegador;
+* visibilidade.
+
+Não remover toda a lógica de segurança. Alterar a política conscientemente.
+
+## Loop de marcas dá tranco
+
+Verificar:
+
+* largura calculada;
+* gap;
+* clones;
+* keyframes;
+* imagens carregadas;
+* mudança de dimensão;
+* fonte;
+* velocidade.
+
+## Imagens ficam brancas
+
+Verificar:
+
+* placeholder;
+* `onLoad`;
+* erro remoto;
+* próxima mídia não pronta;
+* container sem cor;
+* imagem desmontada durante transição.
+
+## Site parece genérico
+
+Verificar:
+
+* ausência de tese;
+* hero convencional;
+* seções iguais;
+* motion genérico;
+* copy genérica;
+* componentes prontos sem adaptação;
+* ritmo previsível.
+
+Não resolver adicionando mais cards ou mais animações.
+
+## Página de bio parece Linktree
+
+Verificar:
+
+* hierarquia;
+* peso dos CTAs;
+* identidade;
+* mídia;
+* primeira dobra;
+* excesso de seções.
+
+## Projeto demora horas sem ganho visual
+
+Verificar:
+
+* escopo aberto;
+* modelo excessivo;
+* falta de prova visual;
+* QA repetido;
+* ausência de condição de parada;
+* redesign completo antes de validar hero.
+
+## Sombra de logo forte
+
+Verificar:
+
+* opacidade;
+* blur;
+* spread;
+* deslocamento;
+* fundo;
+* clipping.
+
+## Séries de imagens misturadas
+
+Verificar:
+
+* manifesto;
+* nomes;
+* agrupamento;
+* ordem;
+* curadoria.
+
+---
+
+# 24. QA obrigatório
+
+## Viewports
+
+Mobile:
+
+* 360×800;
+* 375×812;
+* 390×844;
+* 412×915;
+* 430×932.
+
+Desktop:
+
+* 1366×768;
+* 1440×900.
+
+Adicionar breakpoints específicos do projeto quando necessário.
+
+## Estados
+
+Testar:
+
+* carregamento inicial;
+* rede lenta;
+* imagem falhando;
+* API falhando;
+* JavaScript desabilitado;
+* reduced motion;
+* aba oculta;
+* retorno à aba;
+* scroll para fora;
+* retorno à seção;
+* swipe lento;
+* swipe rápido;
+* drag;
+* teclado;
+* rotação;
+* zoom de texto.
+
+## Evidência
+
+Screenshots comprovam layout.
+
+Gravações comprovam:
+
+* autoplay;
+* motion;
+* swipe;
+* pause;
+* retomada;
+* vídeos simultâneos;
+* loop;
+* loading.
+
+Console e network comprovam:
+
+* erros;
+* 404;
+* hydration;
+* requests duplicados;
+* mídia carregada;
+* status de API.
+
+Nunca usar screenshot para provar comportamento dinâmico.
+
+---
+
+# 25. Critério de aprovação
+
+Uma alteração só está aprovada quando:
+
+* requisito atualizado;
+* critério atendido;
+* mobile validado;
+* desktop validado;
+* console limpo;
+* rede limpa;
+* sem regressão;
+* evidência salva;
+* build aprovado;
+* humano consegue abrir a prova.
+
+A nota dada pelo próprio agente não vale como aprovação.
+
+---
+
+# 26. Git e deployment
+
+Antes de qualquer deploy:
+
+```bash
+git status
+git diff --stat
+git diff
+git branch --show-current
+git rev-parse HEAD
+```
+
+Regras:
+
+* criar checkpoint antes de mudança grande;
+* não versionar credenciais;
+* não versionar `.vercel`;
+* não versionar perfis de navegador;
+* não usar `--prod` durante refinamento;
+* gerar preview;
+* confirmar commit;
+* confirmar `gitDirty=0`;
+* confirmar domínio de metadata;
+* confirmar rotas;
+* só promover após aprovação humana.
+
+---
+
+# 27. Limpeza final
+
+Limpeza só acontece depois da aprovação visual.
+
+Auditar:
+
+* código morto;
+* componentes antigos;
+* CSS sem uso;
+* dependências sem uso;
+* assets duplicados;
+* mídia sem referência;
+* screenshots;
+* relatórios temporários;
+* perfis de browser;
+* logs;
+* caches;
+* builds;
+* feature flags;
+* mocks.
+
+Antes de apagar:
+
+1. buscar referências;
+2. verificar imports;
+3. verificar rotas;
+4. verificar metadata;
+5. verificar posters;
+6. verificar fallbacks;
+7. criar checkpoint.
+
+Depois:
+
+```bash
+rm -rf node_modules .next
+npm ci
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Comparar visual antes e depois.
+
+---
+
+# 28. Política de tempo
+
+## Ajuste localizado
+
+Esperado:
+
+* 10 a 40 minutos.
+
+## Componente novo
+
+Esperado:
+
+* 30 a 90 minutos.
+
+## Direção visual
+
+Primeiro checkpoint:
+
+* hero;
+* motion;
+* mobile;
+* screenshot.
+
+Não continuar por horas sem prova.
+
+## Redesign completo
+
+Dividir em fases.
+
+O agente deve parar quando:
+
+* o prazo estimado crescer muito;
+* a tese não se sustentar;
+* o escopo expandir;
+* o projeto exigir decisão de produto;
+* surgir risco de produção.
+
+---
+
+# 29. Contrato do agente
+
+O agente deve:
+
+* verificar antes de afirmar;
+* preservar requisitos aprovados;
+* declarar impacto;
+* corrigir causa raiz;
+* testar mobile;
+* gerar evidência;
+* informar limitações;
+* evitar invenção;
+* evitar redesign não solicitado;
+* respeitar produção;
+* parar quando solicitado.
+
+O agente não deve:
+
+* dizer que viu sem abrir;
+* dizer que testou sem evidência;
+* usar nota própria como prova;
+* esconder falhas;
+* misturar fases;
+* alterar copy durante correção técnica;
+* alterar layout durante limpeza;
+* instalar dependência pesada sem motivo;
+* criar novo problema para resolver problema antigo.
+
+---
+
+# 30. Relatório final padrão
+
+Entregar sempre:
+
+1. objetivo da rodada;
+2. arquivos alterados;
+3. requisitos afetados;
+4. causa raiz;
+5. solução;
+6. decisões tomadas;
+7. o que foi preservado;
+8. testes executados;
+9. resultados mobile;
+10. resultados desktop;
+11. acessibilidade;
+12. performance;
+13. erros restantes;
+14. screenshots;
+15. gravações;
+16. commit;
+17. URL de preview;
+18. status de produção.
+
+Não entregar relatório cheio de adjetivos.
+
+Entregar prova.
+
+---
+
+# 31. Template de prompt para alterações
+
+```txt
+OBJETIVO
+
+[descrever uma única mudança]
+
+ROTAS
+
+[listar]
+
+ESCOPO PERMITIDO
+
+[componentes e arquivos]
+
+ESCOPO PROIBIDO
+
+[áreas que não podem mudar]
+
+REQUISITOS EXISTENTES
+
+Leia docs/requirements-ledger.md.
+Nenhum requisito aprovado pode regredir.
+
+PROBLEMA REPRODUZÍVEL
+
+Rota:
+Viewport:
+Navegador:
+Passos:
+Resultado atual:
+Resultado esperado:
+
+AUTONOMIA
+
+Você decide a melhor solução dentro do escopo.
+Não peça decisão de pixel.
+Não redesenhe outras áreas.
+
+CRITÉRIOS DE ACEITE
+
+[listar critérios observáveis]
+
+TESTES
+
+[listar viewports, interações e estados]
+
+EVIDÊNCIA
+
+Salvar:
+- screenshots;
+- gravação;
+- console/network quando necessário.
+
+VALIDAÇÃO
+
+npm run lint
+npm run typecheck
+npm run build
+
+DEPLOY
+
+Criar apenas preview.
+Não usar --prod.
+Não alterar alias.
+
+ENTREGA
+
+- causa raiz;
+- solução;
+- arquivos;
+- testes;
+- evidências;
+- URL;
+- limitações.
+
+PARE AO FINAL.
+```
+
+---
+
+# 32. Checklist final de prevenção de regressão
+
+Antes de encerrar qualquer rodada:
+
+## Escopo
+
+* a alteração ficou restrita ao pedido?
+* alguma área não solicitada mudou?
+* a copy mudou sem autorização?
+* o layout mudou sem necessidade?
+
+## Requisitos
+
+* ledger atualizado?
+* requisitos anteriores preservados?
+* requisitos substituídos foram marcados?
+
+## Visual
+
+* mobile aprovado?
+* desktop aprovado?
+* mídia bem enquadrada?
+* sem espaço morto?
+* sem overflow?
+* sem branco?
+* sem sombra pesada?
+* sem componente genérico?
+
+## Interação
+
+* autoplay funciona?
+* swipe funciona?
+* retoma após interação?
+* pausa fora da viewport?
+* aba oculta funciona?
+* reduced motion funciona?
+* teclado funciona?
+
+## Performance
+
+* mídia crítica priorizada?
+* mídia offscreen adiada?
+* vídeos controlados?
+* sem downloads duplicados?
+* sem CLS?
+* sem JS desnecessário?
+
+## Conteúdo
+
+* fatos confirmados?
+* sem invenções?
+* sem duplicação?
+* sem headings repetidos?
+* sem clones semânticos?
+
+## Deployment
+
+* árvore limpa?
+* commit correto?
+* preview correto?
+* produção intacta?
+* evidências acessíveis?
+
+Se qualquer resposta for “não sei”, a rodada não está aprovada.
+
+```
+
+A parte mais importante dessa skill não é CSS, motion ou performance. É o **requirements ledger**. Sem ele, cada novo prompt apaga parte do contexto anterior e vocês ficam presos corrigindo a mesma merda várias vezes. Com ele, toda alteração precisa provar que preservou o que já estava aprovado.
+```
+---
+
+# 33. Gate de cobertura: nenhum requisito pode desaparecer
+
+O requirements ledger registra requisitos, mas não prova que todos apareceram nas rotas corretas.
+
+Antes da implementação, criar:
+
+`docs/route-coverage.md`
+
+Formato:
+
+| ID | Requisito ou oferta | Fonte | Rotas obrigatórias | Primeira dobra | Componente | Status | Evidência |
+|---|---|---|---|---|---|---|---|
+| CV-001 | Serviço principal | source-of-truth | `/`, `/campaign` | sim | Hero | pendente | — |
+| CV-002 | Segunda linha de produto | source-of-truth | `/campaign` | não | OfferSplit | pendente | — |
+| CV-003 | CTA de contato | project-profile | todas | sim | PrimaryCTA | pendente | — |
+
+## Auditoria de omissão
+
+Antes de encerrar uma rodada, comparar obrigatoriamente:
+
+1. pedido original;
+2. `docs/source-of-truth.md`;
+3. `docs/project-profile.md`;
+4. `docs/requirements-ledger.md`;
+5. `docs/route-coverage.md`;
+6. interface implementada;
+7. preview publicado.
+
+Perguntar:
+
+* alguma categoria de produto foi esquecida?
+* algum serviço confirmado sumiu?
+* algum CTA obrigatório não aparece?
+* alguma rota comunica apenas parte da oferta?
+* alguma informação existe na home, mas deveria existir também em uma rota secundária?
+* alguma mídia pedida não foi usada?
+* algum comportamento pedido foi substituído por uma versão mais simples sem autorização?
+
+Não aceitar “está implícito”.
+
+Se o usuário pediu duas linhas de produto, as duas precisam aparecer de maneira explícita.
+
+Se o usuário pediu um vídeo, uma imagem não substitui o vídeo.
+
+Se o usuário pediu um mapa, uma ilustração abstrata não substitui o mapa.
+
+---
+
+# 34. Protocolo de integridade tipográfica
+
+Textos animados exigem validação semântica e geométrica.
+
+## Fonte textual única
+
+O texto correto deve existir como uma única fonte de verdade.
+
+Não manter:
+
+* uma versão para animação;
+* outra para acessibilidade;
+* outra para mobile;
+* outra escrita em CSS.
+
+As representações visuais devem ser derivadas da mesma string.
+
+## Divisão para animação
+
+Ao animar palavras ou caracteres:
+
+* nunca remover espaços;
+* nunca animar whitespace como caractere visual;
+* preservar pontuação;
+* preservar acentos;
+* manter palavras como unidades;
+* evitar quebra interna de palavra;
+* usar wrappers por palavra;
+* animar caracteres dentro das palavras somente quando necessário;
+* manter uma leitura única para tecnologia assistiva.
+
+Exemplo conceitual:
+
+```tsx
+<h1 aria-label={title}>
+  <span aria-hidden="true">
+    {lines.map((line) => (
+      <span className="line">
+        {line.words.map((word) => (
+          <span className="word">
+            {word.characters.map(renderCharacter)}
+          </span>
+        ))}
+      </span>
+    ))}
+  </span>
+</h1>
+```
+
+O exemplo é estrutural. Não deve ser copiado sem adaptação.
+
+## Proibido
+
+* simular espaço com `letter-spacing`;
+* inserir spans vazios;
+* espalhar `&nbsp;`;
+* usar margem entre caracteres para construir palavras;
+* cortar texto com largura fixa;
+* esconder truncamento com `overflow: hidden`;
+* medir texto antes da fonte correta carregar;
+* depender de posição absoluta para formar uma frase;
+* esconder texto até JavaScript executar.
+
+## Fontes e medição
+
+Se a animação depende de medidas:
+
+* aguardar `document.fonts.ready`;
+* recalcular após troca de fonte;
+* observar resize;
+* considerar zoom;
+* considerar texto maior;
+* evitar medidas rígidas quando CSS resolve;
+* nunca assumir que a fonte fallback possui a mesma largura.
+
+## Estado final obrigatório
+
+O estado final da animação deve ser validado separadamente.
+
+Testar:
+
+* início;
+* meio;
+* fim;
+* após resize;
+* após fonte carregar;
+* após retorno à aba;
+* reduced motion;
+* JavaScript desabilitado;
+* zoom de 200%.
+
+Reprovar quando:
+
+* letras se juntam;
+* palavras perdem espaços;
+* última palavra fica cortada;
+* pontuação desaparece;
+* máscara continua escondendo parte do texto;
+* transform final mantém conteúdo fora do container;
+* título correto no DOM aparece errado visualmente.
+
+---
+
+# 35. Geometria final vale mais que a animação
+
+Não aprovar uma animação porque o movimento parece bom durante a execução.
+
+A geometria canônica é o estado final.
+
+Para cada componente animado, validar:
+
+| Estado | O que verificar |
+|---|---|
+| Antes da animação | Conteúdo acessível e espaço reservado |
+| Durante | Sem clipping, salto ou colisão |
+| Final | Texto, mídia e controles completamente visíveis |
+| Reduced motion | Estado estável e compreensível |
+| Sem JavaScript | Conteúdo essencial presente |
+
+## Checklist de clipping
+
+Verificar:
+
+* `overflow`;
+* `clip-path`;
+* mask;
+* largura do wrapper;
+* altura do wrapper;
+* `line-height`;
+* transform;
+* perspectiva;
+* stacking context;
+* pseudo-elementos;
+* fonte carregada;
+* container pai;
+* breakpoint;
+* `contain`;
+* filtros;
+* posição absoluta.
+
+Nunca corrigir texto cortado apenas reduzindo a fonte.
+
+Corrigir a causa da restrição geométrica.
+
+---
+
+# 36. Gate de qualidade de seção
+
+Cada seção precisa justificar sua existência visual e estratégica.
+
+Criar, quando o projeto tiver direção visual relevante:
+
+`docs/section-system.md`
+
+| Seção | Função | Silhueta | Elemento dominante | Movimento | Contraste com anterior | CTA |
+|---|---|---|---|---|---|---|
+| Hero | apresentar promessa | assimétrica | mídia principal | reveal proprietário | — | primário |
+| Prova | reduzir risco | compacta | dado ou prova | mínimo | alta densidade | opcional |
+| Produto | gerar desejo | editorial | galeria | contínuo | expansão | contextual |
+
+## Reprovar uma seção quando
+
+* é apenas título, parágrafo e ornamento;
+* repete a composição da seção anterior;
+* possui espaço vazio sem função;
+* parece card ampliado;
+* poderia pertencer a qualquer marca;
+* não adiciona decisão, desejo, prova ou entendimento;
+* o usuário consegue removê-la sem perder nada;
+* depende de explicação para parecer interessante;
+* está tecnicamente correta, mas visualmente morta.
+
+## Variação com coerência
+
+Seções não precisam usar layouts completamente diferentes.
+
+Elas precisam variar:
+
+* densidade;
+* escala;
+* direção;
+* ritmo;
+* proporção;
+* mídia dominante;
+* luminosidade;
+* tensão;
+* movimento.
+
+Não resolver uma seção fraca adicionando mais cards.
+
+Primeiro melhorar:
+
+1. composição;
+2. hierarquia;
+3. escala;
+4. contraste;
+5. ritmo;
+6. mídia;
+7. movimento.
+
+---
+
+# 37. Linguagem interna não pode vazar para a interface
+
+Nomes técnicos, classificações internas e metadados de produção devem permanecer no código ou na documentação.
+
+Remover da interface pública, salvo valor real para o usuário:
+
+* números de arquivo;
+* índices decorativos;
+* nomes de pasta;
+* identificadores;
+* “registro”;
+* “arquivo”;
+* “lab”;
+* “fase”;
+* “ensaio 01”;
+* “item 02”;
+* “bloco 03”;
+* coordenadas usadas como decoração;
+* contadores sem função;
+* nomes internos de campanhas;
+* rótulos criados apenas para preencher espaço.
+
+## Exceções
+
+Manter numeração quando ela ajuda:
+
+* passos de um processo;
+* páginas de conteúdo;
+* progresso;
+* quantidade;
+* comparação;
+* navegação necessária.
+
+Informações úteis para acessibilidade podem existir em:
+
+* `aria-label`;
+* texto visualmente oculto;
+* labels semânticos;
+* descrição do controle.
+
+Não expor metadados só porque eles existem no array de dados.
+
+---
+
+# 38. Componente real não pode ser substituído por decoração
+
+Quando o requisito pedir funcionalidade, entregar funcionalidade.
+
+| Pedido | Entrega válida | Substituto inválido |
+|---|---|---|
+| mapa | mapa interativo localizado | desenho de ruas |
+| vídeo | elemento de vídeo funcional | imagem com ícone de play |
+| formulário | campos submetíveis | card simulando formulário |
+| agenda | agenda ou integração funcional | calendário decorativo |
+| carrossel | navegação e movimento reais | grid estático |
+| rota | link com destino correto | ícone sem ação |
+| feed | conteúdo carregado ou fallback | cards falsos |
+| busca | busca funcional | input decorativo |
+
+## Regra
+
+Elementos visuais podem complementar a função, nunca substituí-la silenciosamente.
+
+Quando uma integração real não for possível:
+
+1. declarar bloqueio;
+2. manter fallback útil;
+3. registrar no ledger;
+4. não fingir que foi implementado.
+
+---
+
+# 39. Full bleed, contained e hybrid devem ser decisões explícitas
+
+Todo componente horizontal relevante deve declarar:
+
+```yaml
+width_behavior:
+  contained | full-bleed | hybrid
+
+mobile:
+  contained | full-bleed | hybrid
+
+desktop:
+  contained | full-bleed | hybrid
+```
+
+## `contained`
+
+Conteúdo respeita o container principal.
+
+Usar para:
+
+* copy;
+* formulários;
+* blocos de leitura;
+* CTAs agrupados.
+
+## `full-bleed`
+
+Conteúdo alcança as bordas da viewport.
+
+Usar quando:
+
+* a mídia precisa ganhar presença;
+* a experiência depende de continuidade;
+* o projeto pede imersão;
+* o mobile se beneficia de mais largura.
+
+## `hybrid`
+
+Texto permanece contido e mídia escapa do container.
+
+Usar para:
+
+* galerias;
+* carrosséis;
+* vídeos;
+* comparadores;
+* faixas visuais.
+
+## QA de full bleed
+
+Verificar:
+
+* largura visual até as bordas;
+* ausência de overflow da página;
+* trilho interno funcionando;
+* safe areas;
+* scrollbar horizontal acidental;
+* clipping em navegadores móveis;
+* elementos interativos acessíveis;
+* alinhamento correto ao retornar para conteúdo contido.
+
+Não dizer que algo é full bleed quando continua preso ao gutter principal.
+
+---
+
+# 40. Motion precisa de coreografia, não repetição
+
+Criar um vocabulário de motion com no máximo 3 a 6 famílias.
+
+Exemplo:
+
+```yaml
+motion_families:
+  structural_reveal:
+    purpose: apresentar estrutura
+
+  typographic_reveal:
+    purpose: introduzir linguagem
+
+  media_transition:
+    purpose: trocar ou revelar mídia
+
+  continuous_motion:
+    purpose: manter elemento vivo
+
+  interaction_feedback:
+    purpose: responder ao usuário
+```
+
+## Regras
+
+* não aplicar a mesma entrada em todas as seções;
+* não inventar uma animação diferente para cada elemento;
+* cada animação deve ter função;
+* motion contínuo deve possuir trajetória perceptível;
+* uma oscilação de poucos pixels não prova movimento significativo;
+* o loop deve fechar sem salto;
+* animação não pode esconder conteúdo essencial;
+* movimento deve respeitar assunto, rosto, produto e área útil;
+* a trajetória precisa ser validada durante um ciclo completo;
+* gravação curta não prova um loop longo.
+
+## Movimento sobre mídia
+
+Quando um elemento deve percorrer uma imagem:
+
+* definir pontos de interesse;
+* definir zona segura;
+* impedir saída da moldura;
+* evitar cobrir CTA;
+* evitar atravessar conteúdo indevido;
+* ajustar trajetória por breakpoint;
+* manter fallback estático coerente;
+* pausar fora da viewport;
+* pausar em aba oculta;
+* respeitar reduced motion.
+
+## Entradas
+
+Variar de acordo com a função:
+
+* texto: máscara, baseline ou foco;
+* mídia: recorte, escala ou perspectiva leve;
+* botão: preenchimento, borda ou assentamento;
+* navegação: linha, clipping ou stagger mínimo;
+* seção: mudança de luz, profundidade ou ritmo.
+
+Não usar `fade-up` como animação universal.
+
+---
+
+# 41. Cobertura comercial por rota
+
+Cada rota precisa ter uma função comercial explícita.
+
+Criar dentro de `docs/route-coverage.md`:
+
+| Rota | Público | Origem | Ofertas obrigatórias | CTA primário | CTA secundário | Mídia obrigatória |
+|---|---|---|---|---|---|---|
+| `/` | público geral | busca | oferta A, oferta B | contato | rota | hero |
+| `/campaign` | campanha | social | oferta A, oferta B | conversão | site completo | galeria, vídeo |
+
+## Regra de paridade
+
+Paridade não significa duplicar toda a home.
+
+Significa que nenhuma rota pode contradizer ou apagar pilares essenciais da empresa.
+
+Uma rota pode ser mais curta, mas deve manter:
+
+* identidade;
+* proposta;
+* ofertas essenciais;
+* CTA;
+* fatos necessários;
+* continuidade com a marca.
+
+Não deixar a mídia dominar tanto que uma linha de produto pareça inexistente.
+
+Não inferir uma oferta apenas pela fotografia.
+
+Nomear aquilo que precisa ser entendido.
+
+---
+
+# 42. Auditoria visual de cinco segundos
+
+Antes de aprovar qualquer tela, observar screenshot estático por cinco segundos e responder:
+
+1. O que está cortado?
+2. O que parece vazio?
+3. O que parece genérico?
+4. O que parece pesado?
+5. O que parece rígido?
+6. O que domina sem merecer?
+7. O que deveria dominar e não domina?
+8. O CTA está evidente?
+9. Existe uma seção visualmente morta?
+10. Algum texto parece erro, placeholder ou metadado?
+
+Se um problema é visível em screenshot sem inspeção técnica, a rodada falhou.
+
+Lint e build não aprovam direção visual.
+
+---
+
+# 43. Auditoria cromática e de forma
+
+Uma identidade não pode depender apenas da cor principal.
+
+Verificar:
+
+* proporção entre cores;
+* temperatura;
+* níveis de contraste;
+* variação de fundo;
+* excesso de áreas chapadas;
+* excesso de retângulos;
+* repetição de cards;
+* ausência de respiro;
+* falta de elementos orgânicos;
+* excesso de curvas sem relação com a marca;
+* glow usado como maquiagem.
+
+## Página excessivamente rígida
+
+Antes de adicionar decoração, testar:
+
+* mudança de escala;
+* assimetria;
+* sobreposição;
+* variação de densidade;
+* transição de fundos;
+* recorte de mídia;
+* linhas de continuidade;
+* alteração de ritmo;
+* espaços negativos intencionais.
+
+Não confundir delicadeza com:
+
+* transparência excessiva;
+* blur;
+* cantos arredondados;
+* gradientes pastel;
+* ornamentos florais;
+* fontes finas demais.
+
+Delicadeza vem de controle, não de enfeite.
+
+---
+
+# 44. Preview publicado é parte do QA
+
+A implementação local não é a entrega final.
+
+Criar:
+
+`docs/release-audit.md`
+
+Formato:
+
+| Rota | Viewport | Ambiente | Build | Commit | Resultado | Evidência |
+|---|---|---|---|---|---|---|
+| `/` | 390×844 | preview | hash | hash | aprovado | screenshot |
+| `/campaign` | 1440×900 | preview | hash | hash | aprovado | screenshot |
+
+## Verificar no preview
+
+* fonte correta carregada;
+* texto sem corte;
+* assets disponíveis;
+* animações funcionando;
+* cache atualizado;
+* metadata correta;
+* favicon;
+* links;
+* mapa;
+* vídeo;
+* carrossel;
+* rotas;
+* console;
+* network;
+* hydration;
+* diferenças entre local e produção;
+* domínio correto;
+* variáveis de ambiente;
+* comportamento mobile real.
+
+Não afirmar que o site publicado foi validado sem abrir cada rota relevante.
+
+Não aprovar produção usando apenas screenshot local.
+
+---
+
+# 45. Teste de regressão por intenção
+
+Testes técnicos não bastam.
+
+Cada requisito deve possuir um tipo de intenção:
+
+```yaml
+intent:
+  content | visual | interaction | conversion | technical | accessibility
+```
+
+Exemplos:
+
+| Requisito | Intenção | Prova |
+|---|---|---|
+| título completo | visual + content | screenshot + DOM |
+| carrossel contínuo | interaction | gravação completa |
+| segunda oferta presente | content + conversion | screenshot + DOM |
+| mapa localizado | interaction + technical | navegador + link |
+| CTA na primeira dobra | conversion | screenshot |
+| seção proprietária | visual | comparação crítica |
+
+A prova deve corresponder à intenção.
+
+`npm run build` não prova:
+
+* qualidade visual;
+* ausência de clipping;
+* presença de uma oferta;
+* qualidade de motion;
+* full bleed;
+* clareza de CTA;
+* mapa corretamente localizado.
+
+---
+
+# 46. Autonomia não autoriza omissão
+
+O agente pode decidir:
+
+* composição;
+* técnica;
+* arquitetura;
+* motion;
+* breakpoints;
+* estrutura de componentes;
+* organização de código;
+* estratégia de performance.
+
+O agente não pode decidir silenciosamente:
+
+* remover requisito;
+* omitir produto;
+* substituir funcionalidade;
+* alterar fato;
+* encurtar rota a ponto de perder oferta;
+* trocar CTA;
+* remover mídia pedida;
+* reinterpretar “contínuo” como “troca automática”;
+* reinterpretar “full bleed” como “quase toda a largura”.
+
+Quando houver conflito entre requisitos:
+
+1. identificar;
+2. registrar;
+3. escolher a solução de menor perda;
+4. explicar;
+5. não fingir que ambos foram atendidos.
+
+---
+
+# 47. Atualização do protocolo de bug
+
+Além das regras da seção 22, todo bug visual deve registrar:
+
+```yaml
+visual_bug:
+  route:
+  viewport:
+  browser:
+  font_state:
+  animation_state:
+  scroll_position:
+  expected_geometry:
+  actual_geometry:
+  parent_container:
+  clipping_source:
+  shared_component:
+```
+
+## Bug de texto cortado
+
+Verificar obrigatoriamente:
+
+* fonte carregada;
+* wrapper de reveal;
+* largura final;
+* `white-space`;
+* quebra de linha;
+* máscara;
+* overflow;
+* transform final;
+* letter-spacing;
+* zoom;
+* string original;
+* espaços preservados;
+* breakpoint;
+* conteúdo traduzido ou alternativo.
+
+## Bug de componente “sem graça”
+
+Não tratar como opinião vaga.
+
+Registrar:
+
+* função da seção;
+* elemento dominante;
+* contraste com anterior;
+* densidade;
+* hierarquia;
+* ritmo;
+* movimento;
+* singularidade;
+* o que pode ser removido;
+* o que falta para sustentar a tese.
+
+A correção deve alterar uma causa visual real, não adicionar decoração aleatória.
+
+---
+
+# 48. Novo gate antes da entrega
+
+Antes do relatório final, executar quatro auditorias independentes:
+
+## Auditoria 1 — Omissão
+
+* todos os produtos?
+* todos os serviços?
+* todos os CTAs?
+* todas as rotas?
+* todas as mídias pedidas?
+* todas as funcionalidades reais?
+
+## Auditoria 2 — Geometria
+
+* nada cortado?
+* nada sobreposto?
+* nenhuma máscara sobrando?
+* nenhuma palavra unida?
+* nenhuma palavra incompleta?
+* sem overflow?
+* sem layout pulando?
+
+## Auditoria 3 — Direção visual
+
+* hero proprietário?
+* seções distintas?
+* nenhuma seção morta?
+* nenhuma interface genérica?
+* ritmo adequado?
+* composição coerente?
+* motion variado e conectado?
+
+## Auditoria 4 — Preview
+
+* build publicado correto?
+* commit correto?
+* rotas abertas?
+* links funcionando?
+* console limpo?
+* mídia carregada?
+* comportamento igual ao aprovado?
+
+Se qualquer auditoria falhar, não encerrar.
+
+---
+
+# 49. Complemento ao checklist final
+
+Adicionar à seção 32:
+
+## Cobertura
+
+* todas as ofertas obrigatórias aparecem?
+* todas as rotas cumprem sua função?
+* existe algum requisito apenas implícito?
+* alguma mídia solicitada foi omitida?
+* algum componente real virou decoração?
+
+## Tipografia
+
+* espaços preservados?
+* palavras completas?
+* pontuação correta?
+* animação termina sem clipping?
+* fonte carregada não altera geometria?
+* zoom de 200% funciona?
+* sem JavaScript continua legível?
+
+## Seções
+
+* cada seção possui função própria?
+* cada seção possui silhueta própria?
+* alguma seção está visualmente morta?
+* duas seções seguidas repetem composição?
+* existe excesso de retângulos ou cards?
+
+## Motion
+
+* movimentos têm funções diferentes?
+* ciclo completo foi gravado?
+* trajetória é perceptível?
+* loop fecha corretamente?
+* estado final está íntegro?
+* reduced motion continua bom?
+
+## Preview
+
+* cada rota foi aberta?
+* cada viewport crítico foi conferido?
+* fontes, mídia e integrações carregaram?
+* o preview corresponde ao commit?
+* o resultado publicado foi comparado ao briefing?
+
+---
+
+# 50. Regra final
+
+O agente não deve esperar o usuário apontar erros visualmente óbvios.
+
+Antes de entregar, deve procurar ativamente:
+
+* texto cortado;
+* palavras unidas;
+* ofertas ausentes;
+* CTAs esquecidos;
+* mídias omitidas;
+* seções fracas;
+* componentes genéricos;
+* animações repetidas;
+* loops quase imóveis;
+* full bleed que não chega às bordas;
+* mapa que não é mapa;
+* vídeo que não é vídeo;
+* labels internos expostos;
+* diferenças entre local e preview.
+
+A obrigação não é apenas executar o que foi pedido.
+
+A obrigação é verificar se o resultado realmente corresponde ao pedido.
