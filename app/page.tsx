@@ -385,7 +385,7 @@ function ScrollGallery({
                 alt={image.alt}
                 width="1170"
                 height="1560"
-                loading={index === 0 ? "eager" : "lazy"}
+                loading="lazy"
                 decoding="async"
                 style={{ objectPosition: image.position ?? "center" }}
               />
