@@ -215,7 +215,7 @@ function HeroStage() {
           width="1170"
           height="1560"
           fetchPriority="high"
-          decoding="async"
+          decoding="sync"
         />
         <span className="photo-glint" aria-hidden="true" />
       </div>
