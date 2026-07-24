@@ -75,8 +75,8 @@ function BrandIntro() {
 
     root.classList.remove("brand-intro-complete");
     root.classList.add("brand-intro-playing");
-    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2200);
-    const finishTimer = window.setTimeout(finish, 2920);
+    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 1320);
+    const finishTimer = window.setTimeout(finish, 1980);
 
     return () => {
       window.clearTimeout(revealTimer);
@@ -290,6 +290,7 @@ function ScrollGallery({
     const section = sectionRef.current;
     if (!section) return;
     const slides = Array.from(section.querySelectorAll<HTMLElement>(".gallery-slide"));
+    const compact = window.matchMedia("(max-width: 900px)").matches;
     let frame = 0;
     let targetProgress = 0;
     let currentProgress = 0;
@@ -331,9 +332,9 @@ function ScrollGallery({
     const animate = (time: number) => {
       const delta = Math.min(48, time - previousTime);
       previousTime = time;
-      const smoothing = 1 - Math.exp(-delta / 185);
+      const smoothing = 1 - Math.exp(-delta / (compact ? 72 : 92));
       const desiredStep = (targetProgress - currentProgress) * smoothing;
-      const maxStep = delta / 1350;
+      const maxStep = delta / (compact ? 520 : 680);
       currentProgress += Math.max(-maxStep, Math.min(maxStep, desiredStep));
 
       if (Math.abs(targetProgress - currentProgress) < .00025) currentProgress = targetProgress;
@@ -369,7 +370,7 @@ function ScrollGallery({
       className={`collection-story collection-${tone}`}
       id={id}
       aria-labelledby={`${id}-title`}
-      style={{ "--slide-count": images.length, "--story-height": `${110 + images.length * 42}svh`, "--story-mobile-height": `${105 + images.length * 38}svh` } as React.CSSProperties}
+      style={{ "--slide-count": images.length, "--story-height": `${100 + images.length * 32}svh`, "--story-mobile-height": `${96 + images.length * 30}svh` } as React.CSSProperties}
     >
       <div className="collection-sticky">
         <div className="gallery-viewport" aria-label={`Galeria ${title}, conduzida pela rolagem.`}>
@@ -384,7 +385,7 @@ function ScrollGallery({
                 alt={image.alt}
                 width="1170"
                 height="1560"
-                loading="lazy"
+                loading={index === 0 ? "eager" : "lazy"}
                 decoding="async"
                 style={{ objectPosition: image.position ?? "center" }}
               />
@@ -477,26 +478,36 @@ export default function Home() {
 
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    const hero = elements.find((element) => element.dataset.reveal === "hero");
+    const sectionElements = elements.filter((element) => element !== hero);
     let observer: IntersectionObserver | null = null;
 
-    const startReveals = () => {
-      if (observer) return;
-      observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            (entry.target as HTMLElement).classList.add("is-revealed");
-            observer?.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: "0px 0px -12%", threshold: 0.12 });
-      elements.forEach((element) => observer?.observe(element));
+    const reveal = (element: HTMLElement) => {
+      element.classList.add("is-revealed");
+      observer?.unobserve(element);
     };
 
-    if (document.documentElement.classList.contains("brand-intro-complete")) startReveals();
-    else window.addEventListener("helena:intro-complete", startReveals, { once: true });
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) reveal(entry.target as HTMLElement);
+      });
+    }, { rootMargin: "18% 0px 18% 0px", threshold: 0.01 });
+
+    sectionElements.forEach((element) => {
+      const rect = element.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 1.16 && rect.bottom >= -window.innerHeight * .1) reveal(element);
+      else observer?.observe(element);
+    });
+
+    const revealHero = () => {
+      if (hero) window.requestAnimationFrame(() => reveal(hero));
+    };
+
+    if (document.documentElement.classList.contains("brand-intro-complete")) revealHero();
+    else window.addEventListener("helena:intro-complete", revealHero, { once: true });
 
     return () => {
-      window.removeEventListener("helena:intro-complete", startReveals);
+      window.removeEventListener("helena:intro-complete", revealHero);
       observer?.disconnect();
     };
   }, []);
