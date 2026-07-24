@@ -244,9 +244,9 @@ function SmartVideo({ src, poster, label, className = "" }: { src: string; poste
     };
 
     const observer = new IntersectionObserver(([entry]) => {
-      inView = entry.isIntersecting && entry.intersectionRatio > 0.35;
+      inView = entry.isIntersecting && entry.intersectionRatio > 0.08;
       sync();
-    }, { threshold: [0, 0.35, 0.75] });
+    }, { rootMargin: "10% 0px", threshold: [0, 0.08, 0.35, 0.75] });
 
     observer.observe(video);
     document.addEventListener("visibilitychange", sync);
@@ -459,7 +459,9 @@ function ExperienceBridge({
 
 export default function Home() {
   useEffect(() => {
+    let frame = 0;
     const updateProgress = () => {
+      frame = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       document.documentElement.style.setProperty("--scroll-progress", max > 0 ? `${window.scrollY / max}` : "0");
       const heroProgress = Math.min(1, window.scrollY / Math.max(window.innerHeight, 1));
@@ -467,12 +469,16 @@ export default function Home() {
       document.documentElement.style.setProperty("--hero-scale", String(1.03 + heroProgress * .12));
       document.documentElement.style.setProperty("--hero-lift", `${heroProgress * -2}%`);
     };
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateProgress);
+    };
     updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
 
