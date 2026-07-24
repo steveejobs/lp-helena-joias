@@ -274,7 +274,6 @@ export default function InstagramLinks() {
       </header>
 
       <section className="profile-hero" aria-labelledby="link-title">
-        <div className="profile-glow" aria-hidden="true" />
         <ButterflyLoop className="link-butterfly-hero" />
         <div className="profile-brand">
           <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" fetchPriority="high" decoding="async" />

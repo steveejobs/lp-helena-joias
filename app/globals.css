@@ -239,7 +239,6 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .link-header > span { color: var(--bronze-500); }
 .link-home { display: flex; align-items: center; gap: .55rem; min-height: 2.75rem; }
 .profile-hero { min-height: 100svh; position: relative; display: flex; flex-direction: column; align-items: center; padding: 4.9rem 1rem 2.2rem; overflow: hidden; text-align: center; background: radial-gradient(circle at 50% 18%, var(--white) 0, var(--rose-100) 42%, var(--rose-200) 110%); isolation: isolate; }
-.profile-glow { position: absolute; z-index: -2; width: 25rem; aspect-ratio: 1; left: 50%; top: -15rem; transform: translateX(-50%); border: 1px solid rgba(153,119,70,.24); border-radius: 50%; box-shadow: 0 0 0 4rem rgba(255,255,255,.13), 0 0 0 8rem rgba(255,255,255,.07); }
 .profile-brand { width: 7.25rem; height: 7.25rem; position: relative; flex: 0 0 auto; }
 .profile-brand img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .profile-kicker { margin: .2rem 0 .8rem; color: var(--bronze-500); font-size: .54rem; font-weight: 650; text-transform: uppercase; letter-spacing: .2em; }
@@ -405,7 +404,8 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   .site-footer > p { margin: 0; }
   .footer-meta { width: 100%; margin-top: 3rem; flex-direction: column; gap: .7rem; }
   .link-page { overflow-x: hidden; box-shadow: none; }
-  .profile-hero { padding-top: max(4.9rem, calc(env(safe-area-inset-top) + 4.2rem)); }
+  .profile-hero { padding-top: max(4.35rem, calc(env(safe-area-inset-top) + 3.85rem)); }
+  .profile-hero h1 { width: 100%; font-size: clamp(3.1rem, 15.5vw, 4.4rem); }
   .link-footer { min-height: 8rem; flex-wrap: wrap; padding: 1.7rem 1rem; }
   .link-footer span:nth-child(2) { display: none; }
 }
@@ -415,7 +415,7 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   h1 { font-size: 3.65rem; }
   .hero-deck { font-size: .88rem; max-width: 18rem; }
   .hero-stage { width: 38vw; right: -1.8rem; bottom: -.6rem; }
-  .profile-hero { min-height: 100svh; padding-top: 4.2rem; padding-bottom: 1.3rem; }
+  .profile-hero { min-height: 100svh; padding-top: max(3.95rem, calc(env(safe-area-inset-top) + 3.45rem)); padding-bottom: 1.3rem; }
   .profile-brand { width: 6rem; height: 6rem; }
   .profile-kicker { margin-bottom: .55rem; }
   .profile-hero h1 { font-size: 3.2rem; }
