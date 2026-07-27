@@ -71,8 +71,8 @@ export const metadata: Metadata = {
     "codex-preview": "development",
   },
   icons: {
-    icon: "/media/logo-background.jpg",
-    shortcut: "/media/logo-background.jpg",
+    icon: "/media/favicon.png",
+    shortcut: "/media/favicon.png",
   },
 };
 
