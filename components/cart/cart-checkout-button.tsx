@@ -41,6 +41,11 @@ export function CartCheckoutButton({
         origin,
       },
     });
+    await Promise.all(items.map((item) => trackAnalyticsEvent({
+      eventName: "checkout_product",
+      metadata: { origin, quantity: item.quantity, variation: item.variationName },
+      productId: item.productId,
+    })));
     const url = buildWhatsAppUrl(phone, message);
     if (pendingWindow) {
       pendingWindow.location.href = url;
@@ -59,4 +64,3 @@ export function CartCheckoutButton({
     </button>
   );
 }
-

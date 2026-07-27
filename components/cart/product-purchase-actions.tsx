@@ -34,12 +34,6 @@ export function ProductPurchaseActions({ product, store }: { product: Product; s
   const add = () => {
     if (unavailable) return;
     addItem(item);
-    void trackAnalyticsEvent({
-      categoryId: product.categoryId,
-      eventName: "add_to_cart",
-      metadata: { origin: "product_page", quantity },
-      productId: product.id,
-    });
   };
 
   const requestOnWhatsApp = async () => {

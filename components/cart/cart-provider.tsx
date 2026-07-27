@@ -170,7 +170,14 @@ export function CartProvider({
   const value = useMemo<CartContextValue>(
     () => ({
       addItem,
-      clear: () => setState({ items: [], version: CART_STATE_VERSION }),
+      clear: () => {
+        const itemCount = state.items.reduce((total, item) => total + item.quantity, 0);
+        setState({ items: [], version: CART_STATE_VERSION });
+        if (itemCount) void trackAnalyticsEvent({
+          eventName: "cart_cleared",
+          metadata: { item_count: itemCount },
+        });
+      },
       closeDrawer: () => setDrawerOpen(false),
       count: state.items.reduce((total, item) => total + item.quantity, 0),
       decrement,

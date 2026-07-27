@@ -1,40 +1,106 @@
 import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { HELENA_STORE_ID } from "@/types/commerce";
-
-type RawEvent = {
-  category_id: string | null;
-  created_at: string;
-  event_name: string;
-  metadata: Record<string, unknown>;
-  product_id: string | null;
-  referrer: string | null;
-  route: string;
-  session_id: string;
-  utm_campaign: string | null;
-  utm_medium: string | null;
-  utm_source: string | null;
-};
-
-function countBy(values: Array<string | null | undefined>) {
-  const counts = new Map<string, number>();
-  for (const value of values) {
-    if (!value) continue;
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]);
-}
-
-function namesFor(rows: Array<[string, number]>, names: Map<string, string>) {
-  return rows.slice(0, 8).map(([id, count]) => ({ count, id, label: names.get(id) ?? "Item removido" }));
-}
 
 export type AnalyticsPeriod = {
   end: Date;
   key: string;
   label: string;
   start: Date;
+};
+
+export type CountRow = { count: number; label: string };
+export type CityRow = {
+  city: string;
+  country_code: string | null;
+  latitude: number;
+  longitude: number;
+  region: string | null;
+  sessions: number;
+};
+export type ProductAnalyticsRow = {
+  additions: number;
+  clicks: number;
+  id: string;
+  impressions: number;
+  label: string;
+  views: number;
+  whatsapp_intents: number;
+};
+export type AnalyticsReport = {
+  browsers: CountRow[];
+  campaigns: CountRow[];
+  categories: Array<CountRow & { id: string }>;
+  cities: CityRow[];
+  comparison: { sessions: number; visits: number };
+  daily: Array<{
+    additions: number;
+    day: string;
+    sessions: number;
+    views: number;
+    whatsapp: number;
+  }>;
+  devices: CountRow[];
+  entries: CountRow[];
+  exits: CountRow[];
+  funnel: {
+    abandoned: number;
+    cart: number;
+    opened: number;
+    viewed: number;
+    whatsapp: number;
+  };
+  operatingSystems: CountRow[];
+  overview: {
+    averageDurationMs: number;
+    averageEngagedMs: number;
+    events: number;
+    newSessions: number;
+    productViews: number;
+    quickExits: number;
+    realtime: number;
+    returningSessions: number;
+    sessions: number;
+    visits: number;
+    whatsappClicks: number;
+    zeroResultSearches: number;
+  };
+  pages: CountRow[];
+  products: ProductAnalyticsRow[];
+  searches: Array<CountRow & { zero_results: number }>;
+  sources: CountRow[];
+};
+
+const EMPTY_REPORT: AnalyticsReport = {
+  browsers: [],
+  campaigns: [],
+  categories: [],
+  cities: [],
+  comparison: { sessions: 0, visits: 0 },
+  daily: [],
+  devices: [],
+  entries: [],
+  exits: [],
+  funnel: { abandoned: 0, cart: 0, opened: 0, viewed: 0, whatsapp: 0 },
+  operatingSystems: [],
+  overview: {
+    averageDurationMs: 0,
+    averageEngagedMs: 0,
+    events: 0,
+    newSessions: 0,
+    productViews: 0,
+    quickExits: 0,
+    realtime: 0,
+    returningSessions: 0,
+    sessions: 0,
+    visits: 0,
+    whatsappClicks: 0,
+    zeroResultSearches: 0,
+  },
+  pages: [],
+  products: [],
+  searches: [],
+  sources: [],
 };
 
 export function resolveAnalyticsPeriod(input: {
@@ -75,87 +141,13 @@ export function resolveAnalyticsPeriod(input: {
   };
 }
 
-export async function getAnalyticsReport(period: AnalyticsPeriod) {
+export async function getAnalyticsReport(period: AnalyticsPeriod): Promise<AnalyticsReport> {
   const supabase = await createSupabaseServerClient();
-  const duration = period.end.getTime() - period.start.getTime();
-  const previousStart = new Date(period.start.getTime() - duration);
-  const [currentResult, previousResult] = await Promise.all([
-    supabase
-      .from("analytics_events")
-      .select("event_name,product_id,category_id,route,session_id,metadata,referrer,utm_source,utm_medium,utm_campaign,created_at")
-      .eq("store_id", HELENA_STORE_ID)
-      .gte("created_at", period.start.toISOString())
-      .lte("created_at", period.end.toISOString())
-      .order("created_at", { ascending: false })
-      .limit(20_000),
-    supabase
-      .from("analytics_events")
-      .select("event_name,session_id")
-      .eq("store_id", HELENA_STORE_ID)
-      .gte("created_at", previousStart.toISOString())
-      .lt("created_at", period.start.toISOString())
-      .limit(20_000),
-  ]);
-  if (currentResult.error || previousResult.error) throw new Error("Não foi possível consultar os eventos.");
-  const events = (currentResult.data ?? []) as RawEvent[];
-  const previous = previousResult.data ?? [];
-  const productIds = [...new Set(events.flatMap((event) => event.product_id ? [event.product_id] : []))];
-  const categoryIds = [...new Set(events.flatMap((event) => event.category_id ? [event.category_id] : []))];
-  const [productResult, categoryResult] = await Promise.all([
-    productIds.length
-      ? supabase.from("products").select("id,name").eq("store_id", HELENA_STORE_ID).in("id", productIds)
-      : Promise.resolve({ data: [] }),
-    categoryIds.length
-      ? supabase.from("categories").select("id,name").eq("store_id", HELENA_STORE_ID).in("id", categoryIds)
-      : Promise.resolve({ data: [] }),
-  ]);
-  const productNames = new Map((productResult.data ?? []).map((item) => [item.id, item.name]));
-  const categoryNames = new Map((categoryResult.data ?? []).map((item) => [item.id, item.name]));
-  const eventCount = (name: string) => events.filter((event) => event.event_name === name).length;
-  const visits = eventCount("page_view");
-  const sessions = new Set(events.map((event) => event.session_id)).size;
-  const productViews = eventCount("product_view");
-  const cartSessions = new Set(events.filter((event) => event.event_name === "add_to_cart").map((event) => event.session_id)).size;
-  const whatsappSessions = new Set(events.filter((event) => event.event_name === "begin_whatsapp_checkout").map((event) => event.session_id)).size;
-  const previousVisits = previous.filter((event) => event.event_name === "page_view").length;
-  const previousSessions = new Set(previous.map((event) => event.session_id)).size;
-  const productRows = (name: string) =>
-    namesFor(countBy(events.filter((event) => event.event_name === name).map((event) => event.product_id)), productNames);
-  const searches = countBy(
-    events
-      .filter((event) => event.event_name === "search_performed")
-      .map((event) => typeof event.metadata?.query === "string" ? event.metadata.query.toLowerCase() : null),
-  ).slice(0, 8).map(([label, count]) => ({ label, count }));
-
-  return {
-    categories: namesFor(
-      countBy(events.filter((event) => event.event_name === "category_view").map((event) => event.category_id)),
-      categoryNames,
-    ),
-    cartSessions,
-    events: events.length,
-    productAdded: productRows("add_to_cart"),
-    productClicked: productRows("product_clicked"),
-    productViews,
-    productViewed: productRows("product_view"),
-    rates: {
-      cartToWhatsapp: cartSessions ? (whatsappSessions / cartSessions) * 100 : 0,
-      viewToCart: productViews ? (eventCount("add_to_cart") / productViews) * 100 : 0,
-    },
-    searches,
-    sessions,
-    sources: countBy(events.map((event) => event.utm_source ?? event.referrer ?? "Direto"))
-      .slice(0, 10)
-      .map(([label, count]) => ({ label, count })),
-    utmCampaigns: countBy(events.map((event) => event.utm_campaign))
-      .slice(0, 8)
-      .map(([label, count]) => ({ label, count })),
-    visits,
-    whatsappClicks: eventCount("whatsapp_opened"),
-    whatsappSessions,
-    comparison: {
-      sessions: previousSessions,
-      visits: previousVisits,
-    },
-  };
+  const { data, error } = await supabase.rpc("admin_store_analytics_v2", {
+    p_end: period.end.toISOString(),
+    p_start: period.start.toISOString(),
+  });
+  if (error) throw new Error("Não foi possível consultar o analytics da loja.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) return EMPTY_REPORT;
+  return { ...EMPTY_REPORT, ...(data as AnalyticsReport) };
 }

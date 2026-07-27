@@ -16,7 +16,7 @@ export function FilterEvent({
     const values = JSON.parse(serialized) as Record<string, string | undefined>;
     if (values.busca) {
       void trackAnalyticsEvent({
-        eventName: "search_performed",
+        eventName: resultCount === 0 ? "search_zero_results" : "search_performed",
         metadata: { query: values.busca, result_count: resultCount },
       });
     }

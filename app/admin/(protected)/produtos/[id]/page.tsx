@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 
+import { publishProductAction } from "@/app/admin/(protected)/produtos/actions";
 import { ProductForm } from "@/components/admin/product-form";
+import { ProductImageUploader } from "@/components/admin/product-image-uploader";
 import { adminImageUrls } from "@/lib/admin/product-images";
 import { requireAdminRole } from "@/lib/auth/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -41,33 +43,34 @@ export default async function EditProductPage({
   ]);
   if (!product) notFound();
   const urls = await adminImageUrls((images ?? []).map((image) => image.storage_path));
+  const imageCount = images?.length ?? 0;
 
   return (
     <main className="admin-page">
       <header className="admin-page-heading"><div><p>Editar produto</p><h1>{product.name}</h1></div></header>
+      <ol className="admin-stepper admin-edit-stepper" aria-label="Progresso do cadastro">
+        <li className="is-complete"><span>✓</span><div><strong>Informações</strong><small>Salvas</small></div></li>
+        <li className={imageCount ? "is-complete" : ""} aria-current={imageCount ? undefined : "step"}>
+          <span>{imageCount ? "✓" : "2"}</span>
+          <div><strong>Fotos</strong><small>{imageCount ? `${imageCount} adicionada(s)` : "Adicione ao menos uma"}</small></div>
+        </li>
+        <li className={product.status === "active" ? "is-complete" : ""} aria-current={imageCount && product.status === "draft" ? "step" : undefined}>
+          <span>{product.status === "active" ? "✓" : "3"}</span>
+          <div><strong>Publicar</strong><small>{product.status === "active" ? "Produto no ar" : "Quando estiver pronto"}</small></div>
+        </li>
+      </ol>
       {query.ok ? <p className="admin-success" role="status">Alteração concluída.</p> : null}
       {query.erro ? <p className="admin-error" role="alert">A ação não pôde ser concluída. Confira os dados e o estado de publicação.</p> : null}
       <ProductForm
         categories={categories ?? []}
         product={{ ...product, status: product.status as ProductStatus }}
       />
-      <section className="admin-panel" style={{ marginTop: 30, padding: 24 }}>
-        <p className="admin-section-kicker">Mídia</p>
+      <section className="admin-panel admin-product-media">
+        <p className="admin-section-kicker">Passo 2 · Fotos</p>
         <h2>Imagens da peça</h2>
-        <form action={uploadProductImageAction} className="admin-upload-form">
-          <input type="hidden" name="productId" value={product.id} />
-          <label>
-            Arquivo
-            <input name="image" type="file" accept="image/webp,.webp" required />
-          </label>
-          <label>
-            Texto alternativo
-            <input name="altText" maxLength={240} placeholder={`Detalhe de ${product.name}`} required />
-          </label>
-          <button type="submit">Enviar imagem</button>
-        </form>
-        <p className="admin-help">WebP já otimizado, entre 320 e 2400 px por lado, até 8 MB. O servidor valida assinatura, extensão, dimensões e loja de destino.</p>
-        {(images ?? []).length ? (
+        <ProductImageUploader action={uploadProductImageAction} productId={product.id} productName={product.name} />
+        <p className="admin-help">JPEG, PNG e WebP são convertidos e redimensionados no seu dispositivo. O servidor ainda valida tipo real, dimensões, tamanho e loja de destino.</p>
+        {imageCount ? (
           <div className="admin-image-grid">
             {(images ?? []).map((image) => (
               <article className="admin-image-card" key={image.id}>
@@ -99,8 +102,21 @@ export default async function EditProductPage({
               </article>
             ))}
           </div>
-        ) : <div className="admin-empty"><p>Nenhuma imagem enviada. Produtos só podem ser publicados após receber uma imagem principal válida.</p></div>}
+        ) : <div className="admin-empty"><p>Nenhuma imagem enviada. O produto só poderá ser publicado após receber uma imagem principal válida.</p></div>}
       </section>
+      {product.status === "draft" && imageCount ? (
+        <section className="admin-publish-callout">
+          <div>
+            <p className="admin-section-kicker">Passo 3 de 3</p>
+            <h2>Pronto para aparecer na loja?</h2>
+            <p>Revise as informações e publique. Você poderá editar ou marcar como indisponível depois.</p>
+          </div>
+          <form action={publishProductAction}>
+            <input type="hidden" name="id" value={product.id} />
+            <button type="submit">Publicar produto</button>
+          </form>
+        </section>
+      ) : null}
     </main>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { AnalyticsRuntime } from "@/components/analytics/analytics-runtime";
+import { AnalyticsDestinations } from "@/components/analytics/analytics-destinations";
 import { getStore } from "@/lib/catalog/repository";
 import { resolveStoreContext } from "@/lib/store/context";
 import "./globals.css";
@@ -126,6 +127,7 @@ export default async function RootLayout({
           }}
         />
         <CartProvider store={store}>
+          <AnalyticsDestinations />
           <AnalyticsRuntime />
           {children}
         </CartProvider>

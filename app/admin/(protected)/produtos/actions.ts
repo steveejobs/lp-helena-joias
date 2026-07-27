@@ -105,3 +105,19 @@ export async function archiveProductAction(formData: FormData) {
   refreshCatalog(data.slug);
   redirect("/admin/produtos?ok=arquivado");
 }
+
+export async function publishProductAction(formData: FormData) {
+  await requireAdminRole(["admin", "editor"], "/admin/produtos");
+  const id = uuidValue(formData, "id");
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("products")
+    .update({ status: "active" })
+    .eq("id", id)
+    .eq("store_id", HELENA_STORE_ID)
+    .select("slug")
+    .maybeSingle();
+  if (error || !data) redirect(`/admin/produtos/${id}?erro=publicar`);
+  refreshCatalog(data.slug);
+  redirect(`/admin/produtos/${id}?ok=publicado`);
+}

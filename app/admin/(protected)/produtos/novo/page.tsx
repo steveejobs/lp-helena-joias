@@ -1,4 +1,4 @@
-import { ProductForm } from "@/components/admin/product-form";
+import { NewProductForm } from "@/components/admin/new-product-form";
 import { requireAdminRole } from "@/lib/auth/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { HELENA_STORE_ID } from "@/types/commerce";
@@ -19,10 +19,10 @@ export default async function NewProductPage({
     .order("sort_order");
 
   return (
-    <main className="admin-page">
+    <main className="admin-page admin-guided-page">
       <header className="admin-page-heading"><div><p>Novo cadastro</p><h1>Adicionar peça</h1></div></header>
-      {params.erro ? <p className="admin-error" role="alert">Revise os campos. O produto ainda não foi criado.</p> : null}
-      <ProductForm categories={categories ?? []} />
+      {params.erro ? <p className="admin-error" role="alert">Revise os campos destacados. Nada foi perdido.</p> : null}
+      <NewProductForm categories={categories ?? []} />
     </main>
   );
 }

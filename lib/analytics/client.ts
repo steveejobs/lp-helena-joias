@@ -8,18 +8,69 @@ export type AnalyticsEventPayload = {
   productId?: string | null;
 };
 
-const SESSION_KEY = "helena.analytics.session";
+type AnalyticsContext = {
+  clientId: string;
+  sessionId: string;
+};
 
-export function getAnalyticsSessionId() {
-  let sessionId = window.localStorage.getItem(SESSION_KEY);
-  if (!sessionId || !/^[0-9a-f-]{36}$/i.test(sessionId)) {
-    sessionId = window.crypto.randomUUID();
-    window.localStorage.setItem(SESSION_KEY, sessionId);
-  }
-  return sessionId;
+type Attribution = {
+  referrer?: string;
+  utmCampaign?: string;
+  utmMedium?: string;
+  utmSource?: string;
+};
+
+const CLIENT_KEY = "helena.analytics.client.v2";
+const SESSION_KEY = "helena.analytics.session.v2";
+const ATTRIBUTION_KEY = "helena.analytics.attribution.v2";
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function validUuid(value: string | null): value is string {
+  return Boolean(value && UUID.test(value));
 }
 
-function attribution() {
+function clientId() {
+  const stored = window.localStorage.getItem(CLIENT_KEY);
+  if (validUuid(stored)) return stored;
+  const created = window.crypto.randomUUID();
+  window.localStorage.setItem(CLIENT_KEY, created);
+  return created;
+}
+
+function sessionId(): string {
+  const now = Date.now();
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(SESSION_KEY) ?? "null") as {
+      id?: string;
+      lastActivity?: number;
+    } | null;
+    if (
+      validUuid(stored?.id ?? null)
+      && typeof stored?.lastActivity === "number"
+      && now - stored.lastActivity < SESSION_TIMEOUT_MS
+    ) {
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify({ id: stored.id, lastActivity: now }));
+      return stored.id as string;
+    }
+  } catch {
+    // A malformed browser value is replaced below.
+  }
+  const created = window.crypto.randomUUID();
+  window.localStorage.setItem(SESSION_KEY, JSON.stringify({ id: created, lastActivity: now }));
+  window.sessionStorage.removeItem(ATTRIBUTION_KEY);
+  return created;
+}
+
+export function getAnalyticsContext(): AnalyticsContext {
+  return { clientId: clientId(), sessionId: sessionId() };
+}
+
+export function getAnalyticsSessionId() {
+  return getAnalyticsContext().sessionId;
+}
+
+function currentAttribution(): Attribution {
   const query = new URLSearchParams(window.location.search);
   let referrer: string | undefined;
   try {
@@ -35,15 +86,59 @@ function attribution() {
   };
 }
 
-export async function trackAnalyticsEvent(payload: AnalyticsEventPayload) {
+function attribution(): Attribution {
+  const current = currentAttribution();
+  const hasCampaign = current.utmCampaign || current.utmMedium || current.utmSource;
+  try {
+    const stored = JSON.parse(window.sessionStorage.getItem(ATTRIBUTION_KEY) ?? "null") as Attribution | null;
+    if (stored && !hasCampaign) return stored;
+    window.sessionStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(current));
+  } catch {
+    // Storage can be unavailable in privacy modes; current attribution still works.
+  }
+  return current;
+}
+
+function sendToGa4(payload: AnalyticsEventPayload, context: AnalyticsContext) {
+  const gtag = (window as Window & {
+    gtag?: (...args: unknown[]) => void;
+  }).gtag;
+  if (!gtag) return;
+  gtag("event", payload.eventName, {
+    category_id: payload.categoryId ?? undefined,
+    engagement_time_msec: payload.metadata?.engagement_ms,
+    page_path: payload.path ?? window.location.pathname,
+    product_id: payload.productId ?? undefined,
+    session_id: context.sessionId,
+    ...payload.metadata,
+  });
+}
+
+export async function trackAnalyticsEvent(
+  payload: AnalyticsEventPayload,
+  options: { beacon?: boolean } = {},
+) {
+  const context = getAnalyticsContext();
+  const body = JSON.stringify({
+    ...payload,
+    ...attribution(),
+    ...context,
+    eventId: window.crypto.randomUUID(),
+    path: payload.path ?? window.location.pathname,
+  });
+  sendToGa4(payload, context);
+
+  if (options.beacon && navigator.sendBeacon) {
+    const queued = navigator.sendBeacon(
+      "/api/analytics",
+      new Blob([body], { type: "application/json" }),
+    );
+    if (queued) return;
+  }
+
   try {
     await fetch("/api/analytics", {
-      body: JSON.stringify({
-        ...payload,
-        ...attribution(),
-        path: payload.path ?? window.location.pathname,
-        sessionId: getAnalyticsSessionId(),
-      }),
+      body,
       headers: { "Content-Type": "application/json" },
       keepalive: true,
       method: "POST",

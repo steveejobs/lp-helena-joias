@@ -32,10 +32,10 @@ export function HomeWhatsAppButton({
       type="button"
       disabled={!phone}
       onClick={open}
-      aria-label={phone ? "Falar no WhatsApp" : "Atendimento pelo WhatsApp sendo configurado"}
+      aria-label={phone ? "Falar no WhatsApp" : "Falar no WhatsApp — atendimento sendo configurado"}
     >
       <span className="whatsapp-icon" aria-hidden="true">◌</span>
-      <span>{phone ? "Falar no WhatsApp" : "Atendimento em configuração"}</span>
+      <span>{phone ? "Falar no WhatsApp" : "Falar no WhatsApp · em breve"}</span>
     </button>
   );
 }

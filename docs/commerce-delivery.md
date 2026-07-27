@@ -32,6 +32,9 @@ inventado. O catálogo Helena permanece vazio até o cadastro dos produtos reais
 1. `20260726220000_multistore_helena_foundation.sql`
 2. `20260726233000_helena_variant_isolation_and_storage.sql`
 3. `20260726234500_helena_runtime_image_compatibility.sql`
+4. `20260727090000_analytics_v2_event_types.sql`
+5. `20260727090500_analytics_v2_sessions_and_reporting.sql`
+6. `20260727100000_analytics_v2_report_refinements.sql`
 
 As migrations foram aplicadas incrementalmente no projeto Supabase
 `uwspaoysziftmmwnceud`. Nenhuma tabela foi truncada, nenhuma coluna da Vision foi
@@ -139,17 +142,18 @@ fica pública.
 ## Cadastrar produtos
 
 1. Entrar em `/admin/produtos`.
-2. Criar um rascunho com nome, categoria e informações comerciais reais.
-3. Abrir o produto criado e enviar ao menos uma imagem WebP.
-4. Conferir imagem principal, ordem e texto alternativo.
-5. Voltar ao formulário, escolher `Ativo` e salvar.
+2. Informar nome, categoria, descrição breve e preço opcional.
+3. Salvar o rascunho e escolher uma foto JPEG, PNG ou WebP.
+4. Conferir a prévia, imagem principal, ordem e texto alternativo.
+5. Usar o botão guiado **Publicar produto**.
 
 Produtos ativos precisam de imagem principal válida. A exclusão definitiva não
 existe na interface comum; use **Arquivar produto**.
 
-No runtime Cloudflare/Vinext não há codec nativo seguro para conversão de
-imagens. Por isso o painel aceita WebP já otimizado, de 320 a 2400 px por lado e
-até 8 MB. A Vision mantém intacto o contrato legado de cinco derivados.
+O navegador converte JPEG, PNG ou WebP de até 20 MB para um WebP otimizado,
+limitado a 2400 px. O servidor recebe somente o resultado WebP e valida
+assinatura binária, dimensão, tamanho e namespace da loja. A Vision mantém
+intacto o contrato legado de cinco derivados.
 
 ## Configurar WhatsApp
 
@@ -180,10 +184,15 @@ configuração e não geram link falso.
 - `begin_whatsapp_checkout`
 - `whatsapp_opened`
 - `instagram_clicked`
+- `page_engagement`
+- `search_zero_results`
+- `checkout_product`
+- `cart_cleared`
 
-O navegador mantém um UUID anônimo. Não são coletados nome, telefone, e-mail,
-texto da mensagem ou outro dado pessoal. Impressões exigem 45% de visibilidade
-por 800 ms e são deduplicadas por sessão de aba.
+O navegador mantém um UUID anônimo de visitante e outro de sessão, renovado
+após 30 minutos de inatividade. Não são coletados nome, telefone, e-mail, texto
+da mensagem, IP, GPS, endereço ou bairro. Impressões exigem 45% de visibilidade
+por 800 ms e são deduplicadas por sessão.
 
 ## Arquivos principais
 
@@ -238,7 +247,7 @@ Modificados:
 - não há screenshots de produto real ou dashboard autenticado porque a Helena
   ainda não possui produtos nem usuário administrativo;
 - WhatsApp permanece desconfigurado até o número real ser cadastrado;
-- o dashboard consulta até 20 mil eventos por intervalo; para volumes maiores,
-  deve evoluir para agregações diárias materializadas por loja;
-- conversão automática de JPEG/PNG para WebP depende de um serviço de imagem
-  compatível com Cloudflare e não foi simulada.
+- o mapa depende de um provedor de tiles; o padrão OpenStreetMap é adequado para
+  uso administrativo moderado e pode ser substituído por variável de ambiente;
+- o dashboard autenticado só poderá receber screenshot com dados reais após o
+  provisionamento do primeiro administrador e a chegada de tráfego real.
