@@ -25,7 +25,7 @@ export function ProductGallery({
   }
 
   return (
-    <div className="product-gallery">
+    <div className={`product-gallery${images.length > 1 ? "" : " product-gallery-single"}`}>
       <button
         className="product-main-image"
         type="button"
@@ -38,7 +38,8 @@ export function ProductGallery({
           width={active.width ?? 1000}
           height={active.height ?? 1200}
           sizes="(max-width: 800px) 100vw, 58vw"
-          priority
+          preload
+          quality={90}
         />
         <span>Ampliar</span>
       </button>
@@ -54,7 +55,7 @@ export function ProductGallery({
               key={image.id}
             >
               {image.url ? (
-                <Image src={image.url} alt="" width={120} height={144} sizes="72px" />
+                <Image src={image.url} alt="" width={120} height={144} sizes="72px" quality={90} />
               ) : null}
             </button>
           ))}
@@ -69,10 +70,10 @@ export function ProductGallery({
             width={active.width ?? 1200}
             height={active.height ?? 1400}
             sizes="95vw"
+            quality={90}
           />
         </div>
       ) : null}
     </div>
   );
 }
-

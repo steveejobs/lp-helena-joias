@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ProductAnalytics } from "@/components/analytics/product-analytics";
+import { ProductCardActions } from "@/components/store/product-card-actions";
 
 import type { Product, Store } from "@/types/commerce";
 
@@ -25,7 +26,7 @@ export function ProductCard({
 
   return (
     <article
-      className={`product-card ${index % 7 === 0 ? "product-card-feature" : ""}`}
+      className="product-card"
       data-product-id={product.id}
       style={{ "--product-index": index % 8 } as React.CSSProperties}
     >
@@ -37,8 +38,9 @@ export function ProductCard({
             alt={image.altText}
             width={image.width ?? 900}
             height={image.height ?? 1100}
-            priority={index < 4}
-            sizes={index % 7 === 0 ? "(max-width: 760px) 100vw, 48vw" : "(max-width: 760px) 50vw, 25vw"}
+            preload={index === 0}
+            quality={90}
+            sizes="(max-width: 900px) 50vw, 25vw"
           />
         ) : (
           <span className="product-image-missing" aria-label="Imagem ainda não cadastrada">
@@ -56,9 +58,25 @@ export function ProductCard({
         <p>{product.category?.name ?? "Helena Joias"}</p>
         <h3><Link href={`/produto/${product.slug}`}>{product.name}</Link></h3>
         {product.shortDescription ? <span>{product.shortDescription}</span> : null}
-        <div>
+        <div className="product-card-buy-row">
           <strong>{priceVisible ? formatPrice(product.price!, store) : "Consulte pelo WhatsApp"}</strong>
-          <Link href={`/produto/${product.slug}`} aria-label={`Ver ${product.name}`}>↗</Link>
+          <div>
+            <Link href={`/produto/${product.slug}`}>Ver detalhes</Link>
+            <ProductCardActions
+              item={{
+                imageAlt: image?.altText ?? null,
+                imageUrl: image?.url ?? null,
+                name: product.name,
+                price: priceVisible ? product.price : null,
+                productId: product.id,
+                quantity: 1,
+                slug: product.slug,
+                status: product.status === "sold_out" ? "sold_out" : "active",
+                variationId: null,
+                variationName: null,
+              }}
+            />
+          </div>
         </div>
       </div>
     </article>

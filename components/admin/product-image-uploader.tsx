@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 const SOURCE_LIMIT = 20 * 1024 * 1024;
+const SERVER_LIMIT = 8 * 1024 * 1024;
 const MAX_DIMENSION = 2_400;
 
 type PreparedImage = {
@@ -49,15 +50,6 @@ export function ProductImageUploader({
         setError("A foto precisa ter pelo menos 320 pixels em cada lado.");
         return;
       }
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const context = canvas.getContext("2d", { alpha: true });
-      if (!context) throw new Error("canvas_unavailable");
-      context.drawImage(bitmap, 0, 0, width, height);
-      bitmap.close();
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.88));
-      if (!blob) throw new Error("conversion_failed");
       const safeName = file.name
         .replace(/\.[^.]+$/, "")
         .normalize("NFD")
@@ -65,6 +57,22 @@ export function ProductImageUploader({
         .replace(/[^a-z0-9-]+/gi, "-")
         .replace(/^-+|-+$/g, "")
         .toLowerCase() || "produto";
+      const keepOriginal = file.type === "image/webp" && scale === 1 && file.size <= SERVER_LIMIT;
+      let blob: Blob = file;
+      if (!keepOriginal) {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d", { alpha: true });
+        if (!context) throw new Error("canvas_unavailable");
+        context.drawImage(bitmap, 0, 0, width, height);
+        const converted = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, "image/webp", 0.94),
+        );
+        if (!converted) throw new Error("conversion_failed");
+        blob = converted;
+      }
+      bitmap.close();
       const optimized = new File([blob], `${safeName}.webp`, { type: "image/webp" });
       const transfer = new DataTransfer();
       transfer.items.add(optimized);
