@@ -106,19 +106,23 @@ test("ships the high-resolution logo formation and scroll-driven butterfly asset
   assert.ok(sprite.byteLength > 1_000_000);
 });
 
-test("keeps contact CTAs prominent but inactive until data is confirmed", async () => {
-  const [home, links] = await Promise.all([
+test("keeps contact CTAs visible and activates them only from store configuration", async () => {
+  const [home, links, whatsappButton] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/instagram/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/home/whatsapp-button.tsx", import.meta.url), "utf8"),
   ]);
   const source = `${home}\n${links}`;
 
   assert.match(source, /Falar no WhatsApp/);
   assert.match(source, /Traçar rota/);
-  assert.doesNotMatch(source, /wa\.me|api\.whatsapp\.com|google\.com\/maps\/dir/);
+  assert.doesNotMatch(source, /google\.com\/maps\/dir|\+?55\d{10,}/);
+  assert.match(source, /disabled=\{!phone\}/);
+  assert.match(whatsappButton, /normalizeWhatsAppNumber\(store\.whatsappNumber\)/);
+  assert.match(whatsappButton, /wa\.me\/\$\{phone\}/);
   assert.doesNotMatch(source, /images\.length \+ \.85/);
-  assert.match(home, /Math\.exp\(-delta \/ 185\)/);
-  assert.match(home, /const maxStep = delta \/ 1350/);
+  assert.match(home, /Math\.exp\(-delta \/ \(compact \? 72 : 92\)\)/);
+  assert.match(home, /const maxStep = delta \/ \(compact \? 520 : 680\)/);
   assert.match(links, /Math\.exp\(-delta \/ 190\)/);
   assert.match(links, /const maxStep = delta \/ 1300/);
 });

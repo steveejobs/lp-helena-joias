@@ -2,6 +2,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CartCountButton } from "@/components/cart/cart-count-button";
+import { HomeStorePreview } from "@/components/home/store-preview";
+import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
 
 type GalleryImage = { src: string; alt: string; position?: string };
 
@@ -405,10 +408,7 @@ function ScrollGallery({
           </div>
           <div className="collection-actions">
             <TransitionLink className="collection-instagram" href="/instagram">Conhecer a Helena <span aria-hidden="true">→</span></TransitionLink>
-            <button className="whatsapp-spotlight whatsapp-spotlight-compact" type="button" disabled aria-label="Falar no WhatsApp — número ainda não cadastrado">
-              <span className="whatsapp-icon" aria-hidden="true">◌</span>
-              <span>Falar no WhatsApp</span>
-            </button>
+            <HomeWhatsAppButton className="whatsapp-spotlight whatsapp-spotlight-compact" origin={`coleção ${title}`} />
           </div>
         </div>
       </div>
@@ -441,10 +441,7 @@ function ExperienceBridge({
           <p>{description}</p>
           <div className="bridge-actions">
             <TransitionLink className="bridge-primary" href="/instagram">Descobrir a loja <span aria-hidden="true">↗︎</span></TransitionLink>
-            <button className="whatsapp-spotlight" type="button" disabled aria-label="Falar no WhatsApp — número ainda não cadastrado">
-              <span className="whatsapp-icon" aria-hidden="true">◌</span>
-              <span>Falar no WhatsApp</span>
-            </button>
+            <HomeWhatsAppButton origin={`seção ${id}`} />
             {showRoute ? (
               <button className="route-pending" type="button" disabled aria-label="Traçar rota — endereço ainda não cadastrado">
                 <span>Traçar rota</span><small>Como chegar</small>
@@ -531,10 +528,12 @@ export default function Home() {
           <span>Helena <small>Joias</small></span>
         </a>
         <nav aria-label="Navegação principal">
+          <TransitionLink href="/loja" className="nav-cta">Loja <span aria-hidden="true">↗︎</span></TransitionLink>
           <a href="#colecoes">Coleções</a>
           <a href="#movimento">Em movimento</a>
           <a href="#visite">Visite a Helena</a>
-          <TransitionLink href="/instagram" className="nav-cta">Instagram <span aria-hidden="true">↗︎</span></TransitionLink>
+          <TransitionLink href="/instagram">Instagram</TransitionLink>
+          <CartCountButton />
         </nav>
       </header>
 
@@ -549,8 +548,9 @@ export default function Home() {
           </h1>
           <p className="hero-deck">Na Helena, você encontra uma seleção de joias para experimentar combinações, descobrir novos detalhes e escolher o brilho que faz sentido para você.</p>
           <div className="hero-actions">
-            <a className="primary-button" href="#colecoes"><span>Explorar coleções</span><i aria-hidden="true">→</i></a>
-            <button className="whatsapp-spotlight" type="button" disabled aria-label="Falar no WhatsApp — número ainda não cadastrado"><span className="whatsapp-icon" aria-hidden="true">◌</span><span>Falar no WhatsApp</span></button>
+            <TransitionLink className="primary-button" href="/loja"><span>Explorar peças</span><i aria-hidden="true">→</i></TransitionLink>
+            <a className="text-link" href="#colecoes">Ver coleções <span aria-hidden="true">↓</span></a>
+            <HomeWhatsAppButton origin="hero da home" />
             <a className="text-link" href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗︎</span></a>
           </div>
         </div>
@@ -581,6 +581,8 @@ export default function Home() {
         <h2 id="collections-title">Escolha o brilho<br /><em>que acompanha o seu.</em></h2>
         <a href="#luz-de-perto">Começar a descoberta <span aria-hidden="true">↓</span></a>
       </section>
+
+      <HomeStorePreview />
 
       <ScrollGallery
         id="luz-de-perto"
@@ -637,10 +639,11 @@ export default function Home() {
         <p>Beleza, brilho e presença.</p>
         <nav aria-label="Navegação do rodapé">
           <a href="#inicio">Início</a>
+          <TransitionLink href="/loja">Loja online</TransitionLink>
           <a href="#colecoes">Coleções</a>
           <TransitionLink href="/instagram">Experiência Instagram</TransitionLink>
           <a href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram ↗︎</a>
-          <button className="whatsapp-spotlight footer-whatsapp" type="button" disabled aria-label="Falar no WhatsApp — número ainda não cadastrado"><span className="whatsapp-icon" aria-hidden="true">◌</span><span>Falar no WhatsApp</span></button>
+          <HomeWhatsAppButton className="whatsapp-spotlight footer-whatsapp" origin="rodapé da home" />
         </nav>
         <div className="footer-meta"><span>Seg–Sex 08h — 18h · Sábado 08h — 12h</span><small>© {new Date().getFullYear()} Helena Joias</small></div>
       </footer>

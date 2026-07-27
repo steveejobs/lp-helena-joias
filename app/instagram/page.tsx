@@ -3,6 +3,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
+import { useCart } from "@/components/cart/cart-provider";
+import { normalizeWhatsAppNumber } from "@/lib/whatsapp/order-message";
 
 type ProfileLinkProps = {
   number: string;
@@ -12,6 +15,7 @@ type ProfileLinkProps = {
   external?: boolean;
   primary?: boolean;
   disabled?: boolean;
+  action?: () => void;
 };
 
 const topGallery = [
@@ -28,7 +32,7 @@ const bottomGallery = [
   { src: "/media/gallery-2-4.jpg", alt: "Seleção dourada Helena Joias" },
 ];
 
-function ProfileLink({ number, title, detail, href, external = false, primary = false, disabled = false }: ProfileLinkProps) {
+function ProfileLink({ number, title, detail, href, external = false, primary = false, disabled = false, action }: ProfileLinkProps) {
   const className = `profile-link ${primary ? "profile-link-primary" : ""}`;
 
   if (disabled) {
@@ -41,7 +45,20 @@ function ProfileLink({ number, title, detail, href, external = false, primary = 
     );
   }
 
+  if (action) {
+    return (
+      <button className={className} type="button" onClick={action}>
+        <span className="profile-link-number">{number}</span>
+        <span className="profile-link-copy"><strong>{title}</strong><small>{detail}</small></span>
+        <i aria-hidden="true">↗</i>
+      </button>
+    );
+  }
+
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (external && href?.includes("instagram.com")) {
+      void trackAnalyticsEvent({ eventName: "instagram_clicked", metadata: { source: "instagram_route" } });
+    }
     if (external || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     document.documentElement.classList.add("is-leaving");
@@ -232,6 +249,19 @@ function LinkVideo({ src, poster, label }: { src: string; poster: string; label:
 }
 
 export default function InstagramLinks() {
+  const { store } = useCart();
+  const phone = normalizeWhatsAppNumber(store.whatsappNumber);
+  const openWhatsApp = async () => {
+    if (!phone) return;
+    const message = store.whatsappDefaultMessage?.trim()
+      || `Olá! Vim pela página de links da ${store.name} e gostaria de solicitar atendimento.`;
+    const pending = window.open("", "_blank");
+    if (pending) pending.opener = null;
+    await trackAnalyticsEvent({ eventName: "whatsapp_opened", metadata: { origin: "instagram_route" } });
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    if (pending) pending.location.href = url;
+    else window.location.assign(url);
+  };
   useEffect(() => {
     document.body.classList.add("link-body");
     const revealItems = Array.from(document.querySelectorAll<HTMLElement>("[data-link-reveal]"));
@@ -270,7 +300,7 @@ export default function InstagramLinks() {
           document.documentElement.classList.add("is-leaving");
           window.setTimeout(() => { window.location.href = "/"; }, 380);
         }}><span aria-hidden="true">←</span> Site completo</Link>
-        <span>@helenaajoias</span>
+        <Link href="/loja">Loja online ↗</Link>
       </header>
 
       <section className="profile-hero" aria-labelledby="link-title">
@@ -283,10 +313,11 @@ export default function InstagramLinks() {
         <p className="profile-deck">Conheça a Helena, explore as coleções e escolha o próximo passo.</p>
 
         <nav className="profile-links" aria-label="Links principais da Helena Joias">
-          <ProfileLink number="01" title="Falar no WhatsApp" detail="Atendimento direto" primary disabled />
-          <ProfileLink number="02" title="Traçar rota" detail="Encontre a Helena" disabled />
-          <ProfileLink number="03" title="Ver Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
-          <ProfileLink number="04" title="Site completo" detail="Viva a experiência Helena" href="/" />
+          <ProfileLink number="01" title="Explorar a loja" detail="Escolha suas peças online" href="/loja" primary />
+          <ProfileLink number="02" title="Falar no WhatsApp" detail={phone ? "Atendimento direto" : "Atendimento em configuração"} action={phone ? openWhatsApp : undefined} disabled={!phone} />
+          <ProfileLink number="03" title="Traçar rota" detail="Encontre a Helena" disabled />
+          <ProfileLink number="04" title="Ver Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
+          <ProfileLink number="05" title="Site completo" detail="Viva a experiência Helena" href="/" />
         </nav>
 
         <div className="profile-hours" aria-label="Horário de funcionamento">
@@ -306,14 +337,15 @@ export default function InstagramLinks() {
           <LinkVideo src="/media/atelier-2.mp4" poster="/media/atelier-2-poster.jpg" label="Seleção de peças" />
         </div>
         <div className="link-final-links" data-link-reveal>
-          <ProfileLink number="→" title="Falar no WhatsApp" detail="Atendimento direto" primary disabled />
+          <ProfileLink number="→" title="Explorar a loja" detail="Curadoria online" href="/loja" primary />
+          <ProfileLink number="→" title="Falar no WhatsApp" detail={phone ? "Atendimento direto" : "Atendimento em configuração"} action={phone ? openWhatsApp : undefined} primary disabled={!phone} />
           <ProfileLink number="↗" title="Acompanhar no Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
         </div>
       </section>
 
       <footer className="link-footer">
         <span>Helena Joias</span><span>Beleza · brilho · exclusividade</span>
-        <Link href="/">Experiência completa <span aria-hidden="true">↗︎</span></Link>
+        <Link href="/loja">Explorar a loja <span aria-hidden="true">↗︎</span></Link>
       </footer>
     </main>
   );
