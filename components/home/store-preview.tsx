@@ -89,7 +89,6 @@ export function HomeStorePreview() {
             >
               <span className="home-store-image">
                 <img src={src} alt={alt} width={product?.image?.width ?? 900} height={product?.image?.height ?? 1200} loading={index ? "lazy" : "eager"} />
-                <i>{String(index + 1).padStart(2, "0")}</i>
               </span>
               <span className="home-store-piece-copy">
                 <small>{label}</small>

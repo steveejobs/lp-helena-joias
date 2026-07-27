@@ -26,9 +26,10 @@ export function CategoryRail({
             <CategoryIcon iconKey={category.iconKey} label={`Categoria ${category.name}`} />
           </span>
           <span className="category-rail-copy">
-            <b>{String(index + 1).padStart(2, "0")}</b>
             <strong>{category.name}</strong>
-            <i aria-hidden="true">↗</i>
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M5 15 15 5M7 5h8v8" />
+            </svg>
           </span>
         </Link>
       ))}

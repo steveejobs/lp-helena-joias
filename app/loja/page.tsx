@@ -5,6 +5,7 @@ import { CatalogEmpty } from "@/components/store/catalog-empty";
 import { CatalogFilters } from "@/components/store/catalog-filters";
 import { CategoryRail } from "@/components/store/category-rail";
 import { ProductCard } from "@/components/store/product-card";
+import { StoreButterfly } from "@/components/store/store-butterfly";
 import { listCategories, listProducts, getStore } from "@/lib/catalog/repository";
 import { resolveStoreContext } from "@/lib/store/context";
 import type { CatalogFilters as Filters } from "@/types/commerce";
@@ -98,6 +99,7 @@ export default async function ShopPage({
           <p>Escolha por forma</p>
           <h2 id="categories-title">Encontre o detalhe<br /><em>que fala por você.</em></h2>
         </div>
+        <StoreButterfly />
         <CategoryRail categories={categories} />
       </section>
 

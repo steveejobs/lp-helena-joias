@@ -27,6 +27,7 @@ export function ProductCard({
     <article
       className={`product-card ${index % 7 === 0 ? "product-card-feature" : ""}`}
       data-product-id={product.id}
+      style={{ "--product-index": index % 8 } as React.CSSProperties}
     >
       <ProductAnalytics categoryId={product.categoryId} productId={product.id} />
       <Link className="product-card-media" href={`/produto/${product.slug}`}>

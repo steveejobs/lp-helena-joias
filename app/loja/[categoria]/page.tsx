@@ -83,7 +83,7 @@ export default async function CategoryPage({ params }: PageProps) {
         <Link href="/loja">Loja</Link><span>/</span><span>{category.name}</span>
       </nav>
       <section className="category-opening">
-        <p>Categoria · {String(category.sortOrder + 1).padStart(2, "0")}</p>
+        <p>Explore por categoria</p>
         <h1>{category.name}</h1>
         <span>{category.description ?? "Uma seleção dedicada a essa forma de brilhar."}</span>
       </section>
