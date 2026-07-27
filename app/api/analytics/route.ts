@@ -81,17 +81,31 @@ function clientProfile(userAgent: string | null) {
 }
 
 function cityGeo(request: CloudflareRequest) {
-  const latitude = Number(request.cf?.latitude);
-  const longitude = Number(request.cf?.longitude);
+  const cityHeader = request.headers.get("x-vercel-ip-city");
+  let vercelCity = cityHeader;
+  try {
+    vercelCity = cityHeader ? decodeURIComponent(cityHeader) : null;
+  } catch {
+    vercelCity = cityHeader;
+  }
+  const latitudeValue = request.cf?.latitude ?? request.headers.get("x-vercel-ip-latitude");
+  const longitudeValue = request.cf?.longitude ?? request.headers.get("x-vercel-ip-longitude");
+  const latitude = latitudeValue === null || latitudeValue === undefined ? Number.NaN : Number(latitudeValue);
+  const longitude = longitudeValue === null || longitudeValue === undefined ? Number.NaN : Number(longitudeValue);
   return {
-    city: shortString(request.cf?.city, 120),
+    city: shortString(request.cf?.city ?? vercelCity, 120),
     country: shortString(
-      request.cf?.country ?? request.headers.get("cf-ipcountry"),
+      request.cf?.country
+        ?? request.headers.get("x-vercel-ip-country")
+        ?? request.headers.get("cf-ipcountry"),
       2,
     )?.toUpperCase() ?? null,
     latitude: Number.isFinite(latitude) ? Math.round(latitude * 10) / 10 : null,
     longitude: Number.isFinite(longitude) ? Math.round(longitude * 10) / 10 : null,
-    region: shortString(request.cf?.region, 120),
+    region: shortString(
+      request.cf?.region ?? request.headers.get("x-vercel-ip-country-region"),
+      120,
+    ),
   };
 }
 

@@ -26,7 +26,8 @@ métrica. A adição à sacola possui uma única fonte de emissão.
 ## Privacidade geográfica
 
 A aplicação não solicita GPS e não armazena IP, CEP, endereço ou bairro. O
-servidor usa os campos geográficos do `request.cf`, remove precisão e grava
+servidor usa os campos geográficos do `request.cf` no Cloudflare ou os
+cabeçalhos `x-vercel-ip-*` na Vercel, remove precisão e grava
 latitude/longitude com apenas uma casa decimal. O dashboard agrega por cidade e
 limita o mapa a zoom 8.
 
