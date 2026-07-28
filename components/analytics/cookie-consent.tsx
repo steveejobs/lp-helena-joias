@@ -47,7 +47,6 @@ export function CookieConsent() {
       className="cookie-consent"
       role="dialog"
     >
-      <div className="cookie-consent-mark" aria-hidden="true"><i /><i /></div>
       <div className="cookie-consent-copy">
         <p>Privacidade, com transparência</p>
         <h2 id="cookie-consent-title">Uma experiência feita para você.</h2>
@@ -59,7 +58,7 @@ export function CookieConsent() {
       </div>
       <div className="cookie-consent-actions">
         <button type="button" className="cookie-consent-accept" onClick={() => choose("accepted")}>
-          Aceitar analytics
+          Aceitar cookies
         </button>
         <button type="button" onClick={() => choose("necessary")}>
           Somente necessários

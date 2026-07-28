@@ -32,7 +32,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   right: clamp(.8rem, 2vw, 1.5rem);
   bottom: max(clamp(.8rem, 2vw, 1.5rem), env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem 1.25rem;
   width: min(52rem, calc(100vw - 1.6rem));
@@ -46,35 +46,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
   animation: cookie-consent-in .55s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.cookie-consent-mark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 3.6rem;
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: 50%;
-  background: var(--ink);
-}
-
-.cookie-consent-mark::before {
-  width: 1.25rem;
-  aspect-ratio: 1;
-  border: 1px solid var(--rose-200);
-  border-radius: 50%;
-  content: "";
-}
-
-.cookie-consent-mark i {
-  position: absolute;
-  width: .24rem;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--rose-200);
-}
-
-.cookie-consent-mark i:first-child { transform: translate(-.72rem, -.62rem); }
-.cookie-consent-mark i:last-child { transform: translate(.72rem, .62rem); }
 .cookie-consent-copy { min-width: 0; }
 .cookie-consent-copy > p {
   margin: 0 0 .35rem;
@@ -148,17 +119,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
     left: .7rem;
     right: .7rem;
     bottom: max(.7rem, env(safe-area-inset-bottom));
-    grid-template-columns: 2.8rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: .8rem;
     width: auto;
     padding: .9rem;
     border-radius: 1.15rem;
   }
-  .cookie-consent-mark { width: 2.8rem; align-self: start; }
   .cookie-consent-copy h2 { font-size: 1rem; }
   .cookie-consent-copy > span { font-size: .64rem; }
   .cookie-consent-actions {
-    grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 1fr 1fr;
     min-width: 0;
@@ -187,7 +156,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .brand-intro { position: fixed; z-index: 110; inset: 0; display: grid; place-items: center; overflow: hidden; background: var(--ink); color: var(--rose-100); pointer-events: auto; transform-origin: top; transition: transform .66s cubic-bezier(.76,0,.24,1), filter .58s ease; }
 .brand-intro::before { content: ""; position: absolute; width: min(70vw, 48rem); aspect-ratio: 1; border: 1px solid rgba(250,220,212,.12); border-radius: 50%; box-shadow: 0 0 0 6rem rgba(250,220,212,.035), 0 0 0 12rem rgba(250,220,212,.018); animation: intro-ring 1.45s cubic-bezier(.16,1,.3,1) both; }
-.brand-intro::after { content: ""; position: absolute; left: 8vw; right: 8vw; top: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(250,220,212,.26), transparent); transform: scaleX(0); animation: intro-line .9s ease .48s both; }
 .brand-intro-halo { position: absolute; width: min(44vw, 31rem); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(180,147,110,.2), transparent 68%); filter: blur(12px); animation: intro-halo 1.3s ease-in-out both; }
 .brand-intro-animation { position: relative; z-index: 2; width: min(42vw, 23rem); height: min(42vw, 23rem); object-fit: contain; filter: drop-shadow(0 1.5rem 3rem rgba(180,147,110,.18)); }
 .brand-intro-wordmark { position: absolute; z-index: 3; top: calc(50% + min(18vw, 10.5rem)); display: flex; align-items: baseline; gap: .75rem; text-transform: uppercase; letter-spacing: .34em; opacity: 0; transform: translateY(1.2rem); animation: intro-wordmark .52s cubic-bezier(.16,1,.3,1) .72s both; }
@@ -502,7 +470,6 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 @keyframes gallery-light-sweep { 0%, 18% { transform: translateX(-120%); } 62%, 100% { transform: translateX(120%); } }
 @keyframes rail-meeting-pulse { 50% { transform: translate(-50%,-50%) scale(1.08); box-shadow: 0 0 3.8rem rgba(250,220,212,.2); } }
 @keyframes intro-ring { from { opacity: 0; transform: scale(.72); } 45% { opacity: 1; } to { opacity: .55; transform: scale(1); } }
-@keyframes intro-line { to { transform: scaleX(1); } }
 @keyframes intro-halo { from { opacity: 0; transform: scale(.55); } 45% { opacity: .7; } to { opacity: .38; transform: scale(1.18); } }
 @keyframes intro-wordmark { to { opacity: 1; transform: none; } }
 @keyframes intro-copy { to { opacity: .52; } }
