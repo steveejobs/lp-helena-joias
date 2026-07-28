@@ -18,19 +18,48 @@ export function CookieConsent() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
+    let frame = 0;
+    let revealTimer = 0;
+    let fallbackTimer = 0;
+
+    const prepareConsent = () => {
+      frame = window.requestAnimationFrame(() => {
+        const stored = getAnalyticsConsent();
+        setChoice(stored);
+        setOpen(stored === null);
+        setReady(true);
+      });
+    };
+    const prepareAfterIntro = () => {
+      window.clearTimeout(fallbackTimer);
+      revealTimer = window.setTimeout(prepareConsent, 1150);
+    };
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const waitsForHomeIntro = pathname === "/" && !reducedMotion;
+
+    if (waitsForHomeIntro) {
+      window.addEventListener("helena:intro-complete", prepareAfterIntro, { once: true });
+      fallbackTimer = window.setTimeout(prepareAfterIntro, 3800);
+    } else {
+      prepareConsent();
+    }
+
+    const reopen = () => {
       const stored = getAnalyticsConsent();
       setChoice(stored);
-      setOpen(stored === null);
       setReady(true);
-    });
-    const reopen = () => setOpen(true);
+      setOpen(true);
+    };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
+
     return () => {
       window.cancelAnimationFrame(frame);
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener("helena:intro-complete", prepareAfterIntro);
       window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
     };
-  }, []);
+  }, [pathname]);
 
   if (!ready || !open || pathname.startsWith("/admin")) return null;
 

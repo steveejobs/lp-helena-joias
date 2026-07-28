@@ -7,7 +7,6 @@ const REVEAL_SELECTOR = [
   ".featured-products",
   ".catalog-section",
   ".shop-assistance",
-  ".category-opening",
   ".category-products",
   ".product-detail",
   ".related-products",

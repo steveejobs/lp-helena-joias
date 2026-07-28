@@ -82,7 +82,7 @@ export default async function CategoryPage({ params }: PageProps) {
       <nav className="store-breadcrumbs" aria-label="Navegação estrutural">
         <Link href="/loja">Loja</Link><span>/</span><span>{category.name}</span>
       </nav>
-      <section className="category-opening">
+      <section className="category-opening" key={category.slug}>
         <p>Explore por categoria</p>
         <h1>{category.name}</h1>
         <span>{category.description ?? "Uma seleção dedicada a essa forma de brilhar."}</span>

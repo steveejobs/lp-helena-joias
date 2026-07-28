@@ -563,10 +563,28 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   .link-footer span:nth-child(2) { display: none; }
   .home-store-heading { grid-template-columns: 1fr; align-items: start; gap: 1.6rem; }
   .home-store-heading > div:last-child { max-width: 29rem; margin-left: auto; }
-  .home-store-stage { grid-template-rows: repeat(2, minmax(17rem, 48vw)); }
-  .home-category-line { overflow-x: auto; grid-template-columns: repeat(5, minmax(10rem, 1fr)); scrollbar-width: none; }
+  .home-store-stage {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(32rem, 96vw) minmax(18rem, 54vw);
+    gap: .8rem;
+  }
+  .home-store-piece-1 { grid-column: 1 / -1; grid-row: 1; }
+  .home-store-piece-2 { grid-column: 1; grid-row: 2; }
+  .home-store-piece-3 { grid-column: 2; grid-row: 2; }
+  .home-store-note { display: none; }
+  .home-category-line {
+    overflow-x: auto;
+    grid-template-columns: repeat(5, minmax(10rem, 1fr));
+    scroll-padding-inline: .5rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
   .home-category-line::-webkit-scrollbar { display: none; }
-  .home-category-line a { min-height: 8rem; grid-template-columns: 4rem 1fr; }
+  .home-category-line a {
+    min-height: 8rem;
+    grid-template-columns: 4rem 1fr;
+    scroll-snap-align: start;
+  }
 }
 
 @media (max-width: 420px) and (max-height: 830px) {
@@ -656,9 +674,6 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   .home-store-piece-1 { grid-column: 1 / -1; grid-row: 1; }
   .home-store-piece-2 { grid-column: 1; grid-row: 2; }
   .home-store-piece-3 { grid-column: 2; grid-row: 2; }
-  .home-store-note { grid-column: 1 / -1; grid-row: 3; min-height: 4rem; flex-direction: row; align-items: center; padding: .85rem 1rem; writing-mode: initial; }
-  .home-store-note span { font-size: 1.05rem; }
-  .home-store-note p { text-align: right; }
   .home-store-piece-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; padding: 1rem; }
   .home-store-piece-copy strong { width: 100%; font-size: 1.35rem; }
   .home-store-piece-2 .home-store-piece-copy, .home-store-piece-3 .home-store-piece-copy { padding: .85rem; }

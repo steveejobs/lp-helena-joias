@@ -53,11 +53,13 @@ export function ProductCard({
           {product.featured ? <small>Destaque</small> : null}
           {product.status === "sold_out" ? <small>Indisponível</small> : null}
         </span>
+        {product.shortDescription ? (
+          <span className="product-card-description">{product.shortDescription}</span>
+        ) : null}
       </Link>
       <div className="product-card-copy">
         <p>{product.category?.name ?? "Helena Joias"}</p>
         <h3><Link href={`/produto/${product.slug}`}>{product.name}</Link></h3>
-        {product.shortDescription ? <span>{product.shortDescription}</span> : null}
         <div className="product-card-buy-row">
           <strong>{priceVisible ? formatPrice(product.price!, store) : "Consulte pelo WhatsApp"}</strong>
           <div>
