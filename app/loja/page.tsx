@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { CatalogEmpty } from "@/components/store/catalog-empty";
@@ -83,18 +84,48 @@ export default async function ShopPage({
         }}
       />
       <section className="shop-opening" aria-labelledby="shop-title">
-        <div>
+        <div className="shop-opening-copy">
           <p>Curadoria Helena · Loja online</p>
-          <h1 id="shop-title">Peças para<br /><em>brilhar à sua maneira.</em></h1>
+          <h1 id="shop-title">Escolha o brilho<br /><em>que encontra você.</em></h1>
+          <div className="shop-opening-actions">
+            <Link href="#colecao-completa">
+              <span><strong>Explorar a seleção</strong><small>{products.length} peças disponíveis</small></span>
+              <i aria-hidden="true">↓</i>
+            </Link>
+            <Link href="#categorias">Escolher por categoria <span aria-hidden="true">↗︎</span></Link>
+          </div>
         </div>
-        <p>
-          Explore com calma. Escolha seus favoritos e converse com a Helena
-          para confirmar disponibilidade e atendimento.
-        </p>
-        <Link href="#colecao-completa">Ver a seleção <span aria-hidden="true">↓</span></Link>
+        <div className="shop-opening-art" aria-label="Editorial Helena Joias">
+          <span className="shop-opening-orbit shop-opening-orbit-one" aria-hidden="true" />
+          <span className="shop-opening-orbit shop-opening-orbit-two" aria-hidden="true" />
+          <figure className="shop-opening-image shop-opening-image-main">
+            <Image
+              src="/media/gallery-3-2.jpg"
+              alt="Modelo usando brincos geométricos e colares Helena Joias"
+              fill
+              priority
+              quality={90}
+              sizes="(max-width: 720px) 92vw, 38vw"
+            />
+          </figure>
+          <figure className="shop-opening-image shop-opening-image-detail">
+            <Image
+              src="/media/gallery-2-2.jpg"
+              alt="Composição de peças douradas Helena Joias"
+              fill
+              quality={90}
+              sizes="(max-width: 720px) 34vw, 12vw"
+            />
+          </figure>
+          <span className="shop-opening-seal" aria-hidden="true"><b>H</b><small>Curadoria</small></span>
+        </div>
+        <div className="shop-opening-bottom">
+          <p>Uma seleção para olhar de perto, combinar sem pressa e levar para a sua história.</p>
+          <span><b>{String(categories.length).padStart(2, "0")}</b> categorias <i /> edição 2026</span>
+        </div>
       </section>
 
-      <section className="shop-categories" aria-labelledby="categories-title">
+      <section className="shop-categories" aria-labelledby="categories-title" data-store-motion="section">
         <div className="store-section-heading">
           <p>Escolha por forma</p>
           <h2 id="categories-title">Encontre o detalhe<br /><em>que fala por você.</em></h2>
@@ -104,7 +135,7 @@ export default async function ShopPage({
       </section>
 
       {products.some((product) => product.featured) ? (
-        <section className="featured-products" aria-labelledby="featured-title">
+        <section className="featured-products" aria-labelledby="featured-title" data-store-motion="section">
           <div className="store-section-heading">
             <p>Seleção da Helena</p>
             <h2 id="featured-title">Peças em<br /><em>evidência.</em></h2>
@@ -117,7 +148,7 @@ export default async function ShopPage({
         </section>
       ) : null}
 
-      <section className="catalog-section" id="colecao-completa" aria-labelledby="catalog-title">
+      <section className="catalog-section" id="colecao-completa" aria-labelledby="catalog-title" data-store-motion="section">
         <div className="catalog-topline">
           <div className="store-section-heading">
             <p>Coleção completa</p>
@@ -137,7 +168,7 @@ export default async function ShopPage({
         )}
       </section>
 
-      <section className="shop-assistance">
+      <section className="shop-assistance" data-store-motion="section">
         <p>Prefere escolher com ajuda?</p>
         <h2>Conte o que você procura.<br /><em>A Helena cuida do resto.</em></h2>
         {store.whatsappNumber ? (

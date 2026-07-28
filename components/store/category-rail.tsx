@@ -17,6 +17,7 @@ export function CategoryRail({
       {categories.map((category, index) => (
         <Link
           className={currentSlug === category.slug ? "is-current" : undefined}
+          data-store-motion="item"
           href={`/loja/${category.slug}`}
           key={category.id}
           style={{ "--category-index": index } as React.CSSProperties}

@@ -19,50 +19,70 @@ export function StoreMotion() {
     const shell = document.querySelector<HTMLElement>(".store-shell");
     if (!shell || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    let observer: IntersectionObserver | undefined;
+    const targets = new Set<HTMLElement>();
     let revealFrame = 0;
-    let targets: HTMLElement[] = [];
+    let initialPass = true;
 
-    // The store page is streamed by Next. Waiting for hydration avoids changing
-    // server-rendered attributes while React is still reconciling the catalog.
-    const startTimer = window.setTimeout(() => {
-      const sections = Array.from(shell.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
-      const details = Array.from(
-        shell.querySelectorAll<HTMLElement>(".category-rail > a, .product-card"),
-      );
-      targets = [...sections, ...details];
+    const reveal = (element: HTMLElement) => {
+      element.classList.add("is-store-visible");
+      observer.unobserve(element);
+    };
 
-      sections.forEach((element) => element.setAttribute("data-store-motion", "section"));
-      details.forEach((element) => element.setAttribute("data-store-motion", "item"));
-      shell.classList.add("store-motion-ready");
-
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            entry.target.classList.toggle("is-store-visible", entry.isIntersecting);
-          });
-        },
-        { rootMargin: "-5% 0px -7%", threshold: 0 },
-      );
-
-      targets.forEach((element) => observer?.observe(element));
-      revealFrame = window.requestAnimationFrame(() => {
-        targets.forEach((element) => {
-          const rect = element.getBoundingClientRect();
-          const visible = rect.bottom > window.innerHeight * .05 && rect.top < window.innerHeight * .93;
-          element.classList.toggle("is-store-visible", visible);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) reveal(entry.target as HTMLElement);
         });
+      },
+      { rootMargin: "2% 0px -8%", threshold: .04 },
+    );
+
+    const register = () => {
+      revealFrame = 0;
+      const sections = Array.from(shell.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
+      const details = Array.from(shell.querySelectorAll<HTMLElement>(".category-rail > a, .product-card"));
+
+      sections.forEach((element) => {
+        if (!element.dataset.storeMotion) element.dataset.storeMotion = "section";
       });
-    }, 1100);
+      details.forEach((element) => {
+        if (!element.dataset.storeMotion) element.dataset.storeMotion = "item";
+      });
+
+      [...sections, ...details].forEach((element) => {
+        if (targets.has(element)) return;
+        targets.add(element);
+        const rect = element.getBoundingClientRect();
+        const visible = rect.bottom > 0 && rect.top < window.innerHeight * .94;
+
+        if (initialPass && visible) element.classList.add("is-store-visible");
+        else {
+          observer.observe(element);
+          if (visible) window.requestAnimationFrame(() => reveal(element));
+        }
+      });
+
+      if (initialPass) {
+        shell.classList.add("store-motion-ready");
+        initialPass = false;
+      }
+    };
+
+    const requestRegister = () => {
+      if (!revealFrame) revealFrame = window.requestAnimationFrame(register);
+    };
+
+    register();
+    const mutationObserver = new MutationObserver(requestRegister);
+    mutationObserver.observe(shell, { childList: true, subtree: true });
 
     return () => {
-      window.clearTimeout(startTimer);
       if (revealFrame) window.cancelAnimationFrame(revealFrame);
-      observer?.disconnect();
+      observer.disconnect();
+      mutationObserver.disconnect();
       shell.classList.remove("store-motion-ready");
       targets.forEach((element) => {
         element.classList.remove("is-store-visible");
-        element.removeAttribute("data-store-motion");
       });
     };
   }, []);

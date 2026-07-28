@@ -27,6 +27,7 @@ export function ProductCard({
   return (
     <article
       className="product-card"
+      data-store-motion="item"
       data-product-id={product.id}
       style={{ "--product-index": index % 8 } as React.CSSProperties}
     >
