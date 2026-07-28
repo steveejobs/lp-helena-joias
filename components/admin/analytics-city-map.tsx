@@ -17,9 +17,9 @@ export function AnalyticsCityMap({ cities }: { cities: CityRow[] }) {
       if (cancelled || !container.current) return;
       map = L.map(container.current, {
         attributionControl: true,
-        maxZoom: 8,
+        maxZoom: 14,
         minZoom: 2,
-        scrollWheelZoom: false,
+        scrollWheelZoom: true,
         worldCopyJump: true,
         zoomControl: true,
       });
@@ -28,7 +28,7 @@ export function AnalyticsCityMap({ cities }: { cities: CityRow[] }) {
           ?? "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          maxZoom: 8,
+          maxZoom: 19,
         },
       ).addTo(map);
 
@@ -50,10 +50,10 @@ export function AnalyticsCityMap({ cities }: { cities: CityRow[] }) {
           { direction: "top" },
         );
       }
-      if (points.length === 1) map.setView(points[0], 6);
+      if (points.length === 1) map.setView(points[0], 10);
       else if (points.length) {
         map.fitBounds(L.latLngBounds(points), { padding: [28, 28] });
-        if (map.getZoom() > 7) map.setZoom(7);
+        if (map.getZoom() > 11) map.setZoom(11);
       }
     });
 

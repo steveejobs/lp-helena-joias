@@ -864,15 +864,28 @@
   margin: -16px 0 26px;
 }
 
-.admin-period-filters > button,
+.admin-period-filters > a,
 .admin-period-filters summary,
 .admin-period-filters details button {
+  display: inline-flex;
   min-height: 42px;
+  align-items: center;
+  justify-content: center;
   padding: 0 16px;
   border: 1px solid var(--admin-line);
   border-radius: 999px;
+  color: inherit;
   background: var(--admin-white);
   cursor: pointer;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.admin-period-filters > a[aria-current="page"],
+.admin-period-presets a[aria-current="page"] {
+  color: #fff;
+  border-color: #392825;
+  background: #392825;
 }
 
 .admin-period-filters summary {
@@ -898,6 +911,37 @@
   border-radius: 12px;
   background: var(--admin-white);
   box-shadow: 0 16px 40px rgba(54, 36, 32, 0.13);
+}
+
+.admin-period-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.admin-period-presets a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  color: inherit;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.admin-period-more form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-period-more form button {
+  grid-column: 1 / -1;
 }
 
 .admin-period-filters label {
@@ -959,6 +1003,25 @@
   color: var(--admin-muted);
   background: var(--admin-white);
   font-size: 11px;
+}
+
+.admin-live-status span strong {
+  color: var(--admin-ink);
+}
+
+.admin-live-status select,
+.admin-live-status button {
+  min-height: 30px;
+  padding: 0 9px;
+  color: var(--admin-ink);
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+}
+
+.admin-live-status button {
+  cursor: pointer;
 }
 
 .admin-live-status i {

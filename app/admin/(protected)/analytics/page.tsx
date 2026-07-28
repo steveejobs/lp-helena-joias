@@ -1,7 +1,9 @@
 import { AnalyticsCityMap } from "@/components/admin/analytics-city-map";
 import { requireAdminRole } from "@/lib/auth/admin";
 import {
+  ACTIVE_WINDOW_OPTIONS,
   getAnalyticsReport,
+  resolveActiveWindow,
   resolveAnalyticsPeriod,
   type CountRow,
 } from "@/lib/analytics/report";
@@ -22,6 +24,14 @@ function duration(milliseconds: number) {
   if (seconds < 60) return `${seconds}s`;
   const minutes = Math.floor(seconds / 60);
   return `${minutes}min ${seconds % 60}s`;
+}
+
+function analyticsHref(period: string, activeWindow: number) {
+  const params = new URLSearchParams({
+    ativos: String(activeWindow),
+    periodo: period,
+  });
+  return `/admin/analytics?${params.toString()}`;
 }
 
 function Ranking({
@@ -61,7 +71,8 @@ export default async function AnalyticsPage({
     period: first(params.periodo),
     start: first(params.inicio),
   });
-  const report = await getAnalyticsReport(period);
+  const activeWindow = resolveActiveWindow(first(params.ativos));
+  const report = await getAnalyticsReport(period, activeWindow);
   const { funnel, overview } = report;
   const quickExitRate = percentage(overview.quickExits, overview.sessions);
   const returningRate = percentage(overview.returningSessions, overview.sessions);
@@ -71,26 +82,75 @@ export default async function AnalyticsPage({
     <main className="admin-page admin-analytics-page">
       <header className="admin-page-heading">
         <div><p>Decisões com dados reais</p><h1>Analytics</h1></div>
-        <div className="admin-live-status">
+        <form className="admin-live-status">
           <i aria-hidden="true" />
-          <span>{overview.realtime} ativos nos últimos 5 min</span>
-        </div>
+          <span><strong>{overview.realtime}</strong> ativos nos últimos</span>
+          <select aria-label="Intervalo de visitantes ativos" defaultValue={String(activeWindow)} name="ativos">
+            {ACTIVE_WINDOW_OPTIONS.map((minutes) => (
+              <option key={minutes} value={minutes}>{minutes} min</option>
+            ))}
+          </select>
+          <input name="periodo" type="hidden" value={period.key} />
+          {period.key === "custom" ? (
+            <>
+              <input name="inicio" type="hidden" value={first(params.inicio) ?? ""} />
+              <input name="fim" type="hidden" value={first(params.fim) ?? ""} />
+            </>
+          ) : null}
+          <button type="submit">Ver</button>
+        </form>
       </header>
 
-      <form className="admin-period-filters">
-        <button name="periodo" value="today">Hoje</button>
-        <button name="periodo" value="7">7 dias</button>
-        <button name="periodo" value="30">30 dias</button>
+      <nav aria-label="Filtrar analytics por data" className="admin-period-filters">
+        {[
+          ["today", "Hoje"],
+          ["yesterday", "Ontem"],
+          ["7", "7 dias"],
+          ["30", "30 dias"],
+        ].map(([key, label]) => (
+          <a
+            aria-current={period.key === key ? "page" : undefined}
+            href={analyticsHref(key, activeWindow)}
+            key={key}
+          >
+            {label}
+          </a>
+        ))}
         <details>
-          <summary>Período personalizado</summary>
-          <div>
-            <label>Início<input type="date" name="inicio" required /></label>
-            <label>Fim<input type="date" name="fim" required /></label>
-            <button name="periodo" value="custom">Aplicar</button>
+          <summary>Outros períodos</summary>
+          <div className="admin-period-more">
+            <div className="admin-period-presets">
+              {[
+                ["90", "90 dias"],
+                ["180", "6 meses"],
+                ["365", "1 ano"],
+              ].map(([key, label]) => (
+                <a
+                  aria-current={period.key === key ? "page" : undefined}
+                  href={analyticsHref(key, activeWindow)}
+                  key={key}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+            <form>
+              <input name="periodo" type="hidden" value="custom" />
+              <input name="ativos" type="hidden" value={activeWindow} />
+              <label>
+                Início
+                <input defaultValue={first(params.inicio)} max={first(params.fim)} name="inicio" required type="date" />
+              </label>
+              <label>
+                Fim
+                <input defaultValue={first(params.fim)} min={first(params.inicio)} name="fim" required type="date" />
+              </label>
+              <button type="submit">Aplicar período</button>
+            </form>
           </div>
         </details>
         <span className="admin-period-label">{period.label}</span>
-      </form>
+      </nav>
 
       <section className="admin-metrics admin-analytics-metrics">
         <article><span>Visualizações de página</span><strong>{overview.visits}</strong><small>{delta(overview.visits, report.comparison.visits)} vs. período anterior</small></article>
