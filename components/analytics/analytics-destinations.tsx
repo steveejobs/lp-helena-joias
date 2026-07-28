@@ -10,7 +10,7 @@ export function AnalyticsDestinations() {
         dangerouslySetInnerHTML={{
           __html: `
           window.dataLayer = window.dataLayer || [];
-          window.gtag = window.gtag || function(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || function(){dataLayer.push(arguments);};
           (function(){
             var choice = null;
             try { choice = window.localStorage.getItem('helena.analytics.consent.v1'); } catch (_) {}

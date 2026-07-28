@@ -27,25 +27,6 @@ const galleries: Record<string, GalleryImage[]> = {
   ],
 };
 
-function AnimatedLine({ text, className = "", offset = 0 }: { text: string; className?: string; offset?: number }) {
-  let characterIndex = offset;
-
-  return (
-    <span className={`title-line ${className}`} aria-hidden="true">
-      <span className="title-words">
-        {text.split(" ").map((word, wordIndex) => (
-          <span className="title-word" key={`${word}-${wordIndex}`}>
-            {Array.from(word).map((character) => {
-              const index = characterIndex++;
-              return <span className="title-char" style={{ "--char-index": index } as React.CSSProperties} key={`${character}-${index}`}>{character}</span>;
-            })}
-          </span>
-        ))}
-      </span>
-    </span>
-  );
-}
-
 function TransitionLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || href.startsWith("#")) return;
@@ -189,30 +170,13 @@ function ScrollButterfly() {
   );
 }
 
-function HeroStage() {
-  const stageRef = useRef<HTMLDivElement>(null);
-
-  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "touch") return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    stageRef.current?.style.setProperty("--tilt-x", `${(-y * 8).toFixed(2)}deg`);
-    stageRef.current?.style.setProperty("--tilt-y", `${(x * 10).toFixed(2)}deg`);
-  };
-
-  const resetPointer = () => {
-    stageRef.current?.style.setProperty("--tilt-x", "0deg");
-    stageRef.current?.style.setProperty("--tilt-y", "0deg");
-  };
-
+function ChoicePortrait() {
   return (
-    <div className="hero-stage" ref={stageRef} onPointerMove={handlePointer} onPointerLeave={resetPointer}>
-      <div className="orbit orbit-one" aria-hidden="true" />
-      <div className="orbit orbit-two" aria-hidden="true" />
-      <div className="hero-photo-wrap">
+    <figure className="choice-portrait" aria-label="Seleção visual Helena Joias">
+      <span className="choice-orbit choice-orbit-one" aria-hidden="true" />
+      <span className="choice-orbit choice-orbit-two" aria-hidden="true" />
+      <span className="choice-card choice-card-one">
         <img
-          className="hero-photo"
           src="/media/gallery-2-2.jpg"
           alt="Composição Helena Joias com colares, brincos e anéis dourados"
           width="1170"
@@ -220,10 +184,28 @@ function HeroStage() {
           fetchPriority="high"
           decoding="sync"
         />
-        <span className="photo-glint" aria-hidden="true" />
-      </div>
-      <p className="hero-caption"><span>Forma</span><span>Luz</span><span>Presença</span></p>
-    </div>
+      </span>
+      <span className="choice-card choice-card-two">
+        <img
+          src="/media/gallery-1-4.jpg"
+          alt="Modelo usando brincos e colares da Helena Joias"
+          width="1170"
+          height="1560"
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
+      <span className="choice-card choice-card-three">
+        <img
+          src="/media/gallery-3-2.jpg"
+          alt="Modelo usando brincos geométricos e colares da Helena Joias"
+          width="1170"
+          height="1560"
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
+    </figure>
   );
 }
 
@@ -537,24 +519,42 @@ export default function Home() {
         </nav>
       </header>
 
-      <section className="hero" id="inicio" aria-labelledby="hero-title">
-        <div className="hero-light" aria-hidden="true" />
-        <div className="hero-copy" data-reveal="hero">
-          <p className="eyebrow"><span /> Um novo conceito em joias</p>
-          <h1 id="hero-title" aria-label="O brilho encontra a sua forma.">
-            <AnimatedLine text="O brilho" />
-            <AnimatedLine text="encontra a sua" className="title-line-offset" offset={7} />
-            <AnimatedLine text="forma." className="title-line-serif" offset={18} />
+      <section className="hero choice-hero" id="inicio" aria-labelledby="hero-title">
+        <div className="choice-copy" data-reveal="hero">
+          <p className="choice-eyebrow"><i /> Um novo conceito em joias</p>
+          <h1 id="hero-title">
+            O brilho
+            <span>encontra a sua</span>
+            <em>forma.</em>
           </h1>
-          <p className="hero-deck">Na Helena, você encontra uma seleção de joias para experimentar combinações, descobrir novos detalhes e escolher o brilho que faz sentido para você.</p>
-          <div className="hero-actions">
-            <TransitionLink className="primary-button" href="/loja"><span>Explorar peças</span><i aria-hidden="true">→</i></TransitionLink>
-            <a className="text-link" href="#colecoes">Ver coleções <span aria-hidden="true">↓</span></a>
-            <HomeWhatsAppButton origin="hero da home" />
-            <a className="text-link" href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗︎</span></a>
+          <div className="choice-actions">
+            <TransitionLink className="choice-primary-action" href="/loja">
+              <span><strong>Comprar agora</strong><small>Loja online</small></span>
+              <i className="choice-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13M14 7l5 5-5 5" /></svg>
+              </i>
+            </TransitionLink>
+            <a
+              className="choice-route-action"
+              href="https://www.google.com/maps/search/?api=1&query=Helena+Joias"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span><strong>Traçar rota</strong><small>Loja física</small></span>
+              <i className="choice-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21s6-5.15 6-11a6 6 0 1 0-12 0c0 5.85 6 11 6 11Z" />
+                  <circle cx="12" cy="10" r="2" />
+                </svg>
+              </i>
+            </a>
           </div>
         </div>
-        <HeroStage />
+        <ChoicePortrait />
+        <div className="choice-decision" data-reveal="hero">
+          <p>Experimente combinações, descubra novos detalhes e escolha o brilho que faz sentido para você.</p>
+        </div>
+        <p className="choice-detail" aria-hidden="true">Forma <i /> Luz <i /> Presença</p>
         <a className="scroll-cue" href="#manifesto" aria-label="Continuar para a próxima seção"><span>Role para descobrir</span><i aria-hidden="true" /></a>
       </section>
 
