@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 const SOURCE_LIMIT = 20 * 1024 * 1024;
-const SERVER_LIMIT = 8 * 1024 * 1024;
+const SERVER_LIMIT = 4 * 1024 * 1024;
 const MAX_DIMENSION = 2_400;
 
 type PreparedImage = {
@@ -32,6 +32,9 @@ export function ProductImageUploader({
   const prepare = async (file: File | undefined) => {
     if (!file) return;
     setError(null);
+    if (prepared) URL.revokeObjectURL(prepared.preview);
+    setPrepared(null);
+    if (input.current) input.current.value = "";
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setError("Escolha uma imagem JPEG, PNG ou WebP.");
       return;
@@ -66,18 +69,29 @@ export function ProductImageUploader({
         const context = canvas.getContext("2d", { alpha: true });
         if (!context) throw new Error("canvas_unavailable");
         context.drawImage(bitmap, 0, 0, width, height);
-        const converted = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve, "image/webp", 0.94),
-        );
-        if (!converted) throw new Error("conversion_failed");
+        let converted: Blob | null = null;
+        for (const quality of [0.9, 0.82, 0.74, 0.66]) {
+          converted = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve, "image/webp", quality),
+          );
+          if (converted && converted.size <= SERVER_LIMIT) break;
+        }
+        if (!converted || converted.size > SERVER_LIMIT) {
+          bitmap.close();
+          setError("A foto continuou muito grande após a otimização. Escolha outra imagem.");
+          return;
+        }
         blob = converted;
       }
       bitmap.close();
       const optimized = new File([blob], `${safeName}.webp`, { type: "image/webp" });
+      if (optimized.size > SERVER_LIMIT) {
+        setError("A foto otimizada deve ter no máximo 4 MB.");
+        return;
+      }
       const transfer = new DataTransfer();
       transfer.items.add(optimized);
       if (input.current) input.current.files = transfer.files;
-      if (prepared) URL.revokeObjectURL(prepared.preview);
       setPrepared({
         file: optimized,
         height,

@@ -7,7 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { HELENA_STORE_ID } from "@/types/commerce";
 
 const BUCKET = "catalog-products";
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_DIMENSION = 2_400;
 const WEBP_SIGNATURE = [0x52, 0x49, 0x46, 0x46];
 const WEBP_MARKER = [0x57, 0x45, 0x42, 0x50];
@@ -59,7 +59,7 @@ async function validateWebP(file: File, productId: string) {
   if (file.type !== "image/webp" || file.name.split(".").pop()?.toLowerCase() !== "webp") {
     throw new Error("Neste ambiente, envie uma imagem WebP.");
   }
-  if (!file.size || file.size > MAX_BYTES) throw new Error("A imagem deve ter no máximo 8 MB.");
+  if (!file.size || file.size > MAX_BYTES) throw new Error("A imagem deve ter no máximo 4 MB.");
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (!hasBytes(bytes, WEBP_SIGNATURE) || !hasBytes(bytes, WEBP_MARKER, 8)) {
     throw new Error("O conteúdo do arquivo não é WebP válido.");

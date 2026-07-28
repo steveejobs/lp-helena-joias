@@ -21,7 +21,7 @@ export default async function AdminProductsPage({
   const supabase = await createSupabaseServerClient();
   const { data: products, error } = await supabase
     .from("products")
-    .select("id,name,slug,sku,status,price,featured,new_arrival,updated_at,categories(name)")
+    .select("id,name,slug,sku,status,price,featured,new_arrival,updated_at,category:categories!products_store_category_fkey(name)")
     .eq("store_id", HELENA_STORE_ID)
     .order("sort_order")
     .order("updated_at", { ascending: false })
@@ -47,7 +47,7 @@ export default async function AdminProductsPage({
             <thead><tr><th>Produto</th><th>Categoria</th><th>Status</th><th>Preço</th><th>Destaques</th><th></th></tr></thead>
             <tbody>
               {products.map((product) => {
-                const category = Array.isArray(product.categories) ? product.categories[0] : product.categories;
+                const category = Array.isArray(product.category) ? product.category[0] : product.category;
                 return (
                   <tr key={product.id}>
                     <td><strong>{product.name}</strong><br /><small>{product.sku || `/${product.slug}`}</small></td>

@@ -3,6 +3,18 @@ import Link from "next/link";
 import type { AdminSession } from "@/lib/auth/admin";
 import { logoutAction } from "@/app/admin/login/actions";
 
+const adminLinks = [
+  { href: "/admin", label: "Visão geral", roles: ["admin", "editor", "attendant"] },
+  { href: "/admin/produtos", label: "Produtos", roles: ["admin", "editor"] },
+  { href: "/admin/categorias", label: "Categorias", roles: ["admin", "editor"] },
+  { href: "/admin/analytics", label: "Analytics", roles: ["admin"] },
+  { href: "/admin/configuracoes", label: "Configurações", roles: ["admin"] },
+] satisfies Array<{
+  href: string;
+  label: string;
+  roles: AdminSession["role"][];
+}>;
+
 export function AdminShell({
   children,
   session,
@@ -10,6 +22,8 @@ export function AdminShell({
   children: React.ReactNode;
   session: AdminSession;
 }) {
+  const visibleLinks = adminLinks.filter((link) => link.roles.includes(session.role));
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
@@ -17,11 +31,9 @@ export function AdminShell({
           <span>Helena</span><small>Administração</small>
         </Link>
         <nav aria-label="Administração">
-          <Link href="/admin">Visão geral</Link>
-          <Link href="/admin/produtos">Produtos</Link>
-          <Link href="/admin/categorias">Categorias</Link>
-          <Link href="/admin/analytics">Analytics</Link>
-          <Link href="/admin/configuracoes">Configurações</Link>
+          {visibleLinks.map((link) => (
+            <Link href={link.href} key={link.href}>{link.label}</Link>
+          ))}
         </nav>
         <div className="admin-user">
           <p>{session.name}</p>
@@ -35,11 +47,9 @@ export function AdminShell({
           <details>
             <summary>Menu</summary>
             <nav>
-              <Link href="/admin">Visão geral</Link>
-              <Link href="/admin/produtos">Produtos</Link>
-              <Link href="/admin/categorias">Categorias</Link>
-              <Link href="/admin/analytics">Analytics</Link>
-              <Link href="/admin/configuracoes">Configurações</Link>
+              {visibleLinks.map((link) => (
+                <Link href={link.href} key={link.href}>{link.label}</Link>
+              ))}
             </nav>
           </details>
         </header>
@@ -48,4 +58,3 @@ export function AdminShell({
     </div>
   );
 }
-
