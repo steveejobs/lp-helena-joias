@@ -23,13 +23,13 @@ export async function loginAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error || !data.user) redirect("/admin/login?erro=credenciais");
-  const { data: profile } = await supabase
-    .from("profiles")
+  const { data: membership } = await supabase
+    .from("store_memberships")
     .select("active,store_id")
-    .eq("id", data.user.id)
+    .eq("user_id", data.user.id)
     .eq("store_id", HELENA_STORE_ID)
     .maybeSingle();
-  if (!profile?.active) {
+  if (!membership?.active) {
     await supabase.auth.signOut();
     redirect("/admin/login?erro=acesso");
   }
@@ -43,4 +43,3 @@ export async function logoutAction() {
   }
   redirect("/admin/login");
 }
-

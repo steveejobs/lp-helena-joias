@@ -1,5 +1,7 @@
 "use client";
 
+import { hasAnalyticsConsent } from "./consent";
+
 export type AnalyticsEventPayload = {
   categoryId?: string | null;
   eventName: string;
@@ -118,6 +120,7 @@ export async function trackAnalyticsEvent(
   payload: AnalyticsEventPayload,
   options: { beacon?: boolean } = {},
 ) {
+  if (!hasAnalyticsConsent()) return false;
   const context = getAnalyticsContext();
   const body = JSON.stringify({
     ...payload,
@@ -133,7 +136,7 @@ export async function trackAnalyticsEvent(
       "/api/analytics",
       new Blob([body], { type: "application/json" }),
     );
-    if (queued) return;
+    if (queued) return true;
   }
 
   try {
@@ -143,7 +146,9 @@ export async function trackAnalyticsEvent(
       keepalive: true,
       method: "POST",
     });
+    return true;
   } catch {
     // Analytics must never block the shopping experience.
+    return false;
   }
 }

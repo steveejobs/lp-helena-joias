@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/analytics/cookie-settings-button";
 
 export function StoreFooter() {
   return (
@@ -12,10 +13,11 @@ export function StoreFooter() {
         <Link href="/loja">Loja</Link>
         <Link href="/instagram">Instagram</Link>
         <Link href="/carrinho">Sacola</Link>
+        <Link href="/privacidade">Privacidade</Link>
+        <CookieSettingsButton />
       </nav>
       <p>Atendimento e disponibilidade são confirmados diretamente com a Helena.</p>
       <small>© {new Date().getFullYear()} Helena Joias</small>
     </footer>
   );
 }
-

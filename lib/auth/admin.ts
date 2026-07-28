@@ -31,19 +31,23 @@ export async function getAdminSession(): Promise<AdminSession | null> {
 
   const allowlist = authorizedEmails();
   if (allowlist.size && !allowlist.has(user.email.toLowerCase())) return null;
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("id,name,role,active,store_id")
-    .eq("id", user.id)
+  const { data: membership, error } = await supabase
+    .from("store_memberships")
+    .select("role,active,store_id")
+    .eq("user_id", user.id)
     .eq("store_id", HELENA_STORE_ID)
     .eq("active", true)
     .maybeSingle();
-  if (error || !profile) return null;
+  if (error || !membership) return null;
+
+  const metadataName = typeof user.user_metadata?.name === "string"
+    ? user.user_metadata.name.trim()
+    : "";
 
   return {
     email: user.email,
-    name: profile.name?.trim() || user.email,
-    role: profile.role,
+    name: metadataName || user.email,
+    role: membership.role,
     userId: user.id,
   };
 }
@@ -62,4 +66,3 @@ export async function requireAdminRole(
   if (!roles.includes(session.role)) redirect("/admin?erro=permissao");
   return session;
 }
-

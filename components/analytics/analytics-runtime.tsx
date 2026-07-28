@@ -1,17 +1,29 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { getAnalyticsSessionId, trackAnalyticsEvent } from "@/lib/analytics/client";
+import {
+  ANALYTICS_CONSENT_EVENT,
+  hasAnalyticsConsent,
+} from "@/lib/analytics/consent";
 
 const ENGAGEMENT_FLUSH_MS = 15_000;
 
 export function AnalyticsRuntime() {
   const pathname = usePathname();
   const lastPageView = useRef<{ at: number; path: string } | null>(null);
+  const [consentRevision, setConsentRevision] = useState(0);
 
   useEffect(() => {
+    const consentChanged = () => setConsentRevision((current) => current + 1);
+    window.addEventListener(ANALYTICS_CONSENT_EVENT, consentChanged);
+    return () => window.removeEventListener(ANALYTICS_CONSENT_EVENT, consentChanged);
+  }, []);
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin") || !hasAnalyticsConsent()) return;
     const sessionId = getAnalyticsSessionId();
     const startedKey = `helena.analytics.started:${sessionId}`;
     if (!window.localStorage.getItem(startedKey)) {
@@ -74,7 +86,7 @@ export function AnalyticsRuntime() {
       flush(true);
       visibleSince = null;
     };
-  }, [pathname]);
+  }, [consentRevision, pathname]);
 
   return null;
 }

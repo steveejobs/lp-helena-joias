@@ -3,6 +3,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { HELENA_STORE_ID } from "@/types/commerce";
 import { getSupabasePublicEnv } from "./env";
 
 export async function createSupabaseServerClient() {
@@ -10,6 +11,11 @@ export async function createSupabaseServerClient() {
   const { publishableKey, url } = getSupabasePublicEnv();
 
   return createServerClient(url, publishableKey, {
+    global: {
+      headers: {
+        "x-store-id": HELENA_STORE_ID,
+      },
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -26,4 +32,3 @@ export async function createSupabaseServerClient() {
     },
   });
 }
-
