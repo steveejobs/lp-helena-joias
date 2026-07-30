@@ -4,6 +4,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { assertHelenaStore } from "@/lib/store/context";
 import {
+  HELENA_WHATSAPP_NUMBER,
+  HELENA_WHATSAPP_SITE_MESSAGE,
+} from "@/lib/whatsapp/order-message";
+import {
   HELENA_STORE_ID,
   type CatalogFilters,
   type Category,
@@ -43,8 +47,8 @@ const DEVELOPMENT_STORE: Store = {
   name: "Helena Joias",
   showPrices: true,
   slug: "helena-joias",
-  whatsappDefaultMessage: null,
-  whatsappNumber: null,
+  whatsappDefaultMessage: HELENA_WHATSAPP_SITE_MESSAGE,
+  whatsappNumber: HELENA_WHATSAPP_NUMBER,
 };
 
 type CategoryRow = {
@@ -188,8 +192,8 @@ export async function getStore(context: StoreContext): Promise<Store> {
     name: data.name,
     showPrices: data.show_prices,
     slug: data.slug,
-    whatsappDefaultMessage: data.whatsapp_default_message,
-    whatsappNumber: data.whatsapp_number,
+    whatsappDefaultMessage: data.whatsapp_default_message ?? HELENA_WHATSAPP_SITE_MESSAGE,
+    whatsappNumber: data.whatsapp_number ?? HELENA_WHATSAPP_NUMBER,
   };
 }
 

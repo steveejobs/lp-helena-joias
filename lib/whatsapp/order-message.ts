@@ -1,6 +1,10 @@
 import type { CartItem } from "@/lib/cart/types";
 import type { Store } from "@/types/commerce";
 
+export const HELENA_WHATSAPP_NUMBER = "5563992233535";
+export const HELENA_WHATSAPP_SITE_MESSAGE =
+  "Olá! Vim pelo site da Helena Joias e gostaria de solicitar atendimento.";
+
 export function normalizeWhatsAppNumber(value: string | null) {
   if (!value) return null;
   let digits = value.replace(/\D/g, "");
@@ -59,4 +63,3 @@ export function buildWhatsAppMessage({
 export function buildWhatsAppUrl(phone: string, message: string) {
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
-

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
 
 export function CatalogEmpty({ filtered = false }: { filtered?: boolean }) {
   return (
@@ -11,13 +12,12 @@ export function CatalogEmpty({ filtered = false }: { filtered?: boolean }) {
       <span>
         {filtered
           ? "Ajuste os filtros ou volte para a coleção completa."
-          : "Enquanto isso, conheça a Helena e acompanhe as novidades pelo Instagram."}
+          : "Enquanto isso, fale com a Helena para conhecer as peças disponíveis."}
       </span>
       <div>
         {filtered ? <Link href="/loja">Limpar filtros</Link> : null}
-        <Link href="/instagram">Acompanhar a Helena <b aria-hidden="true">↗</b></Link>
+        <HomeWhatsAppButton className="catalog-empty-whatsapp" origin={filtered ? "catálogo sem resultados" : "catálogo vazio"} />
       </div>
     </section>
   );
 }
-

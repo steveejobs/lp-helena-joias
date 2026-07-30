@@ -2,7 +2,10 @@
 
 import { useCart } from "@/components/cart/cart-provider";
 import { trackAnalyticsEvent } from "@/lib/analytics/client";
-import { normalizeWhatsAppNumber } from "@/lib/whatsapp/order-message";
+import {
+  HELENA_WHATSAPP_SITE_MESSAGE,
+  normalizeWhatsAppNumber,
+} from "@/lib/whatsapp/order-message";
 
 export function HomeWhatsAppButton({
   className = "whatsapp-spotlight",
@@ -17,7 +20,7 @@ export function HomeWhatsAppButton({
   const open = async () => {
     if (!phone) return;
     const message = store.whatsappDefaultMessage?.trim()
-      || `Olá! Vim pelo site da ${store.name} e gostaria de solicitar atendimento.`;
+      || HELENA_WHATSAPP_SITE_MESSAGE;
     const pending = window.open("", "_blank");
     if (pending) pending.opener = null;
     await trackAnalyticsEvent({ eventName: "whatsapp_opened", metadata: { origin } });

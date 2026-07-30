@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { useCart } from "@/components/cart/cart-provider";
-import { normalizeWhatsAppNumber } from "@/lib/whatsapp/order-message";
+import {
+  HELENA_WHATSAPP_SITE_MESSAGE,
+  normalizeWhatsAppNumber,
+} from "@/lib/whatsapp/order-message";
+import { brandHighlight, storeLocationUrl } from "@/lib/brand/copy";
 
 type ProfileLinkProps = {
   number: string;
@@ -254,7 +258,7 @@ export default function InstagramLinks() {
   const openWhatsApp = async () => {
     if (!phone) return;
     const message = store.whatsappDefaultMessage?.trim()
-      || `Olá! Vim pela página de links da ${store.name} e gostaria de solicitar atendimento.`;
+      || HELENA_WHATSAPP_SITE_MESSAGE;
     const pending = window.open("", "_blank");
     if (pending) pending.opener = null;
     await trackAnalyticsEvent({ eventName: "whatsapp_opened", metadata: { origin: "instagram_route" } });
@@ -300,7 +304,6 @@ export default function InstagramLinks() {
           document.documentElement.classList.add("is-leaving");
           window.setTimeout(() => { window.location.href = "/"; }, 380);
         }}><span aria-hidden="true">←</span> Site completo</Link>
-        <Link href="/loja">Loja online ↗</Link>
       </header>
 
       <section className="profile-hero" aria-labelledby="link-title">
@@ -308,16 +311,15 @@ export default function InstagramLinks() {
         <div className="profile-brand">
           <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" fetchPriority="high" decoding="async" />
         </div>
-        <p className="profile-kicker">Um novo conceito em joias</p>
+        <p className="profile-kicker">{brandHighlight}</p>
         <h1 id="link-title">Seu brilho<br /><em>começa aqui.</em></h1>
         <p className="profile-deck">Conheça a Helena, explore as coleções e escolha o próximo passo.</p>
 
         <nav className="profile-links" aria-label="Links principais da Helena Joias">
-          <ProfileLink number="01" title="Explorar a loja" detail="Escolha suas peças online" href="/loja" primary />
-          <ProfileLink number="02" title="Falar no WhatsApp" detail={phone ? "Atendimento direto" : "Atendimento em configuração"} action={phone ? openWhatsApp : undefined} disabled={!phone} />
-          <ProfileLink number="03" title="Traçar rota" detail="Encontre a Helena" disabled />
-          <ProfileLink number="04" title="Ver Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
-          <ProfileLink number="05" title="Site completo" detail="Viva a experiência Helena" href="/" />
+          <ProfileLink number="01" title="Falar no WhatsApp" detail={phone ? "Atendimento direto" : "Atendimento em configuração"} action={phone ? openWhatsApp : undefined} disabled={!phone} primary />
+          <ProfileLink number="02" title="Traçar rota" detail="Encontre a Helena" href={storeLocationUrl} external />
+          <ProfileLink number="03" title="Ver Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
+          <ProfileLink number="04" title="Site completo" detail="Viva a experiência Helena" href="/" />
         </nav>
 
         <div className="profile-hours" aria-label="Horário de funcionamento">
@@ -337,7 +339,6 @@ export default function InstagramLinks() {
           <LinkVideo src="/media/atelier-2.mp4" poster="/media/atelier-2-poster.jpg" label="Seleção de peças" />
         </div>
         <div className="link-final-links" data-link-reveal>
-          <ProfileLink number="→" title="Explorar a loja" detail="Curadoria online" href="/loja" primary />
           <ProfileLink number="→" title="Falar no WhatsApp" detail={phone ? "Atendimento direto" : "Atendimento em configuração"} action={phone ? openWhatsApp : undefined} primary disabled={!phone} />
           <ProfileLink number="↗" title="Acompanhar no Instagram" detail="@helenaajoias" href="https://www.instagram.com/helenaajoias/" external />
         </div>
@@ -345,7 +346,7 @@ export default function InstagramLinks() {
 
       <footer className="link-footer">
         <span>Helena Joias</span><span>Beleza · brilho · exclusividade</span>
-        <Link href="/loja">Explorar a loja <span aria-hidden="true">↗︎</span></Link>
+        <Link href="/">Conhecer a Helena <span aria-hidden="true">↗︎</span></Link>
       </footer>
     </main>
   );

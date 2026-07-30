@@ -1,10 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { CartCountButton } from "@/components/cart/cart-count-button";
-import { HomeStorePreview } from "@/components/home/store-preview";
+import { useEffect, useRef } from "react";
 import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
+import { brandHighlight, storeLocationUrl } from "@/lib/brand/copy";
 
 type GalleryImage = { src: string; alt: string; position?: string };
 
@@ -22,76 +21,13 @@ const galleries: Record<string, GalleryImage[]> = {
   ],
   color: [
     { src: "/media/gallery-3-1.jpg", alt: "Look azul com brincos, colares e pulseiras Helena Joias", position: "center 16%" },
-    { src: "/media/gallery-3-2.jpg", alt: "Close de óculos, brinco geométrico e colares Helena Joias", position: "center 24%" },
+    { src: "/media/gallery-3-2.jpg", alt: "Close de colar, brinco geométrico e outras joias Helena", position: "center 24%" },
     { src: "/media/gallery-3-3.jpg", alt: "Look azul em frente à Helena Joias", position: "center 20%" },
   ],
 };
 
 function TransitionLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || href.startsWith("#")) return;
-    event.preventDefault();
-    document.documentElement.classList.add("is-leaving");
-    window.setTimeout(() => { window.location.href = href; }, 420);
-  };
-
-  return <a href={href} className={className} onClick={handleClick}>{children}</a>;
-}
-
-function BrandIntro() {
-  const [hidden, setHidden] = useState(false);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const finish = () => {
-      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
-      root.classList.add("brand-intro-complete");
-      window.dispatchEvent(new Event("helena:intro-complete"));
-      setHidden(true);
-    };
-
-    if (reduced) {
-      finish();
-      return;
-    }
-
-    root.classList.remove("brand-intro-complete");
-    root.classList.add("brand-intro-playing");
-    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 1320);
-    const finishTimer = window.setTimeout(finish, 1980);
-
-    return () => {
-      window.clearTimeout(revealTimer);
-      window.clearTimeout(finishTimer);
-      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
-    };
-  }, []);
-
-  if (hidden) return null;
-
-  return (
-    <div className="brand-intro" aria-hidden="true">
-      <div className="brand-intro-halo" />
-      <img
-        className="brand-intro-animation"
-        src="/media/logo-formation-v2.webp"
-        alt=""
-        width="720"
-        height="720"
-        fetchPriority="high"
-        decoding="sync"
-        onError={(event) => {
-          if (!event.currentTarget.src.endsWith("/media/logo-formation-final-v2.webp")) {
-            event.currentTarget.src = "/media/logo-formation-final-v2.webp";
-          }
-        }}
-      />
-      <div className="brand-intro-wordmark"><span>Helena</span><small>Joias</small></div>
-      <p>Forma · luz · presença</p>
-    </div>
-  );
+  return <a href={href} className={className}>{children}</a>;
 }
 
 function ScrollButterfly() {
@@ -422,12 +358,12 @@ function ExperienceBridge({
         <div className="bridge-bottom">
           <p>{description}</p>
           <div className="bridge-actions">
-            <TransitionLink className="bridge-primary" href="/instagram">Descobrir a loja <span aria-hidden="true">↗︎</span></TransitionLink>
+            <TransitionLink className="bridge-primary" href="/instagram">Conhecer a Helena <span aria-hidden="true">↗︎</span></TransitionLink>
             <HomeWhatsAppButton origin={`seção ${id}`} />
             {showRoute ? (
-              <button className="route-pending" type="button" disabled aria-label="Traçar rota — endereço ainda não cadastrado">
+              <a className="route-pending" href={storeLocationUrl} target="_blank" rel="noreferrer">
                 <span>Traçar rota</span><small>Como chegar</small>
-              </button>
+              </a>
             ) : null}
           </div>
         </div>
@@ -487,20 +423,15 @@ export default function Home() {
     const revealHero = () => {
       if (hero) window.requestAnimationFrame(() => reveal(hero));
     };
-
-    if (document.documentElement.classList.contains("brand-intro-complete")) revealHero();
-    else window.addEventListener("helena:intro-complete", revealHero, { once: true });
+    revealHero();
 
     return () => {
-      window.removeEventListener("helena:intro-complete", revealHero);
       observer?.disconnect();
     };
   }, []);
 
   return (
     <main className="site-shell">
-      <BrandIntro />
-      <div className="exit-curtain" aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true" />
       <ScrollButterfly />
 
@@ -510,33 +441,25 @@ export default function Home() {
           <span>Helena <small>Joias</small></span>
         </a>
         <nav aria-label="Navegação principal">
-          <TransitionLink href="/loja" className="nav-cta">Loja <span aria-hidden="true">↗︎</span></TransitionLink>
           <a href="#colecoes">Coleções</a>
           <a href="#movimento">Em movimento</a>
           <a href="#visite">Visite a Helena</a>
           <TransitionLink href="/instagram">Instagram</TransitionLink>
-          <CartCountButton />
         </nav>
       </header>
 
       <section className="hero choice-hero" id="inicio" aria-labelledby="hero-title">
         <div className="choice-copy" data-reveal="hero">
-          <p className="choice-eyebrow"><i /> Um novo conceito em joias</p>
+          <p className="choice-eyebrow"><i /> {brandHighlight}</p>
           <h1 id="hero-title">
             O brilho
             <span>encontra a sua</span>
             <em>forma.</em>
           </h1>
           <div className="choice-actions">
-            <TransitionLink className="choice-primary-action" href="/loja">
-              <span><strong>Comprar agora</strong><small>Loja online</small></span>
-              <i className="choice-action-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13M14 7l5 5-5 5" /></svg>
-              </i>
-            </TransitionLink>
             <a
               className="choice-route-action"
-              href="https://www.google.com/maps/search/?api=1&query=Helena+Joias"
+              href={storeLocationUrl}
               target="_blank"
               rel="noreferrer"
             >
@@ -581,8 +504,6 @@ export default function Home() {
         <h2 id="collections-title">Escolha o brilho<br /><em>que acompanha o seu.</em></h2>
         <a href="#luz-de-perto">Começar a descoberta <span aria-hidden="true">↓</span></a>
       </section>
-
-      <HomeStorePreview />
 
       <ScrollGallery
         id="luz-de-perto"
@@ -639,7 +560,6 @@ export default function Home() {
         <p>Beleza, brilho e presença.</p>
         <nav aria-label="Navegação do rodapé">
           <a href="#inicio">Início</a>
-          <TransitionLink href="/loja">Loja online</TransitionLink>
           <a href="#colecoes">Coleções</a>
           <TransitionLink href="/instagram">Experiência Instagram</TransitionLink>
           <a href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram ↗︎</a>

@@ -35,6 +35,10 @@ const fallbackCategories: PreviewData["categories"] = [
   { iconKey: "sets", id: "sets", name: "Conjuntos", slug: "conjuntos" },
 ];
 
+function productDisplayName(name: string) {
+  return name.replace(/[óo]culos/giu, "Colar");
+}
+
 export function HomeStorePreview() {
   const [data, setData] = useState<PreviewData | null>(null);
   useEffect(() => {
@@ -57,7 +61,7 @@ export function HomeStorePreview() {
     }).format(price);
 
   return (
-    <section className="home-store-preview" id="loja-online" aria-labelledby="home-store-title" data-reveal="section">
+    <section className="home-store-preview" id="loja-online" aria-labelledby="home-store-title">
       <header className="home-store-heading">
         <div>
           <p><span /> A curadoria agora online</p>
@@ -75,12 +79,14 @@ export function HomeStorePreview() {
           const editorial = "src" in item ? item : fallback[index];
           const src = product?.image?.url ?? editorial?.src ?? "/media/gallery-2-2.jpg";
           const alt = product?.image?.altText ?? editorial?.alt ?? product?.name ?? "";
-          const label = product?.categoryName ?? editorial?.label ?? "Helena Joias";
+          const label = productDisplayName(product?.categoryName ?? editorial?.label ?? "Helena Joias");
+          const name = productDisplayName(product?.name ?? `Descobrir ${label.toLowerCase()}`);
           return (
             <Link
               className={`home-store-piece home-store-piece-${index + 1}`}
               href={product ? `/produto/${product.slug}` : `/loja/${label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`}
               key={product?.slug ?? label}
+              style={{ "--piece-index": `"0${index + 1}"` } as React.CSSProperties}
               onClick={() => product && void trackAnalyticsEvent({
                 categoryId: product.categoryId,
                 eventName: "product_clicked",
@@ -92,17 +98,15 @@ export function HomeStorePreview() {
               </span>
               <span className="home-store-piece-copy">
                 <small>{label}</small>
-                <strong>{product?.name ?? `Descobrir ${label.toLowerCase()}`}</strong>
+                <strong>{name}</strong>
                 <b>{product ? (product.price == null ? "Consultar disponibilidade" : format(product.price)) : "Ver seleção"} <i aria-hidden="true">↗</i></b>
               </span>
             </Link>
           );
         })}
-        <aside className="home-store-note">
-          <span>Curadoria<br />Helena</span>
-          <p>Fotografia real.<br />Escolha sem pressa.<br />Atendimento humano.</p>
-        </aside>
       </div>
+
+      <p className="home-store-swipe-hint" aria-hidden="true"><span /> Deslize para ver todas as peças</p>
 
       <nav className="home-category-line" aria-label="Explorar categorias da loja">
         {categories.map((category) => (

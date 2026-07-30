@@ -11,6 +11,7 @@ import { listCategories, listProducts, getStore } from "@/lib/catalog/repository
 import { resolveStoreContext } from "@/lib/store/context";
 import type { CatalogFilters as Filters } from "@/types/commerce";
 import { FilterEvent } from "@/components/analytics/filter-event";
+import { normalizeWhatsAppNumber } from "@/lib/whatsapp/order-message";
 
 type SearchValues = Record<string, string | string[] | undefined>;
 
@@ -61,6 +62,12 @@ export default async function ShopPage({
     listProducts(context, filters),
   ]);
   const filtered = Object.values(current).some(Boolean);
+  const whatsappNumber = normalizeWhatsAppNumber(store.whatsappNumber);
+  const whatsappMessage = store.whatsappDefaultMessage?.trim()
+    || `Olá! Vim pela loja online da ${store.name} e gostaria de solicitar atendimento.`;
+  const whatsappUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
+    : null;
 
   const itemList = {
     "@context": "https://schema.org",
@@ -88,10 +95,22 @@ export default async function ShopPage({
           <p>Curadoria Helena · Loja online</p>
           <h1 id="shop-title">Escolha o brilho<br /><em>que encontra você.</em></h1>
           <div className="shop-opening-actions">
-            <Link href="#colecao-completa">
-              <span><strong>Explorar a seleção</strong><small>{products.length} peças disponíveis</small></span>
-              <i aria-hidden="true">↓</i>
-            </Link>
+            {products.length ? (
+              <Link href="#colecao-completa">
+                <span><strong>Explorar a seleção</strong><small>{products.length} peças disponíveis</small></span>
+                <i aria-hidden="true">↓</i>
+              </Link>
+            ) : whatsappUrl ? (
+              <a href={whatsappUrl} target="_blank" rel="noreferrer">
+                <span><strong>Falar com a Helena</strong><small>Atendimento pelo WhatsApp</small></span>
+                <i aria-hidden="true">↗</i>
+              </a>
+            ) : (
+              <Link href="#categorias">
+                <span><strong>Conhecer as categorias</strong><small>Explore a curadoria Helena</small></span>
+                <i aria-hidden="true">↓</i>
+              </Link>
+            )}
             <Link href="#categorias">Escolher por categoria <span aria-hidden="true">↗︎</span></Link>
           </div>
         </div>
@@ -125,7 +144,7 @@ export default async function ShopPage({
         </div>
       </section>
 
-      <section className="shop-categories" aria-labelledby="categories-title" data-store-motion="section">
+      <section className="shop-categories" id="categorias" aria-labelledby="categories-title" data-store-motion="section">
         <div className="store-section-heading">
           <p>Escolha por forma</p>
           <h2 id="categories-title">Encontre o detalhe<br /><em>que fala por você.</em></h2>
@@ -171,8 +190,8 @@ export default async function ShopPage({
       <section className="shop-assistance" data-store-motion="section">
         <p>Prefere escolher com ajuda?</p>
         <h2>Conte o que você procura.<br /><em>A Helena cuida do resto.</em></h2>
-        {store.whatsappNumber ? (
-          <Link href="/loja">Solicitar atendimento <span aria-hidden="true">↗</span></Link>
+        {whatsappUrl ? (
+          <a href={whatsappUrl} target="_blank" rel="noreferrer">Solicitar atendimento <span aria-hidden="true">↗</span></a>
         ) : (
           <span className="pending-assistance">Atendimento online sendo configurado</span>
         )}

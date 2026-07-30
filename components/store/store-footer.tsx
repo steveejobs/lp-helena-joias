@@ -1,17 +1,16 @@
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/analytics/cookie-settings-button";
+import { brandHighlight } from "@/lib/brand/copy";
 
 export function StoreFooter() {
   return (
     <footer className="store-footer">
       <div>
         <p>Helena Joias</p>
-        <h2>Seu brilho,<br /><em>na sua forma.</em></h2>
+        <h2>{brandHighlight}</h2>
       </div>
       <nav aria-label="Links da loja">
-        <Link href="/">Início</Link>
         <Link href="/loja">Loja</Link>
-        <Link href="/instagram">Instagram</Link>
         <Link href="/carrinho">Sacola</Link>
         <Link href="/privacidade">Privacidade</Link>
         <CookieSettingsButton />
