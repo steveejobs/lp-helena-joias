@@ -3,6 +3,7 @@
 import { useCart } from "@/components/cart/cart-provider";
 import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import {
+  HELENA_WHATSAPP_NUMBER,
   HELENA_WHATSAPP_SITE_MESSAGE,
   normalizeWhatsAppNumber,
 } from "@/lib/whatsapp/order-message";
@@ -15,7 +16,8 @@ export function HomeWhatsAppButton({
   origin: string;
 }) {
   const { store } = useCart();
-  const phone = normalizeWhatsAppNumber(store.whatsappNumber);
+  const phone = normalizeWhatsAppNumber(store.whatsappNumber)
+    ?? HELENA_WHATSAPP_NUMBER;
 
   const open = async () => {
     if (!phone) return;
@@ -33,12 +35,19 @@ export function HomeWhatsAppButton({
     <button
       className={className}
       type="button"
-      disabled={!phone}
       onClick={open}
-      aria-label={phone ? "Falar no WhatsApp" : "Falar no WhatsApp — atendimento sendo configurado"}
+      aria-label="Falar no WhatsApp"
     >
-      <span className="whatsapp-icon" aria-hidden="true">◌</span>
-      <span>{phone ? "Falar no WhatsApp" : "Falar no WhatsApp · em breve"}</span>
+      <span className="whatsapp-copy">
+        <strong>Falar no WhatsApp</strong>
+        <small>Atendimento direto</small>
+      </span>
+      <span className="whatsapp-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M20 11.6a8 8 0 0 1-11.8 7l-4.2 1.1 1.1-4.1A8 8 0 1 1 20 11.6Z" />
+          <path d="M8.4 7.8c.3-.3.7-.2.9.1l1 1.8c.1.3.1.6-.1.8l-.7.7c.6 1.4 1.7 2.5 3.1 3.1l.7-.7c.2-.2.5-.3.8-.1l1.8 1c.3.2.4.6.1.9-.6.8-1.5 1.2-2.5 1.1-3.2-.4-6.3-3.5-6.7-6.7-.1-1 .3-1.9 1.1-2.5Z" />
+        </svg>
+      </span>
     </button>
   );
 }

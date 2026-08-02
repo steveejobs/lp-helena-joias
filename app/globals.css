@@ -206,9 +206,15 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .primary-button:hover, .primary-button:focus-visible { background: var(--bronze-500); color: var(--white); transform: translateY(-2px); }
 .primary-button:hover i, .primary-button:focus-visible i { transform: rotate(-35deg); background: var(--ink); }
 .text-link { font-size: .71rem; text-transform: uppercase; letter-spacing: .13em; border-bottom: 1px solid var(--bronze-300); padding: .7rem 0; }
-.whatsapp-spotlight { position: relative; min-height: 3.35rem; display: inline-flex; align-items: center; gap: .75rem; padding: .45rem 1.15rem .45rem .5rem; border: 1px solid rgba(255,255,255,.28); border-radius: 99px; background: var(--bronze-500); color: var(--white); box-shadow: 0 .8rem 2.4rem rgba(153,119,70,.28); cursor: not-allowed; opacity: 1; text-transform: uppercase; letter-spacing: .11em; font: 650 .62rem/1 var(--sans); isolation: isolate; }
+.whatsapp-spotlight { position: relative; min-height: 3.35rem; display: inline-grid; grid-template-columns: minmax(0, 1fr) 2.35rem; align-items: center; gap: .75rem; padding: .45rem .5rem .45rem 1.05rem; border: 1px solid rgba(255,255,255,.28); border-radius: 99px; background: var(--bronze-500); color: var(--white); box-shadow: 0 .8rem 2.4rem rgba(153,119,70,.28); cursor: pointer; opacity: 1; font-family: var(--sans); text-align: left; isolation: isolate; }
 .whatsapp-spotlight::after { content: ""; position: absolute; inset: -.28rem; z-index: -1; border: 1px solid color-mix(in srgb, var(--bronze-300) 62%, transparent); border-radius: inherit; animation: whatsapp-pulse 2.8s ease-in-out infinite; }
-.whatsapp-icon { width: 2.35rem; height: 2.35rem; display: grid; place-items: center; border-radius: 50%; background: var(--white); color: var(--bronze-500); font: 1.3rem/1 var(--sans); }
+.whatsapp-copy { min-width: 0; display: grid; gap: .22rem; }
+.whatsapp-copy strong { font-size: .62rem; font-weight: 650; line-height: 1; letter-spacing: .11em; text-transform: uppercase; }
+.whatsapp-copy small { opacity: .7; font-size: .48rem; line-height: 1; letter-spacing: .08em; text-transform: uppercase; }
+.whatsapp-icon { width: 2.35rem; height: 2.35rem; display: grid; place-items: center; border-radius: 50%; background: var(--white); color: var(--bronze-500); transition: transform .3s cubic-bezier(.16,1,.3,1); }
+.whatsapp-icon svg { width: 1.18rem; height: 1.18rem; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.whatsapp-spotlight:hover .whatsapp-icon,
+.whatsapp-spotlight:focus-visible .whatsapp-icon { transform: rotate(-8deg) scale(1.06); }
 
 .hero-stage { --tilt-x: 0deg; --tilt-y: 0deg; grid-column: 7 / 13; position: relative; width: min(31vw, 28rem); justify-self: center; perspective: 1200px; animation: stage-in .88s cubic-bezier(.16, 1, .3, 1) .08s both paused; }
 .brand-intro-complete .hero-stage { animation-play-state: running; }
@@ -223,19 +229,17 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .scroll-cue i { width: 2.8rem; height: 1px; background: var(--ink); position: relative; overflow: hidden; }
 .scroll-cue i::after { content: ""; position: absolute; inset: 0; background: var(--white); transform: translateX(-100%); animation: cue 2.1s ease-in-out infinite; }
 
-[data-reveal] { opacity: 0; transform: translateY(2.25rem); clip-path: inset(0 0 12% 0); transition: opacity .42s ease, transform .58s cubic-bezier(.16,1,.3,1), clip-path .58s cubic-bezier(.16,1,.3,1); }
-[data-reveal="media"] { transform: translateY(3.5rem) scale(.965); clip-path: inset(7% 4% 10% 4% round 2rem); }
-[data-reveal="hero"] { transition-delay: 0s; }
-[data-reveal].is-revealed { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
-[data-reveal]:not([data-reveal="hero"]) > * { opacity: 0; transform: translateY(.9rem); transition: opacity .36s ease, transform .52s cubic-bezier(.16,1,.3,1); }
-[data-reveal].is-revealed > * { opacity: 1; transform: none; }
-[data-reveal].is-revealed > :nth-child(2) { transition-delay: .025s; }
-[data-reveal].is-revealed > :nth-child(3) { transition-delay: .05s; }
-[data-reveal].is-revealed > :nth-child(4) { transition-delay: .075s; }
-[data-reveal].is-revealed > :nth-child(5) { transition-delay: .1s; }
-[data-reveal="media"] .video-card { opacity: 0; transition: opacity .58s ease, transform .88s cubic-bezier(.16,1,.3,1); }
-[data-reveal="media"].is-revealed .video-card-left { opacity: 1; transform: translateY(4rem); }
-[data-reveal="media"].is-revealed .video-card-right { opacity: 1; transform: translateY(-4rem); transition-delay: .1s; }
+.motion-ready [data-reveal] { opacity: .14; transform: translateY(12px) scale(.992); transition: opacity 640ms cubic-bezier(.22,.61,.36,1), transform 640ms cubic-bezier(.22,.61,.36,1); }
+.motion-ready [data-reveal].is-revealed { opacity: 1; transform: none; }
+.motion-ready [data-reveal]:not([data-reveal="media"]) > * { opacity: .18; transform: translateY(9px); transition: opacity 640ms cubic-bezier(.22,.61,.36,1), transform 640ms cubic-bezier(.22,.61,.36,1); }
+.motion-ready [data-reveal]:not([data-reveal="media"]).is-revealed > * { opacity: 1; transform: none; }
+.motion-ready [data-reveal]:not([data-reveal="media"]).is-revealed > :nth-child(2) { transition-delay: 40ms; }
+.motion-ready [data-reveal]:not([data-reveal="media"]).is-revealed > :nth-child(3) { transition-delay: 80ms; }
+.motion-ready [data-reveal]:not([data-reveal="media"]).is-revealed > :nth-child(4) { transition-delay: 120ms; }
+.motion-ready [data-reveal]:not([data-reveal="media"]).is-revealed > :nth-child(n+5) { transition-delay: 160ms; }
+.motion-ready [data-reveal="media"] .video-card { opacity: .18; transition: opacity 640ms cubic-bezier(.22,.61,.36,1), transform 640ms cubic-bezier(.22,.61,.36,1); }
+.motion-ready [data-reveal="media"].is-revealed .video-card { opacity: 1; }
+.motion-ready [data-reveal="media"].is-revealed .video-card-right { transition-delay: 40ms; }
 
 .manifesto { min-height: 76svh; display: grid; place-content: center; padding: 7rem max(1.2rem, 8vw); background: var(--rose-50); position: relative; overflow: hidden; }
 .manifesto::before { content: ""; position: absolute; width: 43rem; aspect-ratio: 1; left: -18rem; top: -20rem; border: 1px solid var(--rose-200); border-radius: 50%; box-shadow: 0 0 0 5rem rgba(250,220,212,.18), 0 0 0 10rem rgba(250,220,212,.09); }
@@ -297,10 +301,11 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .story-progress i { position: relative; height: 1px; overflow: hidden; background: color-mix(in srgb, currentColor 24%, transparent); }
 .story-progress i::after { content: ""; position: absolute; inset: 0; background: currentColor; transform: scaleX(var(--story-progress)); transform-origin: left; }
 .collection-instagram { width: max-content; min-height: 2.9rem; display: inline-flex; align-items: center; gap: 1rem; margin: 2.4rem 0 0 2rem; padding: .55rem 1rem; border: 1px solid currentColor; border-radius: 99px; font-size: .6rem; font-weight: 650; text-transform: uppercase; letter-spacing: .12em; }
-.collection-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.35rem; margin-top: 2.2rem; }
-.collection-actions .collection-instagram { margin: 0 0 0 2rem; }
+.collection-actions { width: min(100%, 31rem); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: .75rem; margin: 2.2rem 0 0 2rem; }
+.collection-actions .collection-instagram { width: 100%; min-height: 3.1rem; justify-content: center; margin: 0; text-align: center; }
 .whatsapp-spotlight-compact { min-height: 2.9rem; padding-right: .9rem; font-size: .54rem; }
 .whatsapp-spotlight-compact .whatsapp-icon { width: 2rem; height: 2rem; font-size: 1.05rem; }
+.whatsapp-spotlight-compact .whatsapp-copy small { display: none; }
 .collection-night .whatsapp-spotlight { background: var(--rose-100); color: var(--ink); border-color: rgba(250,220,212,.6); box-shadow: 0 .8rem 2.4rem rgba(250,220,212,.12); }
 .collection-night .whatsapp-icon { background: var(--ink); color: var(--rose-100); }
 
@@ -316,8 +321,10 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .bridge-orbit .bridge-copy h2 em { color: var(--rose-200); }
 .bridge-bottom { display: grid; grid-template-columns: minmax(15rem, 30rem) 1fr; align-items: end; gap: 3rem; margin: 3.5rem 0 0 clamp(1rem, 8vw, 8rem); }
 .bridge-bottom > p { margin: 0; font-family: var(--serif); font-size: clamp(1rem, 1.5vw, 1.3rem); line-height: 1.65; opacity: .74; }
-.bridge-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 1rem; }
-.bridge-primary { min-height: 3.35rem; display: inline-flex; align-items: center; gap: 1.6rem; padding: 0 1.2rem; border: 1px solid currentColor; border-radius: 99px; font-size: .62rem; font-weight: 650; text-transform: uppercase; letter-spacing: .12em; transition: transform .3s ease, background .3s ease, color .3s ease; }
+.bridge-actions { width: min(100%, 38rem); display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); align-items: stretch; justify-self: end; gap: .75rem; }
+.bridge-primary { width: 100%; min-height: 3.35rem; display: inline-flex; align-items: center; justify-content: space-between; gap: 1.6rem; padding: 0 1.2rem; border: 1px solid currentColor; border-radius: 99px; font-size: .62rem; font-weight: 650; text-transform: uppercase; letter-spacing: .12em; transition: transform .3s ease, background .3s ease, color .3s ease; }
+.bridge-actions .whatsapp-spotlight,
+.bridge-actions .route-pending { width: 100%; }
 .bridge-primary:hover, .bridge-primary:focus-visible { transform: translateY(-2px); background: var(--ink); color: var(--rose-50); }
 .bridge-orbit .bridge-primary:hover, .bridge-orbit .bridge-primary:focus-visible { background: var(--rose-50); color: var(--ink); }
 .route-pending { min-height: 3.35rem; display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: .24rem; padding: 0 1.2rem; border: 1px solid color-mix(in srgb, currentColor 44%, transparent); border-radius: 99px; background: color-mix(in srgb, var(--bronze-500) 15%, transparent); color: inherit; cursor: pointer; opacity: 1; font-family: var(--sans); transition: background .25s ease, transform .25s ease; -webkit-text-fill-color: currentColor; }
@@ -404,7 +411,8 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .profile-link-copy small { opacity: .62; font-size: .55rem; letter-spacing: .02em; }
 .profile-link > i { width: 2.55rem; height: 2.55rem; display: grid; place-items: center; border-radius: 50%; background: var(--rose-100); color: var(--ink); font-style: normal; }
 .profile-link-primary > i { background: var(--ink); color: var(--rose-50); }
-a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px); background: var(--ink); color: var(--rose-50); }
+.profile-link:not(:disabled):hover,
+.profile-link:not(:disabled):focus-visible { transform: translateY(-2px); background: var(--ink); color: var(--rose-50); }
 .profile-hours { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .7rem; margin-top: 1rem; font-size: .52rem; text-transform: uppercase; letter-spacing: .1em; }
 .profile-hours span { display: flex; gap: .3rem; }
 .profile-hours b { color: var(--bronze-500); }
@@ -413,8 +421,15 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 .link-butterfly canvas { display: block; width: 100%; height: 100%; filter: sepia(.12) saturate(.9) drop-shadow(0 .75rem 1.2rem rgba(33,25,22,.14)); }
 .link-butterfly-hero { position: absolute; z-index: 1; top: 4.3rem; right: clamp(-.8rem, 3vw, 1.2rem); width: 7rem; aspect-ratio: 1; opacity: .42; animation: link-butterfly-drift 6.5s ease-in-out infinite alternate; }
 
-[data-link-reveal] { opacity: 0; transform: translateY(3.2rem); clip-path: inset(0 0 20% 0); transition: opacity .75s ease, transform .95s cubic-bezier(.16,1,.3,1), clip-path .95s cubic-bezier(.16,1,.3,1); }
-[data-link-reveal].is-revealed { opacity: 1; transform: none; clip-path: inset(0); }
+.link-page-ready [data-link-hero] { animation: link-hero-in 760ms cubic-bezier(.16,1,.3,1) both; }
+.link-page-ready [data-link-hero="brand"] { animation-delay: 240ms; }
+.link-page-ready [data-link-hero="kicker"] { animation-delay: 300ms; }
+.link-page-ready [data-link-hero="title"] { animation-delay: 340ms; }
+.link-page-ready [data-link-hero="deck"] { animation-delay: 380ms; }
+.link-page-ready [data-link-hero="actions"] { animation-delay: 420ms; }
+.link-page-ready [data-link-hero="hours"] { animation-delay: 500ms; }
+.motion-ready [data-link-reveal] { opacity: .14; transform: translateY(12px) scale(.992); transition: opacity 640ms cubic-bezier(.22,.61,.36,1), transform 640ms cubic-bezier(.22,.61,.36,1); }
+.motion-ready [data-link-reveal].is-revealed { opacity: 1; transform: none; }
 .link-gallery { --rail-top: -1.8rem; --rail-bottom: 1.8rem; --rail-top-tilt: -2.4deg; --rail-bottom-tilt: 2.4deg; --rail-focus: .82; --rail-glow: .18; min-height: 96svh; position: relative; display: flex; flex-direction: column; justify-content: center; padding: 5.8rem 0 4.5rem; background: var(--ink); color: var(--rose-50); overflow: hidden; }
 .link-gallery::before { content: ""; position: absolute; z-index: 1; left: 50%; top: 57%; width: 15rem; aspect-ratio: 1; border: 1px solid rgba(250,220,212,.12); border-radius: 50%; opacity: var(--rail-glow); transform: translate(-50%,-50%) scale(calc(.82 + var(--rail-glow))); box-shadow: 0 0 0 2.8rem rgba(250,220,212,.025), 0 0 6rem rgba(230,199,181,.15); transition: opacity .15s linear, transform .15s linear; }
 .link-gallery-heading { position: relative; z-index: 4; padding: 0 1.15rem; }
@@ -460,6 +475,7 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 @keyframes bridge-morph { to { transform: rotate(19deg) scale(.9, 1.12); border-radius: 39% 61% 43% 57% / 61% 36% 64% 39%; } }
 @keyframes whatsapp-pulse { 0%, 100% { opacity: .35; transform: scale(.98); } 50% { opacity: .75; transform: scale(1.02); } }
 @keyframes link-curtain-out { to { transform: scaleY(0); } }
+@keyframes link-hero-in { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: none; } }
 @keyframes link-butterfly-drift { to { transform: translate3d(-1.2rem, 1rem, 0) rotate(5deg); opacity: .58; } }
 @keyframes gallery-flow-left { to { transform: translate3d(-50%,0,0); } }
 @keyframes gallery-flow-right { from { transform: translate3d(-50%,0,0); } to { transform: translate3d(0,0,0); } }
@@ -539,7 +555,7 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   .story-progress { margin: .75rem 0 0 .8rem; }
   .collection-actions { display: grid; grid-template-columns: 1fr 1fr; margin-top: .72rem; gap: .5rem; }
   .collection-actions .collection-instagram { width: 100%; justify-content: center; margin: 0; padding-inline: .7rem; }
-  .whatsapp-spotlight-compact { width: 100%; justify-content: center; margin: 0; padding-right: .65rem; }
+  .whatsapp-spotlight-compact { width: 100%; grid-template-columns: 1fr; justify-content: center; margin: 0; padding-inline: .65rem; text-align: center; }
   .whatsapp-spotlight-compact .whatsapp-icon { display: none; }
   .gallery-scroll-label { right: 1rem; bottom: 1rem; }
   .experience-bridge { min-height: 72svh; padding: 5.2rem 1.25rem; }
@@ -691,6 +707,8 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 
 /* Home hero — integrated from the approved guided-choice prototype. */
 .hero.choice-hero {
+  height: 100svh;
+  min-height: 40rem;
   grid-template-rows: 1fr;
   align-items: center;
   gap: 1rem;
@@ -713,6 +731,15 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   grid-row: 1;
   align-self: center;
 }
+
+.motion-ready [data-hero-reveal] {
+  opacity: 0;
+  transition: opacity 760ms cubic-bezier(.16,1,.3,1), transform 920ms cubic-bezier(.16,1,.3,1);
+}
+.motion-ready [data-hero-reveal="copy"] { transform: translate3d(-24px, 18px, 0); }
+.motion-ready [data-hero-reveal="media"] { transform: translate3d(34px, 12px, 0) scale(.94) rotate(1.5deg); transition-delay: 80ms; }
+.motion-ready [data-hero-reveal="decision"] { transform: translateY(16px); transition-delay: 180ms; }
+.motion-ready [data-hero-reveal].is-revealed { opacity: 1; transform: none; }
 
 .choice-eyebrow {
   display: flex;
@@ -761,8 +788,8 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 .choice-actions {
   position: relative;
   display: grid;
-  width: min(100%, 14.25rem);
-  grid-template-columns: 1fr;
+  width: min(100%, 29rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .55rem;
   margin: 1.35rem 0 0 clamp(1rem, 4vw, 4rem);
 }
@@ -780,6 +807,29 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
   border-radius: 1rem;
   transition: border-color .25s ease, background .25s ease, color .25s ease, transform .3s ease;
 }
+
+.choice-whatsapp-action {
+  width: 100%;
+  cursor: pointer;
+  font-family: var(--sans);
+  text-align: left;
+}
+.choice-whatsapp-action .whatsapp-copy { position: relative; z-index: 1; }
+.choice-whatsapp-action .whatsapp-copy strong { font: 500 clamp(1.02rem, 1.45vw, 1.18rem)/1 var(--serif); letter-spacing: 0; text-transform: none; }
+.choice-whatsapp-action .whatsapp-copy small { color: rgba(255,255,255,.7); font: 650 .4rem/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.choice-whatsapp-action .whatsapp-icon {
+  position: relative;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-left: 1px solid rgba(255,255,255,.28);
+  border-radius: 0;
+  background: transparent;
+  color: currentColor;
+}
+.choice-whatsapp-action:hover,
+.choice-whatsapp-action:focus-visible { border-color: var(--ink); background: var(--ink); transform: translateY(-2px); }
+.choice-whatsapp-action:hover .whatsapp-icon,
+.choice-whatsapp-action:focus-visible .whatsapp-icon { transform: rotate(-8deg) scale(1.06); }
 
 .choice-primary-action {
   background: var(--bronze-500);
@@ -992,10 +1042,11 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 
 @media (max-width: 720px) {
   .hero.choice-hero {
-    min-height: 100svh;
+    height: 100svh;
+    min-height: 40rem;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto auto;
-    align-content: start;
+    grid-template-rows: auto minmax(9rem, 1fr) auto;
+    align-content: stretch;
     gap: 0;
     padding: max(6.5rem, calc(env(safe-area-inset-top) + 5.5rem)) 1.1rem max(2.8rem, env(safe-area-inset-bottom));
   }
@@ -1017,8 +1068,10 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
     grid-column: 1;
     grid-row: 2;
     width: calc(100% - 1rem);
-    aspect-ratio: 3 / 1.72;
+    height: min(26svh, 13.5rem);
+    aspect-ratio: auto;
     margin-top: .75rem;
+    align-self: center;
   }
   .choice-card { border-radius: 48% 48% .75rem .75rem; }
   .choice-card-one img { object-position: center 45%; }
@@ -1032,6 +1085,7 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
     grid-column: 1;
     grid-row: 3;
     padding: 1.15rem 1rem 0;
+    align-self: end;
   }
   .choice-decision p { max-width: 21rem; font-size: .88rem; line-height: 1.45; }
   .choice-detail,
@@ -1039,14 +1093,15 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 }
 
 @media (max-width: 390px) and (max-height: 760px) {
-  .hero.choice-hero { padding-top: 5.8rem; }
+  .hero.choice-hero { min-height: 36rem; padding-top: 4.9rem; padding-bottom: 1.25rem; }
   .choice-eyebrow { margin-bottom: .7rem; }
-  .choice-copy h1 { font-size: 3.45rem; }
-  .choice-portrait { margin-top: .45rem; }
-  .choice-decision { padding-top: .8rem; }
+  .choice-copy h1 { font-size: 3.05rem; }
+  .choice-actions { gap: .4rem; margin-top: .65rem; }
+  .choice-portrait { height: min(23svh, 9.8rem); margin-top: .4rem; }
+  .choice-decision { padding: .55rem .65rem 0; }
   .choice-decision p { font-size: .8rem; }
-  .choice-primary-action { min-height: 3.45rem; }
-  .choice-route-action { min-height: 3.35rem; }
+  .choice-primary-action,
+  .choice-route-action { min-height: 3.15rem; }
 }
 
 @media (max-width: 480px) {
@@ -1059,6 +1114,8 @@ a.profile-link:hover, a.profile-link:focus-visible { transform: translateY(-2px)
 @media (prefers-reduced-motion: reduce) {
   .choice-card,
   .choice-primary-action::before { animation: none !important; }
+  [data-hero-reveal],
+  [data-link-hero] { opacity: 1 !important; transform: none !important; }
   .choice-card-one { z-index: 3; opacity: 1; transform: none; }
   .choice-card-two { z-index: 2; opacity: 1; transform: translate(var(--choice-deck-mid-x), var(--choice-deck-mid-y)) scale(.975) rotate(1.5deg); }
   .choice-card-three { z-index: 1; opacity: 1; transform: translate(var(--choice-deck-back-x), var(--choice-deck-back-y)) scale(.95) rotate(2.4deg); }

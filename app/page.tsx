@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
+import { useReversibleReveal } from "@/components/motion-controller";
 import { brandHighlight, storeLocationUrl } from "@/lib/brand/copy";
 
 type GalleryImage = { src: string; alt: string; position?: string };
@@ -27,7 +28,71 @@ const galleries: Record<string, GalleryImage[]> = {
 };
 
 function TransitionLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
-  return <a href={href} className={className}>{children}</a>;
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || href.startsWith("#")) return;
+    event.preventDefault();
+    document.documentElement.classList.add("is-leaving");
+    window.setTimeout(() => { window.location.href = href; }, 440);
+  };
+
+  return <a href={href} className={className} onClick={handleClick}>{children}</a>;
+}
+
+function BrandIntro() {
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const finish = () => {
+      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
+      root.classList.add("brand-intro-complete");
+      window.dispatchEvent(new Event("helena:intro-complete"));
+      setHidden(true);
+    };
+
+    root.classList.remove("is-leaving");
+    if (reducedMotion) {
+      finish();
+      return;
+    }
+
+    root.classList.remove("brand-intro-complete");
+    root.classList.add("brand-intro-playing");
+    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 1400);
+    const finishTimer = window.setTimeout(finish, 2050);
+
+    return () => {
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(finishTimer);
+      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
+    };
+  }, []);
+
+  if (hidden) return null;
+
+  return (
+    <div className="brand-intro" aria-hidden="true">
+      <div className="brand-intro-halo" />
+      <img
+        className="brand-intro-animation"
+        src="/media/logo-formation-v2.webp"
+        alt=""
+        width="720"
+        height="720"
+        fetchPriority="high"
+        decoding="sync"
+        onError={(event) => {
+          if (!event.currentTarget.src.endsWith("/media/logo-formation-final-v2.webp")) {
+            event.currentTarget.src = "/media/logo-formation-final-v2.webp";
+          }
+        }}
+      />
+      <div className="brand-intro-wordmark"><span>Helena</span><small>Joias</small></div>
+      <p>Forma · luz · presença</p>
+    </div>
+  );
 }
 
 function ScrollButterfly() {
@@ -108,7 +173,7 @@ function ScrollButterfly() {
 
 function ChoicePortrait() {
   return (
-    <figure className="choice-portrait" aria-label="Seleção visual Helena Joias">
+    <figure className="choice-portrait" aria-label="Seleção visual Helena Joias" data-hero-reveal="media">
       <span className="choice-orbit choice-orbit-one" aria-hidden="true" />
       <span className="choice-orbit choice-orbit-two" aria-hidden="true" />
       <span className="choice-card choice-card-one">
@@ -373,6 +438,8 @@ function ExperienceBridge({
 }
 
 export default function Home() {
+  useReversibleReveal("[data-reveal]:not([data-reveal='hero'])");
+
   useEffect(() => {
     let frame = 0;
     const updateProgress = () => {
@@ -398,40 +465,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-    const hero = elements.find((element) => element.dataset.reveal === "hero");
-    const sectionElements = elements.filter((element) => element !== hero);
-    let observer: IntersectionObserver | null = null;
-
-    const reveal = (element: HTMLElement) => {
-      element.classList.add("is-revealed");
-      observer?.unobserve(element);
-    };
-
-    observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) reveal(entry.target as HTMLElement);
-      });
-    }, { rootMargin: "18% 0px 18% 0px", threshold: 0.01 });
-
-    sectionElements.forEach((element) => {
-      const rect = element.getBoundingClientRect();
-      if (rect.top <= window.innerHeight * 1.16 && rect.bottom >= -window.innerHeight * .1) reveal(element);
-      else observer?.observe(element);
-    });
-
+    const heroElements = Array.from(document.querySelectorAll<HTMLElement>("[data-hero-reveal]"));
     const revealHero = () => {
-      if (hero) window.requestAnimationFrame(() => reveal(hero));
+      window.requestAnimationFrame(() => {
+        heroElements.forEach((element) => element.classList.add("is-revealed"));
+      });
     };
-    revealHero();
 
-    return () => {
-      observer?.disconnect();
-    };
+    if (document.documentElement.classList.contains("brand-intro-complete")) revealHero();
+    else window.addEventListener("helena:intro-complete", revealHero, { once: true });
+
+    return () => window.removeEventListener("helena:intro-complete", revealHero);
   }, []);
 
   return (
     <main className="site-shell">
+      <BrandIntro />
+      <div className="exit-curtain" aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true" />
       <ScrollButterfly />
 
@@ -449,7 +499,7 @@ export default function Home() {
       </header>
 
       <section className="hero choice-hero" id="inicio" aria-labelledby="hero-title">
-        <div className="choice-copy" data-reveal="hero">
+        <div className="choice-copy" data-hero-reveal="copy">
           <p className="choice-eyebrow"><i /> {brandHighlight}</p>
           <h1 id="hero-title">
             O brilho
@@ -457,6 +507,7 @@ export default function Home() {
             <em>forma.</em>
           </h1>
           <div className="choice-actions">
+            <HomeWhatsAppButton className="choice-primary-action choice-whatsapp-action" origin="hero da home" />
             <a
               className="choice-route-action"
               href={storeLocationUrl}
@@ -474,7 +525,7 @@ export default function Home() {
           </div>
         </div>
         <ChoicePortrait />
-        <div className="choice-decision" data-reveal="hero">
+        <div className="choice-decision" data-hero-reveal="decision">
           <p>Experimente combinações, descubra novos detalhes e escolha o brilho que faz sentido para você.</p>
         </div>
         <p className="choice-detail" aria-hidden="true">Forma <i /> Luz <i /> Presença</p>
