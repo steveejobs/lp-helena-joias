@@ -176,35 +176,47 @@ function ChoicePortrait() {
     <figure className="choice-portrait" aria-label="Seleção visual Helena Joias" data-hero-reveal="media">
       <span className="choice-orbit choice-orbit-one" aria-hidden="true" />
       <span className="choice-orbit choice-orbit-two" aria-hidden="true" />
-      <span className="choice-card choice-card-one">
-        <img
-          src="/media/gallery-2-2.jpg"
-          alt="Composição Helena Joias com colares, brincos e anéis dourados"
-          width="1170"
-          height="1560"
-          fetchPriority="high"
-          decoding="sync"
-        />
+      <span className="choice-card-exit choice-card-one">
+        <span className="choice-card-entry">
+          <span className="choice-card">
+            <img
+              src="/media/gallery-2-2.jpg"
+              alt="Composição Helena Joias com colares, brincos e anéis dourados"
+              width="1170"
+              height="1560"
+              fetchPriority="high"
+              decoding="sync"
+            />
+          </span>
+        </span>
       </span>
-      <span className="choice-card choice-card-two">
-        <img
-          src="/media/gallery-1-4.jpg"
-          alt="Modelo usando brincos e colares da Helena Joias"
-          width="1170"
-          height="1560"
-          loading="lazy"
-          decoding="async"
-        />
+      <span className="choice-card-exit choice-card-two">
+        <span className="choice-card-entry">
+          <span className="choice-card">
+            <img
+              src="/media/gallery-1-4.jpg"
+              alt="Modelo usando brincos e colares da Helena Joias"
+              width="1170"
+              height="1560"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+        </span>
       </span>
-      <span className="choice-card choice-card-three">
-        <img
-          src="/media/gallery-3-2.jpg"
-          alt="Modelo usando brincos geométricos e colares da Helena Joias"
-          width="1170"
-          height="1560"
-          loading="lazy"
-          decoding="async"
-        />
+      <span className="choice-card-exit choice-card-three">
+        <span className="choice-card-entry">
+          <span className="choice-card">
+            <img
+              src="/media/gallery-3-2.jpg"
+              alt="Modelo usando brincos geométricos e colares da Helena Joias"
+              width="1170"
+              height="1560"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+        </span>
       </span>
     </figure>
   );
@@ -447,7 +459,9 @@ export default function Home() {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       document.documentElement.style.setProperty("--scroll-progress", max > 0 ? `${window.scrollY / max}` : "0");
       const heroProgress = Math.min(1, window.scrollY / Math.max(window.innerHeight, 1));
+      const heroExit = Math.min(1, Math.max(0, (window.scrollY - window.innerHeight * .12) / (window.innerHeight * .56)));
       document.documentElement.style.setProperty("--hero-scroll", String(heroProgress));
+      document.documentElement.style.setProperty("--hero-exit", String(heroExit));
       document.documentElement.style.setProperty("--hero-scale", String(1.03 + heroProgress * .12));
       document.documentElement.style.setProperty("--hero-lift", `${heroProgress * -2}%`);
     };
@@ -500,11 +514,11 @@ export default function Home() {
 
       <section className="hero choice-hero" id="inicio" aria-labelledby="hero-title">
         <div className="choice-copy" data-hero-reveal="copy">
-          <p className="choice-eyebrow"><i /> {brandHighlight}</p>
-          <h1 id="hero-title">
-            O brilho
-            <span>encontra a sua</span>
-            <em>forma.</em>
+          <p className="choice-eyebrow"><i /> Experimente. Combine. Encontre a sua.</p>
+          <h1 id="hero-title" aria-label={brandHighlight}>
+            <span className="choice-title-mask choice-title-lead" aria-hidden="true"><b>Para cada</b></span>
+            <span className="choice-title-mask choice-title-middle" aria-hidden="true"><b>momento especial,</b></span>
+            <span className="choice-title-mask choice-title-serif" aria-hidden="true"><b>uma joia única.</b></span>
           </h1>
           <div className="choice-actions">
             <HomeWhatsAppButton className="choice-primary-action choice-whatsapp-action" origin="hero da home" />
@@ -525,9 +539,6 @@ export default function Home() {
           </div>
         </div>
         <ChoicePortrait />
-        <div className="choice-decision" data-hero-reveal="decision">
-          <p>Experimente combinações, descubra novos detalhes e escolha o brilho que faz sentido para você.</p>
-        </div>
         <p className="choice-detail" aria-hidden="true">Forma <i /> Luz <i /> Presença</p>
         <a className="scroll-cue" href="#manifesto" aria-label="Continuar para a próxima seção"><span>Role para descobrir</span><i aria-hidden="true" /></a>
       </section>

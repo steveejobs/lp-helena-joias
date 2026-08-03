@@ -309,8 +309,11 @@ export default function InstagramLinks() {
         <div className="profile-brand" data-link-hero="brand">
           <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" fetchPriority="high" decoding="async" />
         </div>
-        <p className="profile-kicker" data-link-hero="kicker">{brandHighlight}</p>
-        <h1 id="link-title" data-link-hero="title">Seu brilho<br /><em>começa aqui.</em></h1>
+        <p className="profile-kicker" data-link-hero="kicker">Experimente. Combine. Encontre a sua.</p>
+        <h1 id="link-title" data-link-hero="title" aria-label={brandHighlight}>
+          <span aria-hidden="true">Para cada momento especial,</span>
+          <em aria-hidden="true">uma joia única.</em>
+        </h1>
         <p className="profile-deck" data-link-hero="deck">Conheça a Helena, explore as coleções e escolha o próximo passo.</p>
 
         <nav className="profile-links" aria-label="Links principais da Helena Joias" data-link-hero="actions">
