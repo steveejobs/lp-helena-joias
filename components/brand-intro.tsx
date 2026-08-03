@@ -38,7 +38,7 @@ export function BrandIntro() {
       window.clearTimeout(assetFallbackTimer);
       root.classList.add("brand-intro-ready");
       revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
-      contentTimer = window.setTimeout(revealContent, 3450);
+      contentTimer = window.setTimeout(revealContent, 3150);
       finishTimer = window.setTimeout(finish, 4100);
     };
 

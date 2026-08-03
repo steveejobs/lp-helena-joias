@@ -28,6 +28,34 @@ const galleries: Record<string, GalleryImage[]> = {
   ],
 };
 
+let butterflyFramesPromise: Promise<HTMLCanvasElement[]> | null = null;
+
+function loadButterflyFrames() {
+  if (butterflyFramesPromise) return butterflyFramesPromise;
+
+  butterflyFramesPromise = new Promise((resolve, reject) => {
+    const sprite = new window.Image();
+    sprite.onload = () => {
+      const frames = Array.from({ length: 16 }, (_, index) => {
+        const frame = document.createElement("canvas");
+        frame.width = 256;
+        frame.height = 256;
+        const context = frame.getContext("2d");
+        if (!context) return frame;
+        const column = index % 4;
+        const row = Math.floor(index / 4);
+        context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+        return frame;
+      });
+      resolve(frames);
+    };
+    sprite.onerror = () => reject(new Error("NÃ£o foi possÃ­vel carregar a animaÃ§Ã£o das borboletas."));
+    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+  });
+
+  return butterflyFramesPromise;
+}
+
 function TransitionLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || href.startsWith("#")) return;
@@ -50,36 +78,56 @@ function ScrollButterfly() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const desktopMotion = window.matchMedia("(min-width: 721px)");
     if (reduced || connection?.saveData) return;
 
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    const sprite = new window.Image();
+    let frames: HTMLCanvasElement[] = [];
+    let cancelled = false;
     let loaded = false;
     let requested = 0;
+    let wingFrame = 0;
     let lastFrame = -1;
     let lastScrollY = window.scrollY;
     let scrollDirection = 1;
+    let pendingDirection = scrollDirection;
+    let pendingDistance = 0;
+    let active = false;
+    let listening = false;
+    let loadStarted = false;
+    let maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    let lastToneCheck = 0;
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
-    const render = () => {
+    const updateDirection = (delta: number) => {
+      if (Math.abs(delta) < 1.25) return;
+      const nextDirection = delta > 0 ? 1 : -1;
+      if (nextDirection === scrollDirection) {
+        pendingDirection = nextDirection;
+        pendingDistance = 0;
+        return;
+      }
+      if (nextDirection !== pendingDirection) {
+        pendingDirection = nextDirection;
+        pendingDistance = Math.abs(delta);
+      } else {
+        pendingDistance += Math.abs(delta);
+      }
+      if (pendingDistance >= 24) {
+        scrollDirection = nextDirection;
+        pendingDistance = 0;
+      }
+    };
+    const render = (time = performance.now()) => {
       requested = 0;
+      if (!active) return;
       const scrollY = window.scrollY;
       const scrollDelta = scrollY - lastScrollY;
-      if (Math.abs(scrollDelta) > .5) scrollDirection = scrollDelta > 0 ? 1 : -1;
+      updateDirection(scrollDelta);
       lastScrollY = scrollY;
-      const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = clamp(scrollY / max);
-      const frame = Math.abs(Math.floor(scrollY / 34)) % 16;
-
-      if (loaded && frame !== lastFrame) {
-        const column = frame % 4;
-        const row = Math.floor(frame / 4);
-        context.clearRect(0, 0, 320, 320);
-        context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 320, 320);
-        lastFrame = frame;
-      }
+      const progress = clamp(scrollY / maxScroll);
 
       const driftX = Math.sin(progress * Math.PI * 7) * 13;
       const driftY = Math.cos(progress * Math.PI * 9) * 18;
@@ -92,34 +140,97 @@ function ScrollButterfly() {
       wrapper.style.setProperty("--butterfly-y", `${driftY.toFixed(2)}px`);
       wrapper.style.setProperty("--butterfly-rotation", `${rotation.toFixed(2)}deg`);
       wrapper.style.setProperty("--butterfly-scale", depth.toFixed(3));
-      wrapper.style.setProperty("--butterfly-depth-blur", `${((1 - depth) * 1.15).toFixed(2)}px`);
 
-      const beneath = document.elementFromPoint(window.innerWidth - 70, window.innerHeight * .62) as HTMLElement | null;
-      wrapper.classList.toggle("is-on-dark", Boolean(beneath?.closest(".movement, .collection-night, .site-footer")));
+      if (time - lastToneCheck > 140) {
+        lastToneCheck = time;
+        const beneath = document.elementFromPoint(window.innerWidth - 70, window.innerHeight * .62) as HTMLElement | null;
+        wrapper.classList.toggle("is-on-dark", Boolean(beneath?.closest(".movement, .collection-night, .site-footer")));
+      }
+    };
+
+    const animateWings = (time: number) => {
+      if (!active) {
+        wingFrame = 0;
+        return;
+      }
+      const frame = Math.floor(time / 78) % 16;
+      if (loaded && frame !== lastFrame) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(frames[frame], 0, 0, canvas.width, canvas.height);
+        lastFrame = frame;
+      }
+      wingFrame = window.requestAnimationFrame(animateWings);
     };
 
     const requestRender = () => {
       if (!requested) requested = window.requestAnimationFrame(render);
     };
 
-    sprite.onload = () => {
-      loaded = true;
-      render();
+    const handleResize = () => {
+      maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      requestRender();
     };
-    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
-    window.addEventListener("scroll", requestRender, { passive: true });
-    window.addEventListener("resize", requestRender);
+
+    const startListening = () => {
+      if (listening) return;
+      listening = true;
+      window.addEventListener("scroll", requestRender, { passive: true });
+      window.addEventListener("resize", handleResize);
+    };
+
+    const stopListening = () => {
+      if (!listening) return;
+      listening = false;
+      window.removeEventListener("scroll", requestRender);
+      window.removeEventListener("resize", handleResize);
+    };
+
+    const syncActivity = () => {
+      active = desktopMotion.matches && document.visibilityState === "visible";
+      wrapper.classList.toggle("is-motion-active", active);
+      if (!active) {
+        stopListening();
+        wrapper.style.setProperty("--butterfly-opacity", "0");
+        if (requested) window.cancelAnimationFrame(requested);
+        if (wingFrame) window.cancelAnimationFrame(wingFrame);
+        requested = 0;
+        wingFrame = 0;
+        return;
+      }
+
+      startListening();
+      lastScrollY = window.scrollY;
+      render();
+      if (!loadStarted) {
+        loadStarted = true;
+        void loadButterflyFrames().then((loadedFrames) => {
+          if (cancelled) return;
+          frames = loadedFrames;
+          loaded = true;
+          syncActivity();
+        }).catch(() => undefined);
+      } else if (loaded && !wingFrame) {
+        wingFrame = window.requestAnimationFrame(animateWings);
+      }
+    };
+
+    desktopMotion.addEventListener("change", syncActivity);
+    document.addEventListener("visibilitychange", syncActivity);
+    syncActivity();
 
     return () => {
-      window.removeEventListener("scroll", requestRender);
-      window.removeEventListener("resize", requestRender);
+      cancelled = true;
+      stopListening();
+      desktopMotion.removeEventListener("change", syncActivity);
+      document.removeEventListener("visibilitychange", syncActivity);
       if (requested) window.cancelAnimationFrame(requested);
+      if (wingFrame) window.cancelAnimationFrame(wingFrame);
     };
   }, []);
 
   return (
     <div className="scroll-butterfly" ref={wrapperRef} aria-hidden="true">
-      <canvas ref={canvasRef} width="320" height="320" />
+      <canvas ref={canvasRef} width="256" height="256" />
     </div>
   );
 }
@@ -141,24 +252,53 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
     const contexts = canvases.map((canvas) => canvas.getContext("2d"));
     if (!section || contexts.some((context) => !context)) return;
 
-    const sprite = new window.Image();
+    let frames: HTMLCanvasElement[] = [];
+    let cancelled = false;
     let spriteLoaded = false;
     let visible = false;
     let wingFrame = 0;
     let scrollFrame = 0;
+    let measureFrame = 0;
     let lastSpriteFrame = -1;
     let lastScrollY = window.scrollY;
     let scrollDirection = 1;
+    let pendingDirection = scrollDirection;
+    let pendingDistance = 0;
+    let sectionTop = 0;
+    let sectionWidth = 0;
+    let sectionHeight = 0;
+    let itemSizes: Array<{ width: number; height: number }> = [];
+    let listening = false;
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
+    const updateDirection = (delta: number) => {
+      if (Math.abs(delta) < 1.25) return;
+      const nextDirection = delta > 0 ? 1 : -1;
+      if (nextDirection === scrollDirection) {
+        pendingDirection = nextDirection;
+        pendingDistance = 0;
+        return;
+      }
+      if (nextDirection !== pendingDirection) {
+        pendingDirection = nextDirection;
+        pendingDistance = Math.abs(delta);
+      } else {
+        pendingDistance += Math.abs(delta);
+      }
+      if (pendingDistance >= 24) {
+        scrollDirection = nextDirection;
+        pendingDistance = 0;
+      }
+    };
     const updatePosition = () => {
       scrollFrame = 0;
+      if (!visible) return;
       const scrollY = window.scrollY;
       const scrollDelta = scrollY - lastScrollY;
-      if (Math.abs(scrollDelta) > .5) scrollDirection = scrollDelta > 0 ? 1 : -1;
+      updateDirection(scrollDelta);
       lastScrollY = scrollY;
-      const rect = section.getBoundingClientRect();
-      const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height));
+      const sectionViewportTop = sectionTop - scrollY;
+      const progress = clamp((window.innerHeight - sectionViewportTop) / (window.innerHeight + sectionHeight));
 
       const tracks = [
         { speed: 1, offset: 0, startX: .02, travelX: .9, arcY: .12 },
@@ -169,24 +309,52 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
       items.forEach((item, index) => {
         const track = tracks[index];
         const travel = clamp(progress * track.speed + track.offset);
-        const routeWidth = Math.max(0, rect.width - item.offsetWidth);
+        const itemSize = itemSizes[index] ?? { width: 0, height: 0 };
+        const routeWidth = Math.max(0, sectionWidth - itemSize.width);
+        const routeHeight = Math.max(0, sectionHeight - itemSize.height);
         const x = (track.startX + track.travelX * travel) * routeWidth;
-        const y = progress * rect.height
-          + Math.sin(progress * Math.PI) * track.arcY * Math.min(rect.height, window.innerHeight);
-        const velocityX = track.travelX * rect.width * scrollDirection;
-        const velocityY = (rect.height
-          + Math.cos(progress * Math.PI) * Math.PI * track.arcY * Math.min(rect.height, window.innerHeight)) * scrollDirection;
+        const curvedY = progress * routeHeight
+          + Math.sin(progress * Math.PI) * track.arcY * Math.min(routeHeight, window.innerHeight);
+        const y = Math.min(routeHeight, Math.max(0, curvedY));
+        const velocityX = track.travelX * sectionWidth * scrollDirection;
+        const velocityY = (sectionHeight
+          + Math.cos(progress * Math.PI) * Math.PI * track.arcY * Math.min(sectionHeight, window.innerHeight)) * scrollDirection;
         const rotation = Math.atan2(velocityY, velocityX) * 180 / Math.PI + 90;
-        const depth = .07 + Math.pow(Math.max(0, Math.sin(progress * Math.PI)), .48) * .93;
-        const depthBlur = (1 - depth) * 1.2;
+        const depth = .07 + Math.pow(Math.max(0, Math.sin(progress * Math.PI)), 1.7) * .93;
         item.style.zIndex = String(Math.max(1, Math.round(depth * 10)));
-        item.style.filter = `blur(${depthBlur.toFixed(2)}px)`;
         item.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg) scale(${depth.toFixed(3)})`;
       });
     };
 
     const requestPosition = () => {
       if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updatePosition);
+    };
+
+    const measure = () => {
+      measureFrame = 0;
+      const rect = section.getBoundingClientRect();
+      sectionTop = rect.top + window.scrollY;
+      sectionWidth = rect.width;
+      sectionHeight = rect.height;
+      itemSizes = items.map((item) => ({ width: item.offsetWidth, height: item.offsetHeight }));
+      lastScrollY = window.scrollY;
+      requestPosition();
+    };
+
+    const requestMeasure = () => {
+      if (visible && !measureFrame) measureFrame = window.requestAnimationFrame(measure);
+    };
+
+    const startListening = () => {
+      if (listening) return;
+      listening = true;
+      window.addEventListener("scroll", requestPosition, { passive: true });
+    };
+
+    const stopListening = () => {
+      if (!listening) return;
+      listening = false;
+      window.removeEventListener("scroll", requestPosition);
     };
 
     const animateWings = (time: number) => {
@@ -201,36 +369,57 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
           const context = contexts[index];
           if (!context) return;
           const offsetFrame = (frame + index * 3) % 16;
-          const column = offsetFrame % 4;
-          const row = Math.floor(offsetFrame / 4);
-          context.clearRect(0, 0, 256, 256);
-          context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(frames[offsetFrame], 0, 0, canvas.width, canvas.height);
         });
         lastSpriteFrame = frame;
       }
       wingFrame = window.requestAnimationFrame(animateWings);
     };
 
+    const syncActivity = () => {
+      const active = visible && document.visibilityState === "visible";
+      wrapper.classList.toggle("is-motion-active", active);
+      if (active) {
+        startListening();
+        requestMeasure();
+        if (spriteLoaded && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
+      } else {
+        stopListening();
+        if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+        if (wingFrame) window.cancelAnimationFrame(wingFrame);
+        scrollFrame = 0;
+        wingFrame = 0;
+      }
+    };
+
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (visible && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
-    }, { rootMargin: "35% 0px" });
+      syncActivity();
+    }, { rootMargin: "25% 0px" });
 
-    sprite.onload = () => {
+    const resizeObserver = new ResizeObserver(requestMeasure);
+
+    void loadButterflyFrames().then((loadedFrames) => {
+      if (cancelled) return;
+      frames = loadedFrames;
       spriteLoaded = true;
-      if (visible && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
-    };
-    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+      syncActivity();
+    }).catch(() => undefined);
     observer.observe(wrapper);
-    updatePosition();
-    window.addEventListener("scroll", requestPosition, { passive: true });
-    window.addEventListener("resize", requestPosition);
+    resizeObserver.observe(section);
+    document.addEventListener("visibilitychange", syncActivity);
+    window.addEventListener("resize", requestMeasure);
 
     return () => {
+      cancelled = true;
       observer.disconnect();
-      window.removeEventListener("scroll", requestPosition);
-      window.removeEventListener("resize", requestPosition);
+      resizeObserver.disconnect();
+      stopListening();
+      document.removeEventListener("visibilitychange", syncActivity);
+      window.removeEventListener("resize", requestMeasure);
       if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+      if (measureFrame) window.cancelAnimationFrame(measureFrame);
       if (wingFrame) window.cancelAnimationFrame(wingFrame);
     };
   }, []);
@@ -240,7 +429,7 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
       {Array.from({ length: count }, (_, index) => (
         <span className={`section-butterfly-pass-item section-butterfly-pass-item-${index + 1}`} key={index}>
           <span className="section-butterfly-idle">
-            <canvas width="256" height="256" />
+            <canvas width="192" height="192" />
           </span>
         </span>
       ))}
@@ -311,13 +500,25 @@ function SmartVideo({ src, poster, label, className = "" }: { src: string; poste
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     const canPlay = !reduced && !connection?.saveData;
     let inView = false;
+    let scrolling = false;
+    let resumeTimer = 0;
 
     const sync = () => {
-      if (canPlay && inView && document.visibilityState === "visible") {
-        void video.play().catch(() => undefined);
-      } else {
+      if (canPlay && inView && !scrolling && document.visibilityState === "visible") {
+        if (video.paused) void video.play().catch(() => undefined);
+      } else if (!video.paused) {
         video.pause();
       }
+    };
+
+    const handleScroll = () => {
+      scrolling = true;
+      sync();
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        scrolling = false;
+        sync();
+      }, 160);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -327,9 +528,12 @@ function SmartVideo({ src, poster, label, className = "" }: { src: string; poste
 
     observer.observe(video);
     document.addEventListener("visibilitychange", sync);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", sync);
+      window.removeEventListener("scroll", handleScroll);
+      window.clearTimeout(resumeTimer);
       video.pause();
     };
   }, []);
@@ -369,14 +573,17 @@ function ScrollGallery({
     const slides = Array.from(section.querySelectorAll<HTMLElement>(".gallery-slide"));
     const compact = window.matchMedia("(max-width: 900px)").matches;
     let frame = 0;
+    let measureFrame = 0;
     let targetProgress = 0;
     let currentProgress = 0;
     let previousTime = performance.now();
+    let sectionTop = 0;
+    let scrollRange = 1;
+    let visible = false;
+    let listening = false;
 
     const readProgress = () => {
-      const rect = section.getBoundingClientRect();
-      const range = Math.max(section.offsetHeight - window.innerHeight, 1);
-      return Math.min(1, Math.max(0, -rect.top / range));
+      return Math.min(1, Math.max(0, (window.scrollY - sectionTop) / scrollRange));
     };
 
     const paint = (progress: number) => {
@@ -402,7 +609,6 @@ function ScrollGallery({
       section.style.setProperty("--story-next-opacity", String(blend));
       section.style.setProperty("--story-active-scale", String(1.055 - blend * .025));
       section.style.setProperty("--story-active-lift", `${blend * -.45}%`);
-      section.style.setProperty("--story-active-saturation", String(.96 + blend * .04));
       section.style.setProperty("--story-next-scale", String(1.035 - blend * .015));
     };
 
@@ -422,6 +628,7 @@ function ScrollGallery({
     };
 
     const requestUpdate = () => {
+      if (!visible) return;
       targetProgress = readProgress();
       if (!frame) {
         previousTime = performance.now();
@@ -429,15 +636,59 @@ function ScrollGallery({
       }
     };
 
-    targetProgress = readProgress();
-    currentProgress = targetProgress;
-    paint(currentProgress);
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-    return () => {
+    const measure = () => {
+      measureFrame = 0;
+      const rect = section.getBoundingClientRect();
+      sectionTop = rect.top + window.scrollY;
+      scrollRange = Math.max(rect.height - window.innerHeight, 1);
+      targetProgress = readProgress();
+      if (!frame) {
+        currentProgress = targetProgress;
+        paint(currentProgress);
+      }
+    };
+
+    const requestMeasure = () => {
+      if (visible && !measureFrame) measureFrame = window.requestAnimationFrame(measure);
+    };
+
+    const startListening = () => {
+      if (listening) return;
+      listening = true;
+      window.addEventListener("scroll", requestUpdate, { passive: true });
+    };
+
+    const stopListening = () => {
+      if (!listening) return;
+      listening = false;
       window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) {
+        measure();
+        startListening();
+        requestUpdate();
+      } else {
+        stopListening();
+        if (frame) window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
+    }, { rootMargin: "25% 0px" });
+
+    const resizeObserver = new ResizeObserver(requestMeasure);
+
+    observer.observe(section);
+    resizeObserver.observe(section);
+    window.addEventListener("resize", requestMeasure);
+    return () => {
+      observer.disconnect();
+      resizeObserver.disconnect();
+      stopListening();
+      window.removeEventListener("resize", requestMeasure);
       if (frame) window.cancelAnimationFrame(frame);
+      if (measureFrame) window.cancelAnimationFrame(measureFrame);
     };
   }, [images.length]);
 
@@ -533,28 +784,61 @@ export default function Home() {
   useReversibleReveal("[data-reveal]:not([data-reveal='hero'])");
 
   useEffect(() => {
+    const progressElement = document.querySelector<HTMLElement>(".scroll-progress");
+    const hero = document.querySelector<HTMLElement>(".choice-hero");
+    if (!progressElement || !hero) return;
     let frame = 0;
+    let viewportHeight = Math.max(window.innerHeight, 1);
+    let maxScroll = Math.max(document.documentElement.scrollHeight - viewportHeight, 1);
     const updateProgress = () => {
       frame = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      document.documentElement.style.setProperty("--scroll-progress", max > 0 ? `${window.scrollY / max}` : "0");
-      const heroProgress = Math.min(1, window.scrollY / Math.max(window.innerHeight, 1));
-      const heroExit = Math.min(1, Math.max(0, (window.scrollY - window.innerHeight * .12) / (window.innerHeight * .56)));
-      document.documentElement.style.setProperty("--hero-scroll", String(heroProgress));
-      document.documentElement.style.setProperty("--hero-exit", String(heroExit));
-      document.documentElement.style.setProperty("--hero-scale", String(1.03 + heroProgress * .12));
-      document.documentElement.style.setProperty("--hero-lift", `${heroProgress * -2}%`);
+      progressElement.style.setProperty("--scroll-progress", `${window.scrollY / maxScroll}`);
+      if (window.scrollY > viewportHeight * 1.2) return;
+      const heroProgress = Math.min(1, window.scrollY / viewportHeight);
+      const heroExit = Math.min(1, Math.max(0, (window.scrollY - viewportHeight * .12) / (viewportHeight * .56)));
+      hero.style.setProperty("--hero-scroll", String(heroProgress));
+      hero.style.setProperty("--hero-exit", String(heroExit));
+      hero.style.setProperty("--hero-scale", String(1.03 + heroProgress * .12));
+      hero.style.setProperty("--hero-lift", `${heroProgress * -2}%`);
     };
     const requestUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updateProgress);
     };
+    const handleResize = () => {
+      viewportHeight = Math.max(window.innerHeight, 1);
+      maxScroll = Math.max(document.documentElement.scrollHeight - viewportHeight, 1);
+      requestUpdate();
+    };
     updateProgress();
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
+    window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
+      window.removeEventListener("resize", handleResize);
       if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
+    const zones = Array.from(document.querySelectorAll<HTMLElement>(".site-shell > section, .site-shell > footer"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    zones.forEach((zone) => zone.classList.add("motion-zone"));
+
+    if (reduced) {
+      zones.forEach((zone) => zone.classList.add("is-motion-active"));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle("is-motion-active", entry.isIntersecting);
+      });
+    }, { rootMargin: "20% 0px", threshold: 0 });
+
+    zones.forEach((zone) => observer.observe(zone));
+    return () => {
+      observer.disconnect();
+      zones.forEach((zone) => zone.classList.remove("motion-zone", "is-motion-active"));
     };
   }, []);
 
