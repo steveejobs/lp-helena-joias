@@ -60,8 +60,8 @@ function BrandIntro() {
 
     root.classList.remove("brand-intro-complete");
     root.classList.add("brand-intro-playing");
-    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 1400);
-    const finishTimer = window.setTimeout(finish, 1950);
+    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
+    const finishTimer = window.setTimeout(finish, 3150);
 
     return () => {
       window.clearTimeout(revealTimer);
@@ -75,20 +75,25 @@ function BrandIntro() {
   return (
     <div className="brand-intro" aria-hidden="true">
       <div className="brand-intro-halo" />
-      <img
-        className="brand-intro-animation"
-        src="/media/logo-formation-v2.webp"
-        alt=""
-        width="720"
-        height="720"
-        fetchPriority="high"
-        decoding="sync"
-        onError={(event) => {
-          if (!event.currentTarget.src.endsWith("/media/logo-formation-final-v2.webp")) {
-            event.currentTarget.src = "/media/logo-formation-final-v2.webp";
-          }
-        }}
-      />
+      <div className="brand-intro-butterflies">
+        {Array.from({ length: 7 }, (_, index) => (
+          <span className={`brand-intro-butterfly brand-intro-butterfly-${index + 1}`} key={index}>
+            <img
+              src="/media/logo-formation-v2.webp"
+              alt=""
+              width="720"
+              height="720"
+              fetchPriority="high"
+              decoding="sync"
+              onError={(event) => {
+                if (!event.currentTarget.src.endsWith("/media/logo-formation-final-v2.webp")) {
+                  event.currentTarget.src = "/media/logo-formation-final-v2.webp";
+                }
+              }}
+            />
+          </span>
+        ))}
+      </div>
       <div className="brand-intro-wordmark"><span>Helena</span><small>Joias</small></div>
       <p>Forma · luz · presença</p>
     </div>

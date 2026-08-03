@@ -44,13 +44,25 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-intro { position: fixed; z-index: 110; inset: 0; display: grid; place-items: center; overflow: hidden; background: transparent; color: var(--ink); pointer-events: auto; transition: opacity .55s ease; }
 .brand-intro::before { content: ""; position: absolute; width: min(70vw, 48rem); aspect-ratio: 1; border: 1px solid rgba(153,119,70,.18); border-radius: 50%; box-shadow: 0 0 0 6rem rgba(153,119,70,.045), 0 0 0 12rem rgba(153,119,70,.022); animation: intro-ring 1.45s cubic-bezier(.16,1,.3,1) both; }
 .brand-intro-halo { position: absolute; width: min(44vw, 31rem); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(180,147,110,.2), transparent 68%); filter: blur(12px); animation: intro-halo 1.3s ease-in-out both; }
-.brand-intro-animation { position: relative; z-index: 2; width: min(42vw, 23rem); height: min(42vw, 23rem); object-fit: contain; filter: drop-shadow(0 1.5rem 3rem rgba(180,147,110,.18)); }
+.brand-intro-butterflies { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.brand-intro-butterfly { position: absolute; display: block; width: clamp(5.6rem, 9vw, 8.2rem); aspect-ratio: 1; transform: rotate(var(--intro-rotation)) scale(var(--intro-scale)); transform-origin: center; transition: opacity .72s ease, transform .9s cubic-bezier(.55,.05,.67,.19), filter .72s ease; will-change: transform, opacity; }
+.brand-intro-butterfly img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 .7rem 1.2rem rgba(153,119,70,.13)); }
+.brand-intro-butterfly-1 { --intro-rotation: -7deg; --intro-scale: .84; --intro-exit-x: -42vw; --intro-exit-y: -42vh; --intro-exit-rotation: -32deg; left: 7%; top: 13%; }
+.brand-intro-butterfly-2 { --intro-rotation: 5deg; --intro-scale: .72; --intro-exit-x: -38vw; --intro-exit-y: -48vh; --intro-exit-rotation: -18deg; left: 28%; top: 6%; }
+.brand-intro-butterfly-3 { --intro-rotation: -2deg; --intro-scale: 1; --intro-exit-x: 0vw; --intro-exit-y: -55vh; --intro-exit-rotation: 12deg; left: 46%; top: 19%; }
+.brand-intro-butterfly-4 { --intro-rotation: 6deg; --intro-scale: .78; --intro-exit-x: 36vw; --intro-exit-y: -48vh; --intro-exit-rotation: 29deg; left: 69%; top: 7%; }
+.brand-intro-butterfly-5 { --intro-rotation: -5deg; --intro-scale: .68; --intro-exit-x: 42vw; --intro-exit-y: -22vh; --intro-exit-rotation: 38deg; left: 87%; top: 28%; }
+.brand-intro-butterfly-6 { --intro-rotation: 7deg; --intro-scale: .8; --intro-exit-x: -40vw; --intro-exit-y: 43vh; --intro-exit-rotation: -35deg; left: 17%; top: 58%; }
+.brand-intro-butterfly-7 { --intro-rotation: -4deg; --intro-scale: .9; --intro-exit-x: 38vw; --intro-exit-y: 42vh; --intro-exit-rotation: 34deg; left: 69%; top: 57%; }
 .brand-intro-wordmark { position: absolute; z-index: 3; top: calc(50% + min(18vw, 10.5rem)); display: flex; align-items: baseline; gap: .75rem; text-transform: uppercase; letter-spacing: .34em; opacity: 0; transform: translateY(1.2rem); animation: intro-wordmark .52s cubic-bezier(.16,1,.3,1) .72s both; }
 .brand-intro-wordmark span { font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.75rem); letter-spacing: .24em; }
 .brand-intro-wordmark small { font-size: .52rem; }
 .brand-intro > p { position: absolute; z-index: 3; bottom: clamp(1.5rem, 4vw, 3.5rem); margin: 0; font-size: .52rem; text-transform: uppercase; letter-spacing: .22em; opacity: 0; animation: intro-copy .42s ease .92s both; }
-.brand-intro-revealing .brand-intro { opacity: 0; }
-.brand-intro-revealing .brand-intro-animation { transform: scale(1.14); opacity: 0; transition: transform .65s cubic-bezier(.16,1,.3,1), opacity .42s ease; }
+.brand-intro-revealing .brand-intro::before,
+.brand-intro-revealing .brand-intro-halo,
+.brand-intro-revealing .brand-intro-wordmark,
+.brand-intro-revealing .brand-intro > p { opacity: 0; animation: none; transition: opacity .38s ease; }
+.brand-intro-revealing .brand-intro-butterfly { opacity: 0; transform: translate3d(var(--intro-exit-x), var(--intro-exit-y), 0) rotate(var(--intro-exit-rotation)) scale(.52); filter: blur(2px); }
 
 .scroll-butterfly { --butterfly-opacity: 0; --butterfly-x: 0px; --butterfly-y: 0px; --butterfly-rotation: 0deg; position: fixed; z-index: 18; right: clamp(.35rem, 2vw, 2rem); top: 56%; width: clamp(7.2rem, 10vw, 10rem); aspect-ratio: 1; opacity: var(--butterfly-opacity); transform: translate3d(var(--butterfly-x), var(--butterfly-y), 0) rotate(var(--butterfly-rotation)); pointer-events: none; transition: opacity .28s linear, filter .42s ease; will-change: transform, opacity; }
 .scroll-butterfly canvas { display: block; width: 100%; height: 100%; filter: sepia(.08) saturate(.92) drop-shadow(0 .8rem 1.4rem rgba(33,25,22,.14)); mix-blend-mode: multiply; }
@@ -411,7 +423,14 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   .hero-stage { position: absolute; width: min(46vw, 14rem); right: -2.2rem; bottom: -.7rem; opacity: .96; }
   .hero-photo-wrap { border-radius: 48% 48% .6rem .6rem; }
   .hero-caption { display: none; }
-  .brand-intro-animation { width: min(78vw, 21rem); height: min(78vw, 21rem); }
+  .brand-intro-butterfly { width: clamp(4.5rem, 22vw, 6.4rem); }
+  .brand-intro-butterfly-1 { left: -2%; top: 13%; }
+  .brand-intro-butterfly-2 { left: 25%; top: 5%; }
+  .brand-intro-butterfly-3 { left: 43%; top: 23%; }
+  .brand-intro-butterfly-4 { left: 70%; top: 8%; }
+  .brand-intro-butterfly-5 { left: 83%; top: 34%; }
+  .brand-intro-butterfly-6 { left: 7%; top: 59%; }
+  .brand-intro-butterfly-7 { left: 68%; top: 61%; }
   .brand-intro-wordmark { top: calc(50% + min(34vw, 9.6rem)); }
   .brand-intro::before { width: 92vw; }
   .scroll-butterfly { right: -1.2rem; top: 61%; width: 6rem; }
