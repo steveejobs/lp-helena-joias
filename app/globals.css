@@ -746,7 +746,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 }
 .choice-whatsapp-action .whatsapp-copy { position: relative; z-index: 1; overflow: hidden; padding-right: .2rem; }
 .choice-whatsapp-action .whatsapp-copy strong { font: 500 clamp(1.02rem, 1.45vw, 1.18rem)/1 var(--serif); letter-spacing: 0; text-transform: none; }
-.choice-whatsapp-action .whatsapp-copy small { color: rgba(255,255,255,.7); font: 650 .36rem/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.choice-whatsapp-action .whatsapp-copy small { color: rgba(255,255,255,.7); white-space: nowrap; }
 .choice-whatsapp-action .whatsapp-icon {
   position: relative;
   justify-self: end;
@@ -791,9 +791,16 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 
 .choice-primary-action small,
 .choice-route-action small {
-  font: 650 .36rem/1 var(--sans);
-  letter-spacing: .1em;
   text-transform: uppercase;
+}
+
+.choice-whatsapp-action .whatsapp-copy small,
+.choice-route-action small {
+  font-family: var(--sans);
+  font-size: .3rem;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: .08em;
 }
 
 .choice-primary-action small { color: rgba(255, 255, 255, .7); }
