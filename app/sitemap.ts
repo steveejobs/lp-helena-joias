@@ -5,18 +5,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: siteUrl,
-      changeFrequency: "monthly",
+      changeFrequency: "weekly",
       priority: 1,
-    },
-    {
-      url: `${siteUrl}/instagram`,
-      changeFrequency: "monthly",
-      priority: .8,
-    },
-    {
-      url: `${siteUrl}/privacidade`,
-      changeFrequency: "yearly",
-      priority: .3,
     },
   ];
 }

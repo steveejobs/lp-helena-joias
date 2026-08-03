@@ -1,3 +1,5 @@
+export { instagramUrl, store, storeLocationUrl } from "@/lib/brand/copy";
+
 const fallbackSiteUrl = "https://lp-helena-joias-psi.vercel.app";
 
 function normalizeUrl(value: string) {
@@ -14,5 +16,7 @@ export const siteUrl = normalizeUrl(
 export const siteName = "Helena Joias";
 
 export const siteDescription =
-  "Conheça a Helena Joias e explore colares, brincos, anéis, pulseiras e combinações para diferentes estilos. Atendimento de segunda a sábado.";
+  "Loja de joias em Araguaína, TO, com colares, brincos, anéis, pulseiras e acessórios selecionados. Visite a Helena Joias ou fale pelo WhatsApp.";
 
+export const siteTitle =
+  "Loja de Joias em Araguaína, TO | Helena Joias";

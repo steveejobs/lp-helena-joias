@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
 import { useReversibleReveal } from "@/components/motion-controller";
-import { brandHighlight, storeLocationUrl } from "@/lib/brand/copy";
+import { brandHighlight, store, storeLocationUrl } from "@/lib/brand/copy";
 
 type GalleryImage = { src: string; alt: string; position?: string };
 
@@ -364,13 +364,13 @@ function ChoicePortrait() {
       <span className="choice-card-exit choice-card-one">
         <span className="choice-card-entry">
           <span className="choice-card">
-            <img
+            <Image
               src="/media/gallery-2-2.jpg"
               alt="Composição Helena Joias com colares, brincos e anéis dourados"
               width="1170"
               height="1560"
-              fetchPriority="high"
-              decoding="sync"
+              sizes="(max-width: 720px) 85vw, 31vw"
+              preload
             />
           </span>
         </span>
@@ -378,11 +378,12 @@ function ChoicePortrait() {
       <span className="choice-card-exit choice-card-two">
         <span className="choice-card-entry">
           <span className="choice-card">
-            <img
+            <Image
               src="/media/gallery-1-4.jpg"
               alt="Modelo usando brincos e colares da Helena Joias"
               width="1170"
               height="1560"
+              sizes="(max-width: 720px) 85vw, 31vw"
               loading="lazy"
               decoding="async"
             />
@@ -392,11 +393,12 @@ function ChoicePortrait() {
       <span className="choice-card-exit choice-card-three">
         <span className="choice-card-entry">
           <span className="choice-card">
-            <img
+            <Image
               src="/media/gallery-3-2.jpg"
               alt="Modelo usando brincos geométricos e colares da Helena Joias"
               width="1170"
               height="1560"
+              sizes="(max-width: 720px) 85vw, 31vw"
               loading="lazy"
               decoding="async"
             />
@@ -563,11 +565,12 @@ function ScrollGallery({
               key={image.src}
               aria-hidden={index !== 0}
             >
-              <img
+              <Image
                 src={image.src}
                 alt={image.alt}
                 width="1170"
                 height="1560"
+                sizes="(max-width: 900px) 100vw, 50vw"
                 loading="lazy"
                 decoding="async"
                 style={{ objectPosition: image.position ?? "center" }}
@@ -686,7 +689,7 @@ export default function Home() {
 
       <header className="site-header">
         <a className="brand-lockup" href="#inicio" aria-label="Helena Joias — início">
-          <span className="brand-symbol" aria-hidden="true"><img src="/media/logo-transparent.png" alt="" width="828" height="828" decoding="async" /></span>
+          <span className="brand-symbol" aria-hidden="true"><Image src="/media/logo-transparent.png" alt="" width="828" height="828" sizes="48px" /></span>
           <span>Helena <small>Joias</small></span>
         </a>
         <nav aria-label="Navegação principal">
@@ -780,9 +783,9 @@ export default function Home() {
       />
       <ExperienceBridge
         id="visite"
-        eyebrow="A próxima escolha começa aqui"
+        eyebrow="Loja de joias em Araguaína"
         title={<>Venha viver<br /><em>a Helena.</em></>}
-        description="De segunda a sexta, das 08h às 18h. Aos sábados, das 08h às 12h. Um convite para ver cada detalhe de perto e escolher sem pressa."
+        description="Visite a Helena Joias no Setor Central, em Araguaína, Tocantins. De segunda a sexta, das 08h às 18h; aos sábados, das 08h às 12h. Veja colares, brincos, anéis e pulseiras de perto e escolha sem pressa."
         variant="orbit"
         showRoute
       />
@@ -805,7 +808,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-brand">
-          <img src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" loading="lazy" decoding="async" />
+          <Image src="/media/logo-transparent.png" alt="Helena Joias" width="828" height="828" sizes="176px" loading="lazy" />
         </div>
         <p>Beleza, brilho e presença.</p>
         <nav aria-label="Navegação do rodapé">
@@ -815,7 +818,16 @@ export default function Home() {
           <a href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram ↗︎</a>
           <HomeWhatsAppButton className="whatsapp-spotlight footer-whatsapp" />
         </nav>
-        <div className="footer-meta"><span>Seg–Sex 08h — 18h · Sábado 08h — 12h</span><small>© {new Date().getFullYear()} Helena Joias</small></div>
+        <div className="footer-meta">
+          <address>
+            <a href={storeLocationUrl} target="_blank" rel="noreferrer">
+              {store.streetAddress} · {store.neighborhood} · {store.city}–{store.state} · CEP {store.postalCode}
+            </a>
+            <a href={`tel:${store.telephone}`}>(63) 99223-3535</a>
+          </address>
+          <span>Seg–Sex 08h — 18h · Sábado 08h — 12h</span>
+          <small>© {new Date().getFullYear()} Helena Joias</small>
+        </div>
       </footer>
     </main>
   );

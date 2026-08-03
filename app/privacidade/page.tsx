@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Privacidade",
   description: "Como a landing page da Helena Joias respeita a sua privacidade.",
   alternates: { canonical: "/privacidade" },
+  robots: { index: false, follow: true },
 };
 
 export default function PrivacyPage() {

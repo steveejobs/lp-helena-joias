@@ -31,8 +31,10 @@ A aplicação local fica disponível em `http://localhost:3000`.
 - `lib/`: copy da marca e integração com WhatsApp.
 - `public/media/`: ativos visuais utilizados pelo site.
 
-O site não usa banco, login, cookies ou ferramentas de analytics. Nenhuma
-variável de ambiente é obrigatória.
+O site não usa banco, login, cookies ou ferramentas de analytics. Para produção,
+configure `NEXT_PUBLIC_SITE_URL` com o domínio canônico. Depois de cadastrar o
+domínio no Google Search Console ou Bing Webmaster Tools, use também
+`GOOGLE_SITE_VERIFICATION` e `BING_SITE_VERIFICATION`, respectivamente.
 
 O deploy de produção utiliza o comando `npm run build:vercel`, configurado em
 `vercel.json`.
