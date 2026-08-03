@@ -1129,16 +1129,16 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   .choice-primary-action,
   .choice-route-action { min-height: clamp(3rem, 6.5svh, 3.55rem); }
   .choice-portrait {
-    --choice-deck-mid-x: .4rem;
+    --choice-deck-mid-x: .25rem;
     --choice-deck-mid-y: -.25rem;
-    --choice-deck-back-x: .75rem;
+    --choice-deck-back-x: .45rem;
     --choice-deck-back-y: .25rem;
-    --choice-deck-lift-x: -.35rem;
+    --choice-deck-lift-x: -.25rem;
     --choice-deck-lift-y: .4rem;
     order: 3;
     flex: 1 1 0;
     min-height: 8rem;
-    max-height: calc((100vw - 3.3rem) * 4 / 3);
+    max-height: calc((100vw - 1rem) * 4 / 3);
     width: auto;
     height: auto;
     aspect-ratio: 3 / 4;
@@ -1161,13 +1161,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   .choice-eyebrow { margin-bottom: .4rem; }
   .choice-copy h1 { font-size: min(3.05rem, 8.4svh); }
   .choice-actions { gap: .4rem; margin-top: .45rem; }
-  .choice-portrait {
-    flex: 0 0 auto;
-    min-height: 0;
-    max-height: none;
-    height: clamp(9rem, 29svh, 13rem);
-    margin-top: .45rem;
-  }
+  .choice-portrait { margin-top: .45rem; }
   .choice-primary-action,
   .choice-route-action { min-height: clamp(2.85rem, 7svh, 3.15rem); }
 }
