@@ -61,7 +61,7 @@ function BrandIntro() {
     root.classList.remove("brand-intro-complete");
     root.classList.add("brand-intro-playing");
     const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 1400);
-    const finishTimer = window.setTimeout(finish, 2050);
+    const finishTimer = window.setTimeout(finish, 1950);
 
     return () => {
       window.clearTimeout(revealTimer);
