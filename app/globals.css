@@ -65,6 +65,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-intro-wordmark span { font-family: var(--serif); font-size: clamp(2.5rem, 5.5vw, 5.5rem); letter-spacing: .2em; line-height: .9; }
 .brand-intro-wordmark small { font-size: clamp(.55rem, 1vw, .8rem); letter-spacing: .42em; }
 .brand-intro > p { position: absolute; z-index: 3; bottom: clamp(1.5rem, 4vw, 3.5rem); margin: 0; font-size: .52rem; text-transform: uppercase; letter-spacing: .22em; opacity: 0; animation: intro-copy .42s ease .92s both; }
+.brand-intro::before, .brand-intro-halo, .brand-intro-wordmark, .brand-intro-wordmark::after, .brand-intro > p { animation-play-state: paused; }
+.brand-intro-ready .brand-intro::before, .brand-intro-ready .brand-intro-halo, .brand-intro-ready .brand-intro-wordmark, .brand-intro-ready .brand-intro-wordmark::after, .brand-intro-ready .brand-intro > p { animation-play-state: running; }
 .brand-intro-revealing .brand-intro::before,
 .brand-intro-revealing .brand-intro-halo,
 .brand-intro-revealing .brand-intro > p { opacity: 0; animation: none; transition: opacity .38s ease; }
@@ -431,7 +433,6 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 @keyframes intro-wordmark-exit { from { clip-path: inset(0); transform: translate(-50%, -50%); } to { clip-path: inset(100% 0 0); transform: translate(-50%, calc(-50% - .8rem)); } }
 @keyframes intro-butterfly-flight {
   0% { transform: translate3d(0, 0, 0) rotate(var(--intro-rotation)) scale(var(--intro-scale)); }
-  38% { transform: translate3d(var(--intro-steer-x), var(--intro-steer-y), 0) rotate(var(--intro-path-rotation)) scale(var(--intro-scale)); }
   100% { transform: translate3d(var(--intro-exit-x), var(--intro-exit-y), 0) rotate(var(--intro-exit-rotation)) scale(.94); }
 }
 @keyframes intro-copy { to { opacity: .52; } }

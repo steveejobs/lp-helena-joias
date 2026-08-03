@@ -45,12 +45,25 @@ function BrandIntro() {
   useEffect(() => {
     const root = document.documentElement;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let revealTimer = 0;
+    let finishTimer = 0;
+    let assetFallbackTimer = 0;
+    let started = false;
 
     const finish = () => {
-      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
+      root.classList.remove("brand-intro-playing", "brand-intro-ready", "brand-intro-revealing");
       root.classList.add("brand-intro-complete");
       window.dispatchEvent(new Event("helena:intro-complete"));
       setHidden(true);
+    };
+
+    const startIntro = () => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(assetFallbackTimer);
+      root.classList.add("brand-intro-ready");
+      revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
+      finishTimer = window.setTimeout(finish, 4100);
     };
 
     root.classList.remove("is-leaving");
@@ -59,15 +72,17 @@ function BrandIntro() {
       return;
     }
 
-    root.classList.remove("brand-intro-complete");
+    root.classList.remove("brand-intro-complete", "brand-intro-ready", "brand-intro-revealing");
     root.classList.add("brand-intro-playing");
-    const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
-    const finishTimer = window.setTimeout(finish, 4100);
+    window.addEventListener("helena:intro-assets-ready", startIntro, { once: true });
+    assetFallbackTimer = window.setTimeout(startIntro, 4000);
 
     return () => {
+      window.removeEventListener("helena:intro-assets-ready", startIntro);
       window.clearTimeout(revealTimer);
       window.clearTimeout(finishTimer);
-      root.classList.remove("brand-intro-playing", "brand-intro-revealing");
+      window.clearTimeout(assetFallbackTimer);
+      root.classList.remove("brand-intro-playing", "brand-intro-ready", "brand-intro-revealing");
     };
   }, []);
 
@@ -84,7 +99,7 @@ function BrandIntro() {
     const formationSprite = new window.Image();
     const flightSprite = new window.Image();
     const creationCurves = [.68, 1.34, .86, 1.52, .76, 1.16, .61, 1.42, .94, 1.62, .72];
-    const creationStartedAt = window.performance.now();
+    let creationStartedAt = 0;
     let animationFrame = 0;
     let cancelled = false;
     let formationLoaded = false;
@@ -93,7 +108,10 @@ function BrandIntro() {
     const lastFormationFrames = formationCanvases.map(() => -1);
 
     const startAnimation = () => {
-      if (!cancelled && !animationFrame) animationFrame = window.requestAnimationFrame(animate);
+      if (cancelled || animationFrame || !formationLoaded || !flightLoaded) return;
+      creationStartedAt = window.performance.now();
+      window.dispatchEvent(new Event("helena:intro-assets-ready"));
+      animationFrame = window.requestAnimationFrame(animate);
     };
 
     const animate = (time: number) => {
@@ -189,15 +207,19 @@ function ScrollButterfly() {
     let loaded = false;
     let requested = 0;
     let lastFrame = -1;
+    let lastScrollY = window.scrollY;
+    let scrollDirection = 1;
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
     const render = () => {
       requested = 0;
+      const scrollY = window.scrollY;
+      const scrollDelta = scrollY - lastScrollY;
+      if (Math.abs(scrollDelta) > .5) scrollDirection = scrollDelta > 0 ? 1 : -1;
+      lastScrollY = scrollY;
       const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = clamp(window.scrollY / max);
-      const entrance = clamp((window.scrollY - window.innerHeight * .72) / (window.innerHeight * .72));
-      const exit = clamp((max - window.scrollY - window.innerHeight * .18) / (window.innerHeight * .7));
-      const frame = Math.floor(window.scrollY / 34) % 16;
+      const progress = clamp(scrollY / max);
+      const frame = Math.abs(Math.floor(scrollY / 34)) % 16;
 
       if (loaded && frame !== lastFrame) {
         const column = frame % 4;
@@ -209,11 +231,16 @@ function ScrollButterfly() {
 
       const driftX = Math.sin(progress * Math.PI * 7) * 13;
       const driftY = Math.cos(progress * Math.PI * 9) * 18;
-      const rotation = Math.sin(progress * Math.PI * 5) * 4;
-      wrapper.style.setProperty("--butterfly-opacity", String(entrance * exit * .3));
+      const velocityX = Math.cos(progress * Math.PI * 7) * Math.PI * 7 * 13 * scrollDirection;
+      const velocityY = -Math.sin(progress * Math.PI * 9) * Math.PI * 9 * 18 * scrollDirection;
+      const rotation = Math.atan2(velocityY, velocityX) * 180 / Math.PI + 90;
+      const depth = .08 + Math.pow(Math.max(0, Math.sin(progress * Math.PI)), .42) * .92;
+      wrapper.style.setProperty("--butterfly-opacity", loaded ? ".3" : "0");
       wrapper.style.setProperty("--butterfly-x", `${driftX.toFixed(2)}px`);
       wrapper.style.setProperty("--butterfly-y", `${driftY.toFixed(2)}px`);
       wrapper.style.setProperty("--butterfly-rotation", `${rotation.toFixed(2)}deg`);
+      wrapper.style.setProperty("--butterfly-scale", depth.toFixed(3));
+      wrapper.style.setProperty("--butterfly-depth-blur", `${((1 - depth) * 1.15).toFixed(2)}px`);
 
       const beneath = document.elementFromPoint(window.innerWidth - 70, window.innerHeight * .62) as HTMLElement | null;
       wrapper.classList.toggle("is-on-dark", Boolean(beneath?.closest(".movement, .collection-night, .site-footer")));
@@ -245,12 +272,12 @@ function ScrollButterfly() {
   );
 }
 
-function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "light" | "dark" }) {
+function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "light" | "dark" }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
-    if (!wrapper || !window.matchMedia("(max-width: 720px)").matches) return;
+    if (!wrapper) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -268,14 +295,18 @@ function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "
     let wingFrame = 0;
     let scrollFrame = 0;
     let lastSpriteFrame = -1;
+    let lastScrollY = window.scrollY;
+    let scrollDirection = 1;
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
     const updatePosition = () => {
       scrollFrame = 0;
+      const scrollY = window.scrollY;
+      const scrollDelta = scrollY - lastScrollY;
+      if (Math.abs(scrollDelta) > .5) scrollDirection = scrollDelta > 0 ? 1 : -1;
+      lastScrollY = scrollY;
       const rect = section.getBoundingClientRect();
       const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height));
-      const edgeFade = Math.min(clamp(progress / .12), clamp((1 - progress) / .12));
-      wrapper.style.opacity = String(edgeFade);
 
       const tracks = [
         { speed: 1, offset: 0, startX: -.18, travelX: 1.32, baseY: .2, arcY: .16, direction: 1 },
@@ -288,8 +319,14 @@ function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "
         const travel = clamp(progress * track.speed + track.offset);
         const x = (track.startX + track.travelX * travel) * rect.width;
         const y = -rect.top + (track.baseY + Math.sin(travel * Math.PI) * track.arcY) * window.innerHeight;
-        const rotation = track.direction * (-12 + travel * 24) + Math.sin(travel * Math.PI * 2) * 4;
-        item.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg)`;
+        const velocityX = track.travelX * rect.width * scrollDirection;
+        const velocityY = Math.cos(travel * Math.PI) * Math.PI * track.arcY * window.innerHeight * scrollDirection;
+        const rotation = Math.atan2(velocityY, velocityX) * 180 / Math.PI + 90;
+        const depth = .07 + Math.pow(Math.max(0, Math.sin(travel * Math.PI)), .48) * .93;
+        const depthBlur = (1 - depth) * 1.2;
+        item.style.zIndex = String(Math.max(1, Math.round(depth * 10)));
+        item.style.filter = `blur(${depthBlur.toFixed(2)}px)`;
+        item.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg) scale(${depth.toFixed(3)})`;
       });
     };
 
@@ -322,7 +359,7 @@ function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
-    }, { rootMargin: "18% 0px" });
+    }, { rootMargin: "35% 0px" });
 
     sprite.onload = () => {
       spriteLoaded = true;
@@ -344,10 +381,10 @@ function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "
   }, []);
 
   return (
-    <div className={`mobile-butterfly-pass-layer is-${tone}`} ref={wrapperRef} aria-hidden="true">
+    <div className={`section-butterfly-pass-layer is-${tone}`} ref={wrapperRef} aria-hidden="true">
       {Array.from({ length: count }, (_, index) => (
-        <span className={`mobile-butterfly-pass-item mobile-butterfly-pass-item-${index + 1}`} key={index}>
-          <span className="mobile-butterfly-idle">
+        <span className={`section-butterfly-pass-item section-butterfly-pass-item-${index + 1}`} key={index}>
+          <span className="section-butterfly-idle">
             <canvas width="256" height="256" />
           </span>
         </span>
@@ -732,13 +769,13 @@ export default function Home() {
       </section>
 
       <section className="manifesto" id="manifesto" aria-label="Manifesto da marca" data-reveal="section">
-        <MobileButterflyPass count={1} />
+        <SectionButterflyPass count={1} />
         <p>Uma loja feita para descobrir.</p>
         <h2>Veja de perto. Combine sem pressa.<br /><em>Encontre a joia que já parece sua.</em></h2>
       </section>
 
       <section className="movement" id="movimento" aria-labelledby="movement-title">
-        <MobileButterflyPass count={3} tone="dark" />
+        <SectionButterflyPass count={3} tone="dark" />
         <div className="movement-heading" data-reveal="section">
           <p className="eyebrow eyebrow-light"><span /> Detalhes em movimento</p>
           <h2 id="movement-title">A joia muda<br /><em>quando você se move.</em></h2>
@@ -752,7 +789,7 @@ export default function Home() {
       </section>
 
       <section className="collections-intro" id="colecoes" aria-labelledby="collections-title" data-reveal="section">
-        <MobileButterflyPass count={1} />
+        <SectionButterflyPass count={1} />
         <p>Três momentos. Três leituras.</p>
         <h2 id="collections-title">Escolha o brilho<br /><em>que acompanha o seu.</em></h2>
         <a href="#luz-de-perto">Começar a descoberta <span aria-hidden="true">↓</span></a>
