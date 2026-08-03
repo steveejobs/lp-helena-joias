@@ -1038,52 +1038,72 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 
 @media (max-width: 720px) {
   .hero.choice-hero {
-    height: 100svh;
+    height: auto;
     min-height: 40rem;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(10rem, 1fr);
-    align-content: stretch;
-    gap: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: max(6.5rem, calc(env(safe-area-inset-top) + 5.5rem)) 1.1rem max(2.8rem, env(safe-area-inset-bottom));
   }
-  .choice-copy { grid-column: 1; grid-row: 1; width: 100%; max-width: 100%; }
+  .choice-copy { display: contents; }
   .motion-ready .choice-copy.is-revealed {
-    transform: translate3d(0, calc(var(--hero-exit) * -3rem), 0) scale(calc(1 - var(--hero-exit) * .045));
-    transform-origin: top center;
+    transform: none;
   }
-  .choice-eyebrow { margin-bottom: .9rem; font-size: .54rem; }
-  .choice-copy h1 { font-size: clamp(3.6rem, 17vw, 4.7rem); }
+  .choice-eyebrow { order: 1; width: 100%; margin-bottom: .9rem; font-size: .54rem; }
+  .choice-copy h1 { order: 2; width: 100%; font-size: clamp(3.6rem, 17vw, 4.7rem); }
   .choice-title-lead { margin-left: 0; }
   .choice-title-middle { margin-left: .55rem; font-size: .5em; }
   .choice-title-serif { margin-left: 1.5rem; font-size: .66em; }
-  .choice-actions { width: 100%; grid-template-columns: 1fr; margin: .9rem 0 0; }
+  .choice-actions { order: 4; width: 100%; grid-template-columns: 1fr; margin: .9rem 0 0; }
   .choice-primary-action,
   .choice-route-action { min-height: 3.55rem; }
   .choice-portrait {
-    --choice-deck-mid-x: .85rem;
-    --choice-deck-mid-y: -.42rem;
-    --choice-deck-back-x: 1.5rem;
-    --choice-deck-back-y: .55rem;
-    --choice-deck-lift-x: -.65rem;
-    --choice-deck-lift-y: .85rem;
-    grid-column: 1;
-    grid-row: 2;
-    width: calc(100% - 1rem);
-    height: min(26svh, 13.5rem);
+    order: 3;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .5rem;
+    width: 100%;
+    height: auto;
     aspect-ratio: auto;
-    margin-top: .75rem;
-    align-self: center;
+    margin: 1.1rem 0 0;
+    align-self: stretch;
   }
   .motion-ready .choice-portrait.is-revealed {
-    transform: translate3d(0, calc(var(--hero-exit) * 2.5rem), 0) scale(calc(1 - var(--hero-exit) * .06));
+    transform: none;
   }
-  .choice-card-one { --choice-entry-x: 4rem; --choice-entry-y: 4rem; --choice-exit-x: -4.5rem; --choice-exit-y: -2rem; }
-  .choice-card-two { --choice-entry-x: -4rem; --choice-entry-y: 5rem; --choice-exit-x: 4.5rem; --choice-exit-y: 1.5rem; }
-  .choice-card-three { --choice-entry-x: 1rem; --choice-entry-y: 7rem; --choice-exit-x: 2rem; --choice-exit-y: 4rem; }
-  .choice-card { border-radius: 48% 48% .75rem .75rem; }
-  .choice-card-one img { object-position: center 45%; }
-  .choice-card-two img { object-position: center 38%; }
-  .choice-card-three img { object-position: center 20%; }
+  .choice-orbit { display: none; }
+  .choice-card-exit,
+  .choice-card-entry,
+  .choice-card {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+  }
+  .choice-card-exit {
+    z-index: auto;
+    opacity: 1;
+    transform: none;
+    animation: none;
+    will-change: auto;
+  }
+  .brand-intro ~ .choice-hero .choice-card-entry,
+  .motion-ready .choice-card-entry,
+  .motion-ready .choice-portrait.is-revealed .choice-card-entry {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .choice-card {
+    aspect-ratio: 3 / 4;
+    border-radius: .75rem;
+    box-shadow: 0 1rem 2.4rem rgba(153, 119, 70, .16);
+    transform: none;
+    animation: none;
+    will-change: auto;
+  }
+  .choice-card img { object-position: center; }
   .choice-detail,
   .choice-hero .scroll-cue { display: none; }
 }
@@ -1093,14 +1113,14 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   .choice-eyebrow { margin-bottom: .7rem; }
   .choice-copy h1 { font-size: 3.05rem; }
   .choice-actions { gap: .4rem; margin-top: .65rem; }
-  .choice-portrait { height: min(23svh, 9.8rem); margin-top: .4rem; }
+  .choice-portrait { height: auto; margin-top: .7rem; }
   .choice-primary-action,
   .choice-route-action { min-height: 3.15rem; }
 }
 
 @media (max-width: 480px) {
   .site-header { padding-inline: .75rem; }
-  .brand-lockup small { display: none; }
+  .brand-lockup small { display: inline; }
   .site-header nav { gap: .35rem; }
   .site-header .nav-cta { padding-inline: .78rem !important; }
 }
