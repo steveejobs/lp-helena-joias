@@ -797,7 +797,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .choice-whatsapp-action .whatsapp-copy small,
 .choice-route-action small {
   font-family: var(--sans);
-  font-size: .3rem;
+  font-size: .34rem;
   font-weight: 650;
   line-height: 1;
   letter-spacing: .08em;
