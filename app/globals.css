@@ -45,15 +45,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-intro::before { content: ""; position: absolute; width: min(70vw, 48rem); aspect-ratio: 1; border: 1px solid rgba(153,119,70,.18); border-radius: 50%; box-shadow: 0 0 0 6rem rgba(153,119,70,.045), 0 0 0 12rem rgba(153,119,70,.022); animation: intro-ring 1.45s cubic-bezier(.16,1,.3,1) both; }
 .brand-intro-halo { position: absolute; width: min(44vw, 31rem); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(180,147,110,.2), transparent 68%); filter: blur(12px); animation: intro-halo 1.3s ease-in-out both; }
 .brand-intro-butterflies { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
-.brand-intro-butterfly { position: absolute; display: block; width: clamp(5.6rem, 9vw, 8.2rem); aspect-ratio: 1; transform: rotate(var(--intro-rotation)) scale(var(--intro-scale)); transform-origin: center; transition: opacity .72s ease, transform .9s cubic-bezier(.55,.05,.67,.19), filter .72s ease; will-change: transform, opacity; }
+.brand-intro-butterfly { position: absolute; display: block; width: clamp(5.6rem, 9vw, 8.2rem); aspect-ratio: 1; transform: rotate(var(--intro-rotation)) scale(var(--intro-scale)); transform-origin: center; transition: opacity var(--intro-exit-duration, .9s) ease, transform var(--intro-exit-duration, .9s) cubic-bezier(.55,.05,.67,.19), filter .72s ease; will-change: transform, opacity; }
 .brand-intro-butterfly img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 .7rem 1.2rem rgba(153,119,70,.13)); }
-.brand-intro-butterfly-1 { --intro-rotation: -7deg; --intro-scale: .84; --intro-exit-x: -42vw; --intro-exit-y: -42vh; --intro-exit-rotation: -32deg; left: 7%; top: 13%; }
-.brand-intro-butterfly-2 { --intro-rotation: 5deg; --intro-scale: .72; --intro-exit-x: -38vw; --intro-exit-y: -48vh; --intro-exit-rotation: -18deg; left: 28%; top: 6%; }
-.brand-intro-butterfly-3 { --intro-rotation: -2deg; --intro-scale: 1; --intro-exit-x: 0vw; --intro-exit-y: -55vh; --intro-exit-rotation: 12deg; left: 46%; top: 19%; }
-.brand-intro-butterfly-4 { --intro-rotation: 6deg; --intro-scale: .78; --intro-exit-x: 36vw; --intro-exit-y: -48vh; --intro-exit-rotation: 29deg; left: 69%; top: 7%; }
-.brand-intro-butterfly-5 { --intro-rotation: -5deg; --intro-scale: .68; --intro-exit-x: 42vw; --intro-exit-y: -22vh; --intro-exit-rotation: 38deg; left: 87%; top: 28%; }
-.brand-intro-butterfly-6 { --intro-rotation: 7deg; --intro-scale: .8; --intro-exit-x: -40vw; --intro-exit-y: 43vh; --intro-exit-rotation: -35deg; left: 17%; top: 58%; }
-.brand-intro-butterfly-7 { --intro-rotation: -4deg; --intro-scale: .9; --intro-exit-x: 38vw; --intro-exit-y: 42vh; --intro-exit-rotation: 34deg; left: 69%; top: 57%; }
+.brand-intro-butterfly-1 { --intro-rotation: -7deg; --intro-scale: .84; --intro-exit-duration: .68s; --intro-exit-x: -42vw; --intro-exit-y: -42vh; --intro-exit-rotation: -32deg; left: 7%; top: 13%; }
+.brand-intro-butterfly-2 { --intro-rotation: 5deg; --intro-scale: .72; --intro-exit-duration: .84s; --intro-exit-x: -38vw; --intro-exit-y: -48vh; --intro-exit-rotation: -18deg; left: 28%; top: 6%; }
+.brand-intro-butterfly-3 { --intro-rotation: -2deg; --intro-scale: 1; --intro-exit-duration: 1.14s; --intro-exit-x: 0vw; --intro-exit-y: -55vh; --intro-exit-rotation: 12deg; left: 46%; top: 19%; }
+.brand-intro-butterfly-4 { --intro-rotation: 6deg; --intro-scale: .78; --intro-exit-duration: .76s; --intro-exit-x: 36vw; --intro-exit-y: -48vh; --intro-exit-rotation: 29deg; left: 69%; top: 7%; }
+.brand-intro-butterfly-5 { --intro-rotation: -5deg; --intro-scale: .68; --intro-exit-duration: .62s; --intro-exit-x: 42vw; --intro-exit-y: -22vh; --intro-exit-rotation: 38deg; left: 87%; top: 28%; }
+.brand-intro-butterfly-6 { --intro-rotation: 7deg; --intro-scale: .8; --intro-exit-duration: .96s; --intro-exit-x: -40vw; --intro-exit-y: 43vh; --intro-exit-rotation: -35deg; left: 17%; top: 58%; }
+.brand-intro-butterfly-7 { --intro-rotation: -4deg; --intro-scale: .9; --intro-exit-duration: 1.08s; --intro-exit-x: 38vw; --intro-exit-y: 42vh; --intro-exit-rotation: 34deg; left: 69%; top: 57%; }
 .brand-intro-wordmark { position: absolute; z-index: 3; top: calc(50% + min(18vw, 10.5rem)); display: flex; align-items: baseline; gap: .75rem; text-transform: uppercase; letter-spacing: .34em; opacity: 0; transform: translateY(1.2rem); animation: intro-wordmark .52s cubic-bezier(.16,1,.3,1) .72s both; }
 .brand-intro-wordmark span { font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.75rem); letter-spacing: .24em; }
 .brand-intro-wordmark small { font-size: .52rem; }
@@ -67,6 +67,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .scroll-butterfly { --butterfly-opacity: 0; --butterfly-x: 0px; --butterfly-y: 0px; --butterfly-rotation: 0deg; position: fixed; z-index: 18; right: clamp(.35rem, 2vw, 2rem); top: 56%; width: clamp(7.2rem, 10vw, 10rem); aspect-ratio: 1; opacity: var(--butterfly-opacity); transform: translate3d(var(--butterfly-x), var(--butterfly-y), 0) rotate(var(--butterfly-rotation)); pointer-events: none; transition: opacity .28s linear, filter .42s ease; will-change: transform, opacity; }
 .scroll-butterfly canvas { display: block; width: 100%; height: 100%; filter: sepia(.08) saturate(.92) drop-shadow(0 .8rem 1.4rem rgba(33,25,22,.14)); mix-blend-mode: multiply; }
 .scroll-butterfly.is-on-dark canvas { filter: brightness(1.7) sepia(.45) saturate(.75) drop-shadow(0 .8rem 1.4rem rgba(250,220,212,.13)); mix-blend-mode: screen; }
+
+.mobile-butterfly-pass-layer { display: none; }
 
 .site-header { position: absolute; z-index: 20; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem clamp(1.15rem, 4vw, 4.5rem); opacity: 1; transform: none; transition: opacity .55s ease, transform .75s cubic-bezier(.16,1,.3,1); }
 .brand-intro ~ .site-header { opacity: 0; transform: translateY(-.8rem); }
@@ -173,6 +175,32 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .collections-intro h2 { max-width: 61rem; }
 .collections-intro h2 em { color: var(--bronze-500); }
 .collections-intro > a { margin-top: 3rem; display: inline-flex; gap: 1rem; align-items: center; font-size: .65rem; text-transform: uppercase; letter-spacing: .15em; padding-bottom: .7rem; border-bottom: 1px solid var(--bronze-300); }
+
+@media (max-width: 720px) {
+  .scroll-butterfly { display: none; }
+  .mobile-butterfly-pass-layer { position: absolute; z-index: 1; inset: 0; display: block; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity .12s linear; }
+  .mobile-butterfly-pass-item { position: absolute; left: 0; top: 0; display: block; width: clamp(3.5rem, 17vw, 5rem); aspect-ratio: 1; opacity: .13; transform-origin: center; will-change: transform; }
+  .mobile-butterfly-pass-item-2 { width: clamp(2.7rem, 13vw, 3.8rem); opacity: .1; }
+  .mobile-butterfly-pass-item-3 { width: clamp(4rem, 20vw, 5.8rem); opacity: .115; }
+  .mobile-butterfly-idle { display: block; width: 100%; height: 100%; animation: mobile-butterfly-idle-one 3.2s ease-in-out infinite alternate; }
+  .mobile-butterfly-pass-item-2 .mobile-butterfly-idle { animation-name: mobile-butterfly-idle-two; animation-duration: 4.1s; }
+  .mobile-butterfly-pass-item-3 .mobile-butterfly-idle { animation-name: mobile-butterfly-idle-three; animation-duration: 2.7s; }
+  .mobile-butterfly-pass-item canvas { display: block; width: 100%; height: 100%; filter: sepia(.12) saturate(.88) drop-shadow(0 .45rem .8rem rgba(33,25,22,.12)); mix-blend-mode: multiply; }
+  .mobile-butterfly-pass-layer.is-dark .mobile-butterfly-pass-item { opacity: .16; }
+  .mobile-butterfly-pass-layer.is-dark .mobile-butterfly-pass-item-2 { opacity: .12; }
+  .mobile-butterfly-pass-layer.is-dark .mobile-butterfly-pass-item-3 { opacity: .14; }
+  .mobile-butterfly-pass-layer.is-dark canvas { filter: brightness(1.75) sepia(.45) saturate(.72) drop-shadow(0 .45rem .8rem rgba(250,220,212,.1)); mix-blend-mode: screen; }
+  .motion-ready [data-reveal] > .mobile-butterfly-pass-layer { transform: none; transition: opacity .12s linear; }
+  .manifesto > p,
+  .manifesto > h2,
+  .collections-intro > p,
+  .collections-intro > h2,
+  .collections-intro > a { position: relative; z-index: 2; }
+}
+
+@keyframes mobile-butterfly-idle-one { to { transform: translate3d(.35rem, -.45rem, 0) rotate(3deg); } }
+@keyframes mobile-butterfly-idle-two { to { transform: translate3d(-.28rem, .38rem, 0) rotate(-4deg); } }
+@keyframes mobile-butterfly-idle-three { to { transform: translate3d(.22rem, -.32rem, 0) rotate(2deg); } }
 
 .collection-story { --story-progress: 0; --story-blend: 0; --story-next-opacity: 0; --story-active-scale: 1.055; --story-active-lift: 0%; --story-active-saturation: .96; --story-next-scale: 1.035; position: relative; height: var(--story-height); }
 .collection-sticky { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(20rem, .75fr); align-items: stretch; overflow: hidden; }
@@ -605,7 +633,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
   .intro-curtain { display: none; }
-  .brand-intro, .scroll-butterfly { display: none; }
+  .brand-intro, .scroll-butterfly, .mobile-butterfly-pass-layer { display: none; }
   .site-header { opacity: 1; transform: none; }
   .hero-photo-wrap { transform: none; }
   [data-reveal], [data-link-reveal] { opacity: 1; transform: none; clip-path: none; }

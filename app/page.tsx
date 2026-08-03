@@ -61,7 +61,7 @@ function BrandIntro() {
     root.classList.remove("brand-intro-complete");
     root.classList.add("brand-intro-playing");
     const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
-    const finishTimer = window.setTimeout(finish, 3150);
+    const finishTimer = window.setTimeout(finish, 3450);
 
     return () => {
       window.clearTimeout(revealTimer);
@@ -172,6 +172,117 @@ function ScrollButterfly() {
   return (
     <div className="scroll-butterfly" ref={wrapperRef} aria-hidden="true">
       <canvas ref={canvasRef} width="320" height="320" />
+    </div>
+  );
+}
+
+function MobileButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: "light" | "dark" }) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !window.matchMedia("(max-width: 720px)").matches) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (reduced || connection?.saveData) return;
+
+    const section = wrapper.parentElement;
+    const items = Array.from(wrapper.querySelectorAll<HTMLElement>(".mobile-butterfly-pass-item"));
+    const canvases = Array.from(wrapper.querySelectorAll<HTMLCanvasElement>("canvas"));
+    const contexts = canvases.map((canvas) => canvas.getContext("2d"));
+    if (!section || contexts.some((context) => !context)) return;
+
+    const sprite = new window.Image();
+    let spriteLoaded = false;
+    let visible = false;
+    let wingFrame = 0;
+    let scrollFrame = 0;
+    let lastSpriteFrame = -1;
+
+    const clamp = (value: number) => Math.min(1, Math.max(0, value));
+    const updatePosition = () => {
+      scrollFrame = 0;
+      const rect = section.getBoundingClientRect();
+      const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height));
+      const edgeFade = Math.min(clamp(progress / .12), clamp((1 - progress) / .12));
+      wrapper.style.opacity = String(edgeFade);
+
+      const tracks = [
+        { speed: 1, offset: 0, startX: -.18, travelX: 1.32, baseY: .2, arcY: .16, direction: 1 },
+        { speed: 1.22, offset: -.08, startX: 1.1, travelX: -1.34, baseY: .5, arcY: -.18, direction: -1 },
+        { speed: .82, offset: .08, startX: -.2, travelX: 1.34, baseY: .72, arcY: -.14, direction: 1 },
+      ];
+
+      items.forEach((item, index) => {
+        const track = tracks[index];
+        const travel = clamp(progress * track.speed + track.offset);
+        const x = (track.startX + track.travelX * travel) * rect.width;
+        const y = -rect.top + (track.baseY + Math.sin(travel * Math.PI) * track.arcY) * window.innerHeight;
+        const rotation = track.direction * (-12 + travel * 24) + Math.sin(travel * Math.PI * 2) * 4;
+        item.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg)`;
+      });
+    };
+
+    const requestPosition = () => {
+      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updatePosition);
+    };
+
+    const animateWings = (time: number) => {
+      if (!visible) {
+        wingFrame = 0;
+        return;
+      }
+
+      const frame = Math.floor(time / 78) % 16;
+      if (spriteLoaded && frame !== lastSpriteFrame) {
+        canvases.forEach((canvas, index) => {
+          const context = contexts[index];
+          if (!context) return;
+          const offsetFrame = (frame + index * 3) % 16;
+          const column = offsetFrame % 4;
+          const row = Math.floor(offsetFrame / 4);
+          context.clearRect(0, 0, 256, 256);
+          context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+        });
+        lastSpriteFrame = frame;
+      }
+      wingFrame = window.requestAnimationFrame(animateWings);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
+    }, { rootMargin: "18% 0px" });
+
+    sprite.onload = () => {
+      spriteLoaded = true;
+      if (visible && !wingFrame) wingFrame = window.requestAnimationFrame(animateWings);
+    };
+    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+    observer.observe(wrapper);
+    updatePosition();
+    window.addEventListener("scroll", requestPosition, { passive: true });
+    window.addEventListener("resize", requestPosition);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", requestPosition);
+      window.removeEventListener("resize", requestPosition);
+      if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+      if (wingFrame) window.cancelAnimationFrame(wingFrame);
+    };
+  }, []);
+
+  return (
+    <div className={`mobile-butterfly-pass-layer is-${tone}`} ref={wrapperRef} aria-hidden="true">
+      {Array.from({ length: count }, (_, index) => (
+        <span className={`mobile-butterfly-pass-item mobile-butterfly-pass-item-${index + 1}`} key={index}>
+          <span className="mobile-butterfly-idle">
+            <canvas width="256" height="256" />
+          </span>
+        </span>
+      ))}
     </div>
   );
 }
@@ -549,11 +660,13 @@ export default function Home() {
       </section>
 
       <section className="manifesto" id="manifesto" aria-label="Manifesto da marca" data-reveal="section">
+        <MobileButterflyPass count={1} />
         <p>Uma loja feita para descobrir.</p>
         <h2>Veja de perto. Combine sem pressa.<br /><em>Encontre a joia que já parece sua.</em></h2>
       </section>
 
       <section className="movement" id="movimento" aria-labelledby="movement-title">
+        <MobileButterflyPass count={3} tone="dark" />
         <div className="movement-heading" data-reveal="section">
           <p className="eyebrow eyebrow-light"><span /> Detalhes em movimento</p>
           <h2 id="movement-title">A joia muda<br /><em>quando você se move.</em></h2>
@@ -567,6 +680,7 @@ export default function Home() {
       </section>
 
       <section className="collections-intro" id="colecoes" aria-labelledby="collections-title" data-reveal="section">
+        <MobileButterflyPass count={1} />
         <p>Três momentos. Três leituras.</p>
         <h2 id="collections-title">Escolha o brilho<br /><em>que acompanha o seu.</em></h2>
         <a href="#luz-de-perto">Começar a descoberta <span aria-hidden="true">↓</span></a>
