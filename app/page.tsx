@@ -40,6 +40,7 @@ function TransitionLink({ href, children, className = "" }: { href: string; chil
 
 function BrandIntro() {
   const [hidden, setHidden] = useState(false);
+  const introRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -70,15 +71,61 @@ function BrandIntro() {
     };
   }, []);
 
+  useEffect(() => {
+    const intro = introRef.current;
+    if (!intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const canvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-flight"));
+    const contexts = canvases.map((canvas) => canvas.getContext("2d"));
+    if (contexts.some((context) => !context)) return;
+
+    const sprite = new window.Image();
+    let animationFrame = 0;
+    let cancelled = false;
+    let loaded = false;
+    let lastFrame = -1;
+
+    const animate = (time: number) => {
+      if (cancelled) return;
+      const frame = Math.floor(time / 76) % 16;
+      if (loaded && frame !== lastFrame) {
+        canvases.forEach((canvas, index) => {
+          const context = contexts[index];
+          if (!context) return;
+          const offsetFrame = (frame + index * 2) % 16;
+          const column = offsetFrame % 4;
+          const row = Math.floor(offsetFrame / 4);
+          context.clearRect(0, 0, 256, 256);
+          context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+        });
+        lastFrame = frame;
+      }
+      animationFrame = window.requestAnimationFrame(animate);
+    };
+
+    sprite.onload = () => {
+      if (cancelled) return;
+      loaded = true;
+      animationFrame = window.requestAnimationFrame(animate);
+    };
+    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+
+    return () => {
+      cancelled = true;
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   if (hidden) return null;
 
   return (
-    <div className="brand-intro" aria-hidden="true">
+    <div className="brand-intro" ref={introRef} aria-hidden="true">
       <div className="brand-intro-halo" />
       <div className="brand-intro-butterflies">
-        {Array.from({ length: 7 }, (_, index) => (
+        {Array.from({ length: 9 }, (_, index) => (
           <span className={`brand-intro-butterfly brand-intro-butterfly-${index + 1}`} key={index}>
             <img
+              className="brand-intro-formation"
               src="/media/logo-formation-v2.webp"
               alt=""
               width="720"
@@ -91,6 +138,7 @@ function BrandIntro() {
                 }
               }}
             />
+            <canvas className="brand-intro-flight" width="256" height="256" />
           </span>
         ))}
       </div>
