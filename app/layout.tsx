@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AnalyticsRuntime } from "@/components/analytics/analytics-runtime";
-import { AnalyticsDestinations } from "@/components/analytics/analytics-destinations";
-import { CookieConsent } from "@/components/analytics/cookie-consent";
 import "./globals.css";
 import { siteDescription, siteName, siteUrl } from "./seo";
 
@@ -121,10 +118,7 @@ export default function RootLayout({
             __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
           }}
         />
-        <AnalyticsDestinations />
-        <AnalyticsRuntime />
         {children}
-        <CookieConsent />
       </body>
     </html>
   );

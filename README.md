@@ -28,11 +28,11 @@ A aplicação local fica disponível em `http://localhost:3000`.
 
 - `app/`: landing page, experiência para Instagram e página de privacidade.
 - `components/`: componentes visuais e interativos.
-- `lib/`: copy da marca, analytics opcional e integração com WhatsApp.
+- `lib/`: copy da marca e integração com WhatsApp.
 - `public/media/`: ativos visuais utilizados pelo site.
 
-Nenhuma variável de ambiente é obrigatória. `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
-pode ser configurada opcionalmente para Google Analytics.
+O site não usa banco, login, cookies ou ferramentas de analytics. Nenhuma
+variável de ambiente é obrigatória.
 
 O deploy de produção utiliza o comando `npm run build:vercel`, configurado em
 `vercel.json`.

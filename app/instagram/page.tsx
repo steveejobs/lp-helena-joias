@@ -3,7 +3,6 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { useReversibleReveal } from "@/components/motion-controller";
 import {
   HELENA_WHATSAPP_NUMBER,
@@ -60,9 +59,6 @@ function ProfileLink({ number, title, detail, href, external = false, primary = 
   }
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (external && href?.includes("instagram.com")) {
-      void trackAnalyticsEvent({ eventName: "instagram_clicked", metadata: { source: "instagram_route" } });
-    }
     if (external || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     document.documentElement.classList.add("is-leaving");
@@ -254,10 +250,9 @@ function LinkVideo({ src, poster, label }: { src: string; poster: string; label:
 
 export default function InstagramLinks() {
   useReversibleReveal("[data-link-reveal]");
-  const openWhatsApp = async () => {
+  const openWhatsApp = () => {
     const pending = window.open("", "_blank");
     if (pending) pending.opener = null;
-    await trackAnalyticsEvent({ eventName: "whatsapp_opened", metadata: { origin: "instagram_route" } });
     const url = `https://wa.me/${HELENA_WHATSAPP_NUMBER}?text=${encodeURIComponent(HELENA_WHATSAPP_SITE_MESSAGE)}`;
     if (pending) pending.location.href = url;
     else window.location.assign(url);

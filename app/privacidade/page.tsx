@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 
-import { CookieSettingsButton } from "@/components/analytics/cookie-settings-button";
-
 export const metadata: Metadata = {
-  title: "Privacidade e cookies",
-  description: "Como a Helena Joias usa dados de navegação e respeita suas escolhas de privacidade.",
+  title: "Privacidade",
+  description: "Como a landing page da Helena Joias respeita a sua privacidade.",
   alternates: { canonical: "/privacidade" },
 };
 
@@ -14,40 +12,27 @@ export default function PrivacyPage() {
       <header>
         <p>Privacidade</p>
         <h1>Dados com cuidado,<br /><em>escolhas com clareza.</em></h1>
-        <span>Última atualização: 28 de julho de 2026.</span>
+        <span>Última atualização: 3 de agosto de 2026.</span>
       </header>
       <div className="privacy-content">
         <section>
           <span>01</span>
           <div>
-            <h2>O que coletamos</h2>
+            <h2>Nenhum rastreamento</h2>
             <p>
-              Quando você autoriza analytics, o Google Analytics pode registrar páginas visitadas,
-              abertura do WhatsApp, tipo de dispositivo, navegador, origem da visita e tempo de uso.
+              Este site não usa cookies, ferramentas de analytics, login ou banco de dados.
+              A sua navegação pela landing page não cria um perfil de visitante.
             </p>
           </div>
         </section>
         <section>
           <span>02</span>
           <div>
-            <h2>Cookies opcionais</h2>
+            <h2>Links externos</h2>
             <p>
-              O Google Analytics usa o cookie <code>_ga</code> para distinguir visitantes e sessões.
-              Ele só pode ser armazenado depois da sua autorização. A sua escolha de privacidade
-              usa apenas o armazenamento funcional do navegador.
+              Ao abrir WhatsApp, Instagram ou Google Maps, você passa a usar os serviços dessas
+              empresas. A partir desse momento, valem as políticas de privacidade de cada serviço.
             </p>
-          </div>
-        </section>
-        <section>
-          <span>03</span>
-          <div>
-            <h2>Controle nas suas mãos</h2>
-            <p>
-              Você pode aceitar, recusar ou mudar sua escolha a qualquer momento. Ao selecionar
-              somente o necessário, removemos os identificadores analíticos acessíveis pelo site e
-              interrompemos o envio de eventos opcionais.
-            </p>
-            <CookieSettingsButton />
           </div>
         </section>
       </div>

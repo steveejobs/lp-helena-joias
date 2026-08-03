@@ -1,6 +1,5 @@
 "use client";
 
-import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import {
   HELENA_WHATSAPP_NUMBER,
   HELENA_WHATSAPP_SITE_MESSAGE,
@@ -8,15 +7,12 @@ import {
 
 export function HomeWhatsAppButton({
   className = "whatsapp-spotlight",
-  origin,
 }: {
   className?: string;
-  origin: string;
 }) {
-  const open = async () => {
+  const open = () => {
     const pending = window.open("", "_blank");
     if (pending) pending.opener = null;
-    await trackAnalyticsEvent({ eventName: "whatsapp_opened", metadata: { origin } });
     const url = `https://wa.me/${HELENA_WHATSAPP_NUMBER}?text=${encodeURIComponent(HELENA_WHATSAPP_SITE_MESSAGE)}`;
     if (pending) pending.location.href = url;
     else window.location.assign(url);

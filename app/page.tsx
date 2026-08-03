@@ -403,7 +403,7 @@ function ScrollGallery({
           </div>
           <div className="collection-actions">
             <TransitionLink className="collection-instagram" href="/instagram">Conhecer a Helena <span aria-hidden="true">→</span></TransitionLink>
-            <HomeWhatsAppButton className="whatsapp-spotlight whatsapp-spotlight-compact" origin={`coleção ${title}`} />
+            <HomeWhatsAppButton className="whatsapp-spotlight whatsapp-spotlight-compact" />
           </div>
         </div>
       </div>
@@ -436,7 +436,7 @@ function ExperienceBridge({
           <p>{description}</p>
           <div className="bridge-actions">
             <TransitionLink className="bridge-primary" href="/instagram">Conhecer a Helena <span aria-hidden="true">↗︎</span></TransitionLink>
-            <HomeWhatsAppButton origin={`seção ${id}`} />
+            <HomeWhatsAppButton />
             {showRoute ? (
               <a className="route-pending" href={storeLocationUrl} target="_blank" rel="noreferrer">
                 <span>Traçar rota</span><small>Como chegar</small>
@@ -521,7 +521,7 @@ export default function Home() {
             <span className="choice-title-mask choice-title-serif" aria-hidden="true"><b>uma joia única.</b></span>
           </h1>
           <div className="choice-actions">
-            <HomeWhatsAppButton className="choice-primary-action choice-whatsapp-action" origin="hero da home" />
+            <HomeWhatsAppButton className="choice-primary-action choice-whatsapp-action" />
             <a
               className="choice-route-action"
               href={storeLocationUrl}
@@ -625,7 +625,7 @@ export default function Home() {
           <a href="#colecoes">Coleções</a>
           <TransitionLink href="/instagram">Experiência Instagram</TransitionLink>
           <a href="https://www.instagram.com/helenaajoias/" target="_blank" rel="noreferrer">Instagram ↗︎</a>
-          <HomeWhatsAppButton className="whatsapp-spotlight footer-whatsapp" origin="rodapé da home" />
+          <HomeWhatsAppButton className="whatsapp-spotlight footer-whatsapp" />
         </nav>
         <div className="footer-meta"><span>Seg–Sex 08h — 18h · Sábado 08h — 12h</span><small>© {new Date().getFullYear()} Helena Joias</small></div>
       </footer>
