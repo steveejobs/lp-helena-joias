@@ -737,18 +737,21 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 }
 
 .choice-whatsapp-action {
+  grid-template-columns: minmax(0, 1fr) 2.65rem;
+  column-gap: .35rem;
   width: 100%;
   cursor: pointer;
   font-family: var(--sans);
   text-align: left;
 }
-.choice-whatsapp-action .whatsapp-copy { position: relative; z-index: 1; }
+.choice-whatsapp-action .whatsapp-copy { position: relative; z-index: 1; overflow: hidden; padding-right: .2rem; }
 .choice-whatsapp-action .whatsapp-copy strong { font: 500 clamp(1.02rem, 1.45vw, 1.18rem)/1 var(--serif); letter-spacing: 0; text-transform: none; }
-.choice-whatsapp-action .whatsapp-copy small { color: rgba(255,255,255,.7); font: 650 .4rem/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.choice-whatsapp-action .whatsapp-copy small { color: rgba(255,255,255,.7); font: 650 .36rem/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .choice-whatsapp-action .whatsapp-icon {
   position: relative;
-  width: 2.8rem;
-  height: 2.8rem;
+  justify-self: end;
+  width: 2.35rem;
+  height: 2.35rem;
   border-left: 1px solid rgba(255,255,255,.28);
   border-radius: 0;
   background: transparent;
@@ -788,8 +791,8 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 
 .choice-primary-action small,
 .choice-route-action small {
-  font: 650 .45rem/1 var(--sans);
-  letter-spacing: .15em;
+  font: 650 .36rem/1 var(--sans);
+  letter-spacing: .1em;
   text-transform: uppercase;
 }
 
@@ -829,8 +832,13 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 
 .choice-route-action small { color: rgba(33, 25, 22, .55); }
 .choice-route-action .choice-action-icon {
-  width: 2.6rem;
+  justify-self: end;
+  width: 2.35rem;
   border-left-color: rgba(153, 119, 70, .32);
+}
+
+@media (min-width: 721px) and (max-width: 920px) {
+  .choice-actions { width: min(100%, 22rem); grid-template-columns: 1fr; }
 }
 .choice-route-action:hover,
 .choice-route-action:focus-visible {
