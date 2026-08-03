@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { BrandIntro } from "@/components/brand-intro";
 import { HomeWhatsAppButton } from "@/components/home/whatsapp-button";
 import { useReversibleReveal } from "@/components/motion-controller";
 import { brandHighlight, store, storeLocationUrl } from "@/lib/brand/copy";
@@ -36,155 +37,6 @@ function TransitionLink({ href, children, className = "" }: { href: string; chil
   };
 
   return <a href={href} className={className} onClick={handleClick}>{children}</a>;
-}
-
-function BrandIntro() {
-  const [hidden, setHidden] = useState(false);
-  const introRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let revealTimer = 0;
-    let finishTimer = 0;
-    let assetFallbackTimer = 0;
-    let started = false;
-
-    const finish = () => {
-      root.classList.remove("brand-intro-playing", "brand-intro-ready", "brand-intro-revealing");
-      root.classList.add("brand-intro-complete");
-      window.dispatchEvent(new Event("helena:intro-complete"));
-      setHidden(true);
-    };
-
-    const startIntro = () => {
-      if (started) return;
-      started = true;
-      window.clearTimeout(assetFallbackTimer);
-      root.classList.add("brand-intro-ready");
-      revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
-      finishTimer = window.setTimeout(finish, 4100);
-    };
-
-    root.classList.remove("is-leaving");
-    if (reducedMotion) {
-      finish();
-      return;
-    }
-
-    root.classList.remove("brand-intro-complete", "brand-intro-ready", "brand-intro-revealing");
-    root.classList.add("brand-intro-playing");
-    window.addEventListener("helena:intro-assets-ready", startIntro, { once: true });
-    assetFallbackTimer = window.setTimeout(startIntro, 4000);
-
-    return () => {
-      window.removeEventListener("helena:intro-assets-ready", startIntro);
-      window.clearTimeout(revealTimer);
-      window.clearTimeout(finishTimer);
-      window.clearTimeout(assetFallbackTimer);
-      root.classList.remove("brand-intro-playing", "brand-intro-ready", "brand-intro-revealing");
-    };
-  }, []);
-
-  useEffect(() => {
-    const intro = introRef.current;
-    if (!intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const formationCanvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-formation"));
-    const formationContexts = formationCanvases.map((canvas) => canvas.getContext("2d"));
-    const flightCanvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-flight"));
-    const flightContexts = flightCanvases.map((canvas) => canvas.getContext("2d"));
-    if (formationContexts.some((context) => !context) || flightContexts.some((context) => !context)) return;
-
-    const formationSprite = new window.Image();
-    const flightSprite = new window.Image();
-    const creationCurves = [.68, 1.34, .86, 1.52, .76, 1.16, .61, 1.42, .94, 1.62, .72];
-    let creationStartedAt = 0;
-    let animationFrame = 0;
-    let cancelled = false;
-    let formationLoaded = false;
-    let flightLoaded = false;
-    let lastFlightFrame = -1;
-    const lastFormationFrames = formationCanvases.map(() => -1);
-
-    const startAnimation = () => {
-      if (cancelled || animationFrame || !formationLoaded || !flightLoaded) return;
-      creationStartedAt = window.performance.now();
-      window.dispatchEvent(new Event("helena:intro-assets-ready"));
-      animationFrame = window.requestAnimationFrame(animate);
-    };
-
-    const animate = (time: number) => {
-      if (cancelled) return;
-
-      if (formationLoaded) {
-        const creationProgress = Math.min(1, Math.max(0, (time - creationStartedAt) / 2200));
-        formationCanvases.forEach((canvas, index) => {
-          const context = formationContexts[index];
-          if (!context) return;
-          const curvedProgress = Math.pow(creationProgress, creationCurves[index]);
-          const frame = creationProgress >= 1 ? 43 : Math.min(42, Math.floor(curvedProgress * 43));
-          if (frame === lastFormationFrames[index]) return;
-          const column = frame % 8;
-          const row = Math.floor(frame / 8);
-          context.clearRect(0, 0, 256, 256);
-          context.drawImage(formationSprite, column * 256, row * 256, 256, 256, 0, 0, 256, 256);
-          lastFormationFrames[index] = frame;
-        });
-      }
-
-      const flightFrame = Math.floor(time / 42) % 16;
-      if (flightLoaded && flightFrame !== lastFlightFrame) {
-        flightCanvases.forEach((canvas, index) => {
-          const context = flightContexts[index];
-          if (!context) return;
-          const offsetFrame = (flightFrame + index * 2) % 16;
-          const column = offsetFrame % 4;
-          const row = Math.floor(offsetFrame / 4);
-          context.clearRect(0, 0, 256, 256);
-          context.drawImage(flightSprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
-        });
-        lastFlightFrame = flightFrame;
-      }
-      animationFrame = window.requestAnimationFrame(animate);
-    };
-
-    formationSprite.onload = () => {
-      if (cancelled) return;
-      formationLoaded = true;
-      startAnimation();
-    };
-    flightSprite.onload = () => {
-      if (cancelled) return;
-      flightLoaded = true;
-      startAnimation();
-    };
-    formationSprite.src = "/media/logo-formation-sprite-v3.webp";
-    flightSprite.src = "/media/butterfly-scroll-sprite-v2.webp";
-
-    return () => {
-      cancelled = true;
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    };
-  }, []);
-
-  if (hidden) return null;
-
-  return (
-    <div className="brand-intro" ref={introRef} aria-hidden="true">
-      <div className="brand-intro-halo" />
-      <div className="brand-intro-butterflies">
-        {Array.from({ length: 11 }, (_, index) => (
-          <span className={`brand-intro-butterfly brand-intro-butterfly-${index + 1}`} key={index}>
-            <canvas className="brand-intro-formation" width="256" height="256" />
-            <canvas className="brand-intro-flight" width="256" height="256" />
-          </span>
-        ))}
-      </div>
-      <div className="brand-intro-wordmark"><span>Helena</span><small>Joias</small></div>
-      <p>Forma · luz · presença</p>
-    </div>
-  );
 }
 
 function ScrollButterfly() {
@@ -284,7 +136,7 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
     if (reduced || connection?.saveData) return;
 
     const section = wrapper.parentElement;
-    const items = Array.from(wrapper.querySelectorAll<HTMLElement>(".mobile-butterfly-pass-item"));
+    const items = Array.from(wrapper.querySelectorAll<HTMLElement>(".section-butterfly-pass-item"));
     const canvases = Array.from(wrapper.querySelectorAll<HTMLCanvasElement>("canvas"));
     const contexts = canvases.map((canvas) => canvas.getContext("2d"));
     if (!section || contexts.some((context) => !context)) return;
@@ -309,20 +161,23 @@ function SectionButterflyPass({ count, tone = "light" }: { count: 1 | 3; tone?: 
       const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height));
 
       const tracks = [
-        { speed: 1, offset: 0, startX: -.18, travelX: 1.32, baseY: .2, arcY: .16, direction: 1 },
-        { speed: 1.22, offset: -.08, startX: 1.1, travelX: -1.34, baseY: .5, arcY: -.18, direction: -1 },
-        { speed: .82, offset: .08, startX: -.2, travelX: 1.34, baseY: .72, arcY: -.14, direction: 1 },
+        { speed: 1, offset: 0, startX: .02, travelX: .9, arcY: .12 },
+        { speed: 1.22, offset: -.08, startX: .9, travelX: -.86, arcY: -.13 },
+        { speed: .82, offset: .08, startX: .04, travelX: .86, arcY: -.1 },
       ];
 
       items.forEach((item, index) => {
         const track = tracks[index];
         const travel = clamp(progress * track.speed + track.offset);
-        const x = (track.startX + track.travelX * travel) * rect.width;
-        const y = -rect.top + (track.baseY + Math.sin(travel * Math.PI) * track.arcY) * window.innerHeight;
+        const routeWidth = Math.max(0, rect.width - item.offsetWidth);
+        const x = (track.startX + track.travelX * travel) * routeWidth;
+        const y = progress * rect.height
+          + Math.sin(progress * Math.PI) * track.arcY * Math.min(rect.height, window.innerHeight);
         const velocityX = track.travelX * rect.width * scrollDirection;
-        const velocityY = Math.cos(travel * Math.PI) * Math.PI * track.arcY * window.innerHeight * scrollDirection;
+        const velocityY = (rect.height
+          + Math.cos(progress * Math.PI) * Math.PI * track.arcY * Math.min(rect.height, window.innerHeight)) * scrollDirection;
         const rotation = Math.atan2(velocityY, velocityX) * 180 / Math.PI + 90;
-        const depth = .07 + Math.pow(Math.max(0, Math.sin(travel * Math.PI)), .48) * .93;
+        const depth = .07 + Math.pow(Math.max(0, Math.sin(progress * Math.PI)), .48) * .93;
         const depthBlur = (1 - depth) * 1.2;
         item.style.zIndex = String(Math.max(1, Math.round(depth * 10)));
         item.style.filter = `blur(${depthBlur.toFixed(2)}px)`;
@@ -711,10 +566,18 @@ export default function Home() {
       });
     };
 
-    if (document.documentElement.classList.contains("brand-intro-complete")) revealHero();
-    else window.addEventListener("helena:intro-complete", revealHero, { once: true });
+    const root = document.documentElement;
+    if (root.classList.contains("brand-intro-complete") || root.classList.contains("brand-intro-content-revealing")) {
+      revealHero();
+    } else {
+      window.addEventListener("helena:intro-content-ready", revealHero, { once: true });
+      window.addEventListener("helena:intro-complete", revealHero, { once: true });
+    }
 
-    return () => window.removeEventListener("helena:intro-complete", revealHero);
+    return () => {
+      window.removeEventListener("helena:intro-content-ready", revealHero);
+      window.removeEventListener("helena:intro-complete", revealHero);
+    };
   }, []);
 
   return (

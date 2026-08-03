@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { BrandIntro } from "@/components/brand-intro";
 import { useReversibleReveal } from "@/components/motion-controller";
 import {
   HELENA_WHATSAPP_NUMBER,
@@ -260,8 +261,24 @@ export default function InstagramLinks() {
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("is-leaving");
+    root.classList.remove("link-page-ready");
     document.body.classList.add("link-body");
-    const readyFrame = window.requestAnimationFrame(() => root.classList.add("link-page-ready"));
+    let readyFrame = 0;
+
+    const revealPage = () => {
+      if (root.classList.contains("link-page-ready") || readyFrame) return;
+      readyFrame = window.requestAnimationFrame(() => {
+        readyFrame = 0;
+        root.classList.add("link-page-ready");
+      });
+    };
+
+    if (root.classList.contains("brand-intro-complete") || root.classList.contains("brand-intro-content-revealing")) {
+      revealPage();
+    } else {
+      window.addEventListener("helena:intro-content-ready", revealPage, { once: true });
+      window.addEventListener("helena:intro-complete", revealPage, { once: true });
+    }
 
     const update = () => {
       const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
@@ -270,7 +287,9 @@ export default function InstagramLinks() {
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => {
-      window.cancelAnimationFrame(readyFrame);
+      if (readyFrame) window.cancelAnimationFrame(readyFrame);
+      window.removeEventListener("helena:intro-content-ready", revealPage);
+      window.removeEventListener("helena:intro-complete", revealPage);
       root.classList.remove("link-page-ready");
       document.body.classList.remove("link-body");
       window.removeEventListener("scroll", update);
@@ -279,7 +298,7 @@ export default function InstagramLinks() {
 
   return (
     <main className="link-page">
-      <div className="link-intro-curtain" aria-hidden="true"><span>HELENA</span></div>
+      <BrandIntro />
       <div className="exit-curtain" aria-hidden="true" />
       <div className="link-progress" aria-hidden="true" />
 
