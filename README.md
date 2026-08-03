@@ -1,13 +1,11 @@
 # Helena Joias
 
-Loja online e painel administrativo da Helena Joias, construídos com Next.js,
-React, Supabase e Vercel.
+Landing page institucional da Helena Joias, construída com Next.js e React.
+O projeto é totalmente independente de banco de dados e autenticação.
 
 ## Requisitos
 
 - Node.js 24
-- Projeto Supabase vinculado
-- Variáveis descritas em `.env.example`
 
 ## Desenvolvimento
 
@@ -28,11 +26,13 @@ A aplicação local fica disponível em `http://localhost:3000`.
 
 ## Estrutura principal
 
-- `app/`: páginas públicas, catálogo, produto e painel administrativo.
+- `app/`: landing page, experiência para Instagram e página de privacidade.
 - `components/`: componentes visuais e interativos.
-- `lib/`: catálogo, autenticação, analytics e integração com Supabase.
+- `lib/`: copy da marca, analytics opcional e integração com WhatsApp.
 - `public/media/`: ativos visuais utilizados pelo site.
-- `supabase/`: migrations e configuração do banco.
+
+Nenhuma variável de ambiente é obrigatória. `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
+pode ser configurada opcionalmente para Google Analytics.
 
 O deploy de produção utiliza o comando `npm run build:vercel`, configurado em
 `vercel.json`.

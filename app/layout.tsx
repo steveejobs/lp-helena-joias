@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { CartProvider } from "@/components/cart/cart-provider";
 import { AnalyticsRuntime } from "@/components/analytics/analytics-runtime";
 import { AnalyticsDestinations } from "@/components/analytics/analytics-destinations";
 import { CookieConsent } from "@/components/analytics/cookie-consent";
-import { getStore } from "@/lib/catalog/repository";
-import { resolveStoreContext } from "@/lib/store/context";
 import "./globals.css";
-import "./store.css";
 import { siteDescription, siteName, siteUrl } from "./seo";
 
 const geistSans = Geist({
@@ -77,13 +73,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const storeContext = await resolveStoreContext();
-  const store = await getStore(storeContext);
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -127,12 +121,10 @@ export default async function RootLayout({
             __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
           }}
         />
-        <CartProvider store={store}>
-          <AnalyticsDestinations />
-          <AnalyticsRuntime />
-          {children}
-          <CookieConsent />
-        </CartProvider>
+        <AnalyticsDestinations />
+        <AnalyticsRuntime />
+        {children}
+        <CookieConsent />
       </body>
     </html>
   );

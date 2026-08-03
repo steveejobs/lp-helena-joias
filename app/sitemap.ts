@@ -1,40 +1,22 @@
 import type { MetadataRoute } from "next";
-import { listCategories, listProductSitemap } from "@/lib/catalog/repository";
-import { resolveStoreContext } from "@/lib/store/context";
 import { siteUrl } from "./seo";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const context = await resolveStoreContext();
-  const [categories, products] = await Promise.all([
-    listCategories(context),
-    listProductSitemap(context),
-  ]);
-
+export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: siteUrl,
+      changeFrequency: "monthly",
       priority: 1,
     },
     {
-      url: `${siteUrl}/loja`,
-      changeFrequency: "daily",
-      priority: .9,
+      url: `${siteUrl}/instagram`,
+      changeFrequency: "monthly",
+      priority: .8,
     },
     {
       url: `${siteUrl}/privacidade`,
       changeFrequency: "yearly",
       priority: .3,
     },
-    ...categories.map((category) => ({
-      url: `${siteUrl}/loja/${category.slug}`,
-      changeFrequency: "weekly" as const,
-      priority: .7,
-    })),
-    ...products.map((product) => ({
-      url: `${siteUrl}/produto/${product.slug}`,
-      lastModified: product.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: .8,
-    })),
   ];
 }

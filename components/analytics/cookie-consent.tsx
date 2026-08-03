@@ -61,7 +61,7 @@ export function CookieConsent() {
     };
   }, [pathname]);
 
-  if (!ready || !open || pathname.startsWith("/admin")) return null;
+  if (!ready || !open) return null;
 
   const choose = (nextChoice: AnalyticsConsent) => {
     saveAnalyticsConsent(nextChoice);
@@ -80,8 +80,8 @@ export function CookieConsent() {
         <p>Privacidade, com transparência</p>
         <h2 id="cookie-consent-title">Uma experiência feita para você.</h2>
         <span id="cookie-consent-description">
-          Usamos cookies opcionais para entender visitas, desempenho das peças e melhorar a loja.
-          A localização é aproximada por cidade; não usamos GPS nem armazenamos seu IP.
+          Usamos cookies opcionais do Google Analytics para entender visitas e melhorar o site.
+          Você pode aceitar, recusar ou mudar essa escolha quando quiser.
         </span>
         <Link href="/privacidade">Entenda como cuidamos dos dados</Link>
       </div>

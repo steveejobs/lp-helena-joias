@@ -23,7 +23,7 @@ export function AnalyticsRuntime() {
   }, []);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin") || !hasAnalyticsConsent()) return;
+    if (!hasAnalyticsConsent()) return;
     const sessionId = getAnalyticsSessionId();
     const startedKey = `helena.analytics.started:${sessionId}`;
     if (!window.localStorage.getItem(startedKey)) {
@@ -49,7 +49,7 @@ export function AnalyticsRuntime() {
       accumulated += performance.now() - visibleSince;
       visibleSince = performance.now();
     };
-    const flush = (beacon = false) => {
+    const flush = () => {
       collect();
       const engagementMs = Math.round(accumulated);
       accumulated = 0;
@@ -60,19 +60,18 @@ export function AnalyticsRuntime() {
           metadata: { engagement_ms: Math.min(engagementMs, 60_000) },
           path: pathname,
         },
-        { beacon },
       );
     };
     const visibilityChanged = () => {
       if (document.visibilityState === "hidden") {
-        flush(true);
+        flush();
         visibleSince = null;
       } else {
         visibleSince = performance.now();
       }
     };
     const pageHidden = () => {
-      flush(true);
+      flush();
       visibleSince = null;
     };
     const interval = window.setInterval(() => flush(), ENGAGEMENT_FLUSH_MS);
@@ -83,7 +82,7 @@ export function AnalyticsRuntime() {
       window.clearInterval(interval);
       document.removeEventListener("visibilitychange", visibilityChanged);
       window.removeEventListener("pagehide", pageHidden);
-      flush(true);
+      flush();
       visibleSince = null;
     };
   }, [consentRevision, pathname]);

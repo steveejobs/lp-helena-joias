@@ -22,41 +22,30 @@ export default function PrivacyPage() {
           <div>
             <h2>O que coletamos</h2>
             <p>
-              Quando você autoriza analytics, registramos páginas visitadas, interação com produtos,
-              buscas, abertura do WhatsApp, tipo de dispositivo, navegador, origem da visita e tempo
-              de uso com a aba visível.
+              Quando você autoriza analytics, o Google Analytics pode registrar páginas visitadas,
+              abertura do WhatsApp, tipo de dispositivo, navegador, origem da visita e tempo de uso.
             </p>
           </div>
         </section>
         <section>
           <span>02</span>
           <div>
-            <h2>Localização aproximada</h2>
+            <h2>Cookies opcionais</h2>
             <p>
-              A cidade e a região são estimadas pela infraestrutura de acesso. Não solicitamos GPS,
-              endereço, bairro nem armazenamos o seu IP no painel da Helena.
+              O Google Analytics usa o cookie <code>_ga</code> para distinguir visitantes e sessões.
+              Ele só pode ser armazenado depois da sua autorização. A sua escolha de privacidade
+              usa apenas o armazenamento funcional do navegador.
             </p>
           </div>
         </section>
         <section>
           <span>03</span>
           <div>
-            <h2>Cookies opcionais</h2>
-            <p>
-              O Google Analytics usa o cookie <code>_ga</code> para distinguir visitantes e sessões.
-              Ele só pode ser armazenado depois da sua autorização. A sacola e a sua escolha de
-              privacidade usam armazenamento estritamente funcional do navegador.
-            </p>
-          </div>
-        </section>
-        <section>
-          <span>04</span>
-          <div>
             <h2>Controle nas suas mãos</h2>
             <p>
               Você pode aceitar, recusar ou mudar sua escolha a qualquer momento. Ao selecionar
               somente o necessário, removemos os identificadores analíticos acessíveis pelo site e
-              interrompemos o analytics próprio.
+              interrompemos o envio de eventos opcionais.
             </p>
             <CookieSettingsButton />
           </div>

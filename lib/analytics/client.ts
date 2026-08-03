@@ -116,39 +116,9 @@ function sendToGa4(payload: AnalyticsEventPayload, context: AnalyticsContext) {
   });
 }
 
-export async function trackAnalyticsEvent(
-  payload: AnalyticsEventPayload,
-  options: { beacon?: boolean } = {},
-) {
+export async function trackAnalyticsEvent(payload: AnalyticsEventPayload) {
   if (!hasAnalyticsConsent()) return false;
   const context = getAnalyticsContext();
-  const body = JSON.stringify({
-    ...payload,
-    ...attribution(),
-    ...context,
-    eventId: window.crypto.randomUUID(),
-    path: payload.path ?? window.location.pathname,
-  });
-  sendToGa4(payload, context);
-
-  if (options.beacon && navigator.sendBeacon) {
-    const queued = navigator.sendBeacon(
-      "/api/analytics",
-      new Blob([body], { type: "application/json" }),
-    );
-    if (queued) return true;
-  }
-
-  try {
-    await fetch("/api/analytics", {
-      body,
-      headers: { "Content-Type": "application/json" },
-      keepalive: true,
-      method: "POST",
-    });
-    return true;
-  } catch {
-    // Analytics must never block the shopping experience.
-    return false;
-  }
+  sendToGa4({ ...payload, metadata: { ...attribution(), ...payload.metadata } }, context);
+  return true;
 }
