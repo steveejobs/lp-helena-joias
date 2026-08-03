@@ -62,7 +62,7 @@ function BrandIntro() {
     root.classList.remove("brand-intro-complete");
     root.classList.add("brand-intro-playing");
     const revealTimer = window.setTimeout(() => root.classList.add("brand-intro-revealing"), 2250);
-    const finishTimer = window.setTimeout(finish, 3450);
+    const finishTimer = window.setTimeout(finish, 3720);
 
     return () => {
       window.clearTimeout(revealTimer);
@@ -75,40 +75,74 @@ function BrandIntro() {
     const intro = introRef.current;
     if (!intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const canvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-flight"));
-    const contexts = canvases.map((canvas) => canvas.getContext("2d"));
-    if (contexts.some((context) => !context)) return;
+    const formationCanvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-formation"));
+    const formationContexts = formationCanvases.map((canvas) => canvas.getContext("2d"));
+    const flightCanvases = Array.from(intro.querySelectorAll<HTMLCanvasElement>(".brand-intro-flight"));
+    const flightContexts = flightCanvases.map((canvas) => canvas.getContext("2d"));
+    if (formationContexts.some((context) => !context) || flightContexts.some((context) => !context)) return;
 
-    const sprite = new window.Image();
+    const formationSprite = new window.Image();
+    const flightSprite = new window.Image();
+    const creationCurves = [.68, 1.34, .86, 1.52, .76, 1.16, .61, 1.42, .94, 1.62, .72];
+    const creationStartedAt = window.performance.now();
     let animationFrame = 0;
     let cancelled = false;
-    let loaded = false;
-    let lastFrame = -1;
+    let formationLoaded = false;
+    let flightLoaded = false;
+    let lastFlightFrame = -1;
+    const lastFormationFrames = formationCanvases.map(() => -1);
+
+    const startAnimation = () => {
+      if (!cancelled && !animationFrame) animationFrame = window.requestAnimationFrame(animate);
+    };
 
     const animate = (time: number) => {
       if (cancelled) return;
-      const frame = Math.floor(time / 76) % 16;
-      if (loaded && frame !== lastFrame) {
-        canvases.forEach((canvas, index) => {
-          const context = contexts[index];
+
+      if (formationLoaded) {
+        const creationProgress = Math.min(1, Math.max(0, (time - creationStartedAt) / 2200));
+        formationCanvases.forEach((canvas, index) => {
+          const context = formationContexts[index];
           if (!context) return;
-          const offsetFrame = (frame + index * 2) % 16;
+          const curvedProgress = Math.pow(creationProgress, creationCurves[index]);
+          const frame = creationProgress >= 1 ? 43 : Math.min(42, Math.floor(curvedProgress * 43));
+          if (frame === lastFormationFrames[index]) return;
+          const column = frame % 8;
+          const row = Math.floor(frame / 8);
+          context.clearRect(0, 0, 256, 256);
+          context.drawImage(formationSprite, column * 256, row * 256, 256, 256, 0, 0, 256, 256);
+          lastFormationFrames[index] = frame;
+        });
+      }
+
+      const flightFrame = Math.floor(time / 42) % 16;
+      if (flightLoaded && flightFrame !== lastFlightFrame) {
+        flightCanvases.forEach((canvas, index) => {
+          const context = flightContexts[index];
+          if (!context) return;
+          const offsetFrame = (flightFrame + index * 2) % 16;
           const column = offsetFrame % 4;
           const row = Math.floor(offsetFrame / 4);
           context.clearRect(0, 0, 256, 256);
-          context.drawImage(sprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
+          context.drawImage(flightSprite, column * 512, row * 512, 512, 512, 0, 0, 256, 256);
         });
-        lastFrame = frame;
+        lastFlightFrame = flightFrame;
       }
       animationFrame = window.requestAnimationFrame(animate);
     };
 
-    sprite.onload = () => {
+    formationSprite.onload = () => {
       if (cancelled) return;
-      loaded = true;
-      animationFrame = window.requestAnimationFrame(animate);
+      formationLoaded = true;
+      startAnimation();
     };
-    sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
+    flightSprite.onload = () => {
+      if (cancelled) return;
+      flightLoaded = true;
+      startAnimation();
+    };
+    formationSprite.src = "/media/logo-formation-sprite-v3.webp";
+    flightSprite.src = "/media/butterfly-scroll-sprite-v2.webp";
 
     return () => {
       cancelled = true;
@@ -122,22 +156,9 @@ function BrandIntro() {
     <div className="brand-intro" ref={introRef} aria-hidden="true">
       <div className="brand-intro-halo" />
       <div className="brand-intro-butterflies">
-        {Array.from({ length: 9 }, (_, index) => (
+        {Array.from({ length: 11 }, (_, index) => (
           <span className={`brand-intro-butterfly brand-intro-butterfly-${index + 1}`} key={index}>
-            <img
-              className="brand-intro-formation"
-              src="/media/logo-formation-v2.webp"
-              alt=""
-              width="720"
-              height="720"
-              fetchPriority="high"
-              decoding="sync"
-              onError={(event) => {
-                if (!event.currentTarget.src.endsWith("/media/logo-formation-final-v2.webp")) {
-                  event.currentTarget.src = "/media/logo-formation-final-v2.webp";
-                }
-              }}
-            />
+            <canvas className="brand-intro-formation" width="256" height="256" />
             <canvas className="brand-intro-flight" width="256" height="256" />
           </span>
         ))}
