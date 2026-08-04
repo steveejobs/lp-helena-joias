@@ -5,7 +5,7 @@ import { siteDescription, siteName, siteUrl } from "@/app/seo";
 import { blogPosts } from "./posts";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Guias de joias e semijoias em Araguaína",
   description:
     "Conteúdos da Helena Joias sobre joias, semijoias, presentes e atendimento em Araguaína, Tocantins.",
   alternates: {
@@ -15,9 +15,16 @@ export const metadata: Metadata = {
     type: "website",
     url: "/blog",
     siteName,
-    title: "Blog | Helena Joias",
+    title: "Guias de joias e semijoias em Araguaína | Helena Joias",
     description:
       "Guias locais da Helena Joias para escolher joias e semijoias em Araguaína.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Guias de joias e semijoias em Araguaína | Helena Joias",
+    description:
+      "Guias locais da Helena Joias para escolher joias e semijoias em Araguaína.",
+    images: ["/media/gallery-2-2.jpg"],
   },
 };
 
@@ -64,7 +71,8 @@ export default function BlogPage() {
             <Link href={`/blog/${post.slug}`} aria-label={`Ler ${post.title}`}>
               <Image src={post.image} alt={post.imageAlt} width={1170} height={1560} sizes="(max-width: 760px) 100vw, 33vw" />
               <div>
-                <span>{post.readingTime}</span>
+                <span>{post.readingTime} de leitura</span>
+                <time dateTime={post.date}>Publicado em {post.date.split("-").reverse().join("/")}</time>
                 <h2>{post.title}</h2>
                 <p>{post.description}</p>
                 <small>Ler artigo</small>

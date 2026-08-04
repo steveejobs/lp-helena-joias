@@ -16,6 +16,10 @@ export function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
+function formatPublicationDate(date: string) {
+  return date.split("-").reverse().join("/");
+}
+
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPost(slug);
@@ -36,6 +40,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.description,
       url: `/blog/${post.slug}`,
+      publishedTime: post.date,
+      modifiedTime: post.date,
       images: [
         {
           url: post.image,
@@ -44,6 +50,12 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
           alt: post.imageAlt,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [post.image],
     },
   };
 }
@@ -74,7 +86,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div>
             <p>{post.tags.join(" · ")}</p>
             <h1>{post.title}</h1>
-            <span>{post.readingTime} de leitura</span>
+            <div className="article-meta">
+              <time dateTime={post.date}>Publicado em {formatPublicationDate(post.date)}</time>
+              <span>Por Helena Joias</span>
+              <span>{post.readingTime} de leitura</span>
+            </div>
           </div>
           <Image src={post.image} alt={post.imageAlt} width={1170} height={1560} sizes="(max-width: 860px) 100vw, 38vw" priority />
         </header>

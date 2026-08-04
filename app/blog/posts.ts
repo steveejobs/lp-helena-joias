@@ -1,4 +1,4 @@
-import { siteName, siteUrl } from "@/app/seo";
+import { siteUrl } from "@/app/seo";
 
 export type BlogPost = {
   slug: string;
@@ -17,41 +17,6 @@ export type BlogPost = {
 };
 
 export const blogPosts: BlogPost[] = [
-  {
-    slug: "loja-de-joias-em-araguaina",
-    title: "Loja de joias em Araguaína: conheça a Helena Joias no Setor Central",
-    description:
-      "Conheça a Helena Joias, loja de joias em Araguaína, TO, com atendimento presencial, colares, brincos, anéis, pulseiras e acessórios selecionados.",
-    date: "2026-08-04",
-    readingTime: "3 min",
-    image: "/media/gallery-3-3.jpg",
-    imageAlt: "Look com joias em frente à Helena Joias em Araguaína",
-    tags: ["Araguaína", "Loja física", "Joias"],
-    intro:
-      "Para quem procura uma loja de joias em Araguaína, a Helena Joias reúne atendimento próximo, curadoria de peças e uma experiência pensada para escolher com calma.",
-    sections: [
-      {
-        heading: "Onde encontrar a Helena Joias",
-        body: [
-          "A Helena Joias fica na Rua Sadoc Correia, 1293, Casa 3, no Setor Central de Araguaína, Tocantins. A localização facilita a visita de quem quer ver colares, brincos, anéis, pulseiras e acessórios de perto antes de escolher.",
-          "A loja atende de segunda a sexta, das 08h às 18h, e aos sábados, das 08h às 12h. Também é possível iniciar o atendimento pelo WhatsApp para tirar dúvidas antes da visita.",
-        ],
-      },
-      {
-        heading: "Por que visitar uma loja física de joias",
-        body: [
-          "Joias e semijoias mudam muito conforme o tom da pele, a roupa, o caimento e a luz. Na loja física, você consegue provar combinações, comparar tamanhos e perceber detalhes que uma foto nem sempre mostra.",
-          "Esse contato ajuda a escolher uma peça para o dia a dia, para presente ou para um momento especial com mais segurança.",
-        ],
-      },
-      {
-        heading: "Uma busca local mais precisa",
-        body: [
-          "Ao pesquisar por Helena Joias em Araguaína, procure pelo nome completo da loja e pela cidade. Esses sinais ajudam a diferenciar a Helena Joias local de outras marcas com nomes parecidos em outras regiões do Brasil.",
-        ],
-      },
-    ],
-  },
   {
     slug: "como-escolher-semijoias-em-araguaina",
     title: "Como escolher semijoias em Araguaína para o dia a dia",
@@ -144,14 +109,10 @@ export function getBlogJsonLd(post: BlogPost) {
     url: getPostUrl(post.slug),
     mainEntityOfPage: getPostUrl(post.slug),
     author: {
-      "@type": "Organization",
-      name: siteName,
-      url: siteUrl,
+      "@id": `${siteUrl}/#organization`,
     },
     publisher: {
-      "@type": "Organization",
-      name: siteName,
-      url: siteUrl,
+      "@id": `${siteUrl}/#organization`,
     },
   };
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Strategic Growth Engine"
+  short_description: "Discover, plan, improve, and validate growth"
+  default_prompt: "Use $seo-ai-visibility to discover this project's business and create an evidence-based growth strategy."
