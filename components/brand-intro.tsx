@@ -2,9 +2,64 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function BrandIntro() {
+type BrandIntroProps = {
+  landingTargetSelector?: string;
+  landingButterfly?: number;
+};
+
+export function BrandIntro({ landingTargetSelector, landingButterfly = 9 }: BrandIntroProps = {}) {
   const [hidden, setHidden] = useState(false);
   const introRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const intro = introRef.current;
+    if (!intro || !landingTargetSelector) return;
+
+    const flyer = intro.querySelector<HTMLElement>(`.brand-intro-butterfly-${landingButterfly}`);
+    const target = document.querySelector<HTMLElement>(landingTargetSelector);
+    if (!flyer || !target) return;
+
+    let geometryFrame = 0;
+
+    const updateLandingGeometry = () => {
+      geometryFrame = 0;
+      const flyerRect = flyer.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const x = targetRect.left + targetRect.width / 2 - (flyerRect.left + flyerRect.width / 2);
+      const y = targetRect.top + targetRect.height / 2 - (flyerRect.top + flyerRect.height / 2);
+      const distance = Math.max(Math.hypot(x, y), 1);
+      const arc = Math.min(90, Math.max(32, distance * .18));
+      let normalX = -y / distance;
+      let normalY = x / distance;
+
+      if (normalY > 0) {
+        normalX *= -1;
+        normalY *= -1;
+      }
+
+      flyer.style.setProperty("--intro-land-x", `${x.toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-y", `${y.toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-x-one", `${(x * .28 + normalX * arc).toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-y-one", `${(y * .28 + normalY * arc).toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-x-two", `${(x * .72 + normalX * arc * .6).toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-y-two", `${(y * .72 + normalY * arc * .6).toFixed(2)}px`);
+      flyer.style.setProperty("--intro-land-scale", String(target.offsetWidth / Math.max(flyer.offsetWidth, 1)));
+    };
+
+    const scheduleGeometryUpdate = () => {
+      if (geometryFrame) window.cancelAnimationFrame(geometryFrame);
+      geometryFrame = window.requestAnimationFrame(updateLandingGeometry);
+    };
+
+    flyer.classList.add("brand-intro-butterfly-landing");
+    scheduleGeometryUpdate();
+    window.addEventListener("resize", scheduleGeometryUpdate);
+
+    return () => {
+      window.removeEventListener("resize", scheduleGeometryUpdate);
+      if (geometryFrame) window.cancelAnimationFrame(geometryFrame);
+    };
+  }, [landingButterfly, landingTargetSelector]);
 
   useEffect(() => {
     const root = document.documentElement;

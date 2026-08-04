@@ -298,7 +298,7 @@ export default function InstagramLinks() {
 
   return (
     <main className="link-page">
-      <BrandIntro />
+      <BrandIntro landingTargetSelector=".link-butterfly-hero" />
       <div className="exit-curtain" aria-hidden="true" />
       <div className="link-progress" aria-hidden="true" />
 

@@ -770,7 +770,13 @@ function ExperienceBridge({
             <HomeWhatsAppButton />
             {showRoute ? (
               <a className="route-pending" href={storeLocationUrl} target="_blank" rel="noreferrer">
-                <span>Traçar rota</span><small>Como chegar</small>
+                <span className="route-copy"><strong>Traçar rota</strong><small>Como chegar</small></span>
+                <i className="route-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21s6-5.15 6-11a6 6 0 1 0-12 0c0 5.85 6 11 6 11Z" />
+                    <circle cx="12" cy="10" r="2" />
+                  </svg>
+                </i>
               </a>
             ) : null}
           </div>

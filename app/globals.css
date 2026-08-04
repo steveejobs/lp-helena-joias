@@ -72,6 +72,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-intro-revealing .brand-intro > p { opacity: 0; animation: none; transition: opacity .38s ease; }
 .brand-intro-revealing .brand-intro-wordmark { animation: intro-wordmark-exit .48s cubic-bezier(.76,0,.24,1) both; }
 .brand-intro-revealing .brand-intro-butterfly { animation: intro-butterfly-flight var(--intro-exit-duration) cubic-bezier(.45,.05,.55,.95) both; }
+.brand-intro-revealing .brand-intro-butterfly-landing { z-index: 3; animation: intro-butterfly-land 1.85s cubic-bezier(.33,.02,.2,1) both; }
 .brand-intro-revealing .brand-intro-formation { visibility: hidden; }
 .brand-intro-revealing .brand-intro-flight { visibility: visible; }
 
@@ -286,10 +287,15 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .bridge-actions .route-pending { width: 100%; }
 .bridge-primary:hover, .bridge-primary:focus-visible { transform: translateY(-2px); background: var(--ink); color: var(--rose-50); }
 .bridge-orbit .bridge-primary:hover, .bridge-orbit .bridge-primary:focus-visible { background: var(--rose-50); color: var(--ink); }
-.route-pending { min-height: 3.35rem; display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: .24rem; padding: 0 1.2rem; border: 1px solid color-mix(in srgb, currentColor 44%, transparent); border-radius: 99px; background: color-mix(in srgb, var(--bronze-500) 15%, transparent); color: inherit; cursor: pointer; opacity: 1; font-family: var(--sans); transition: background .25s ease, transform .25s ease; -webkit-text-fill-color: currentColor; }
-.route-pending span { font-size: .62rem; font-weight: 650; text-transform: uppercase; letter-spacing: .12em; }
-.route-pending small { opacity: .58; font-size: .48rem; text-transform: uppercase; letter-spacing: .1em; }
+.route-pending { min-width: 0; min-height: 3.35rem; display: inline-grid; grid-template-columns: minmax(0, 1fr) 2.35rem; align-items: center; gap: .75rem; padding: .45rem .5rem .45rem 1.05rem; border: 1px solid color-mix(in srgb, currentColor 44%, transparent); border-radius: 99px; background: color-mix(in srgb, var(--bronze-500) 15%, transparent); color: inherit; cursor: pointer; opacity: 1; font-family: var(--sans); text-align: left; transition: background .25s ease, transform .25s ease; -webkit-text-fill-color: currentColor; }
+.route-copy { min-width: 0; display: grid; gap: .22rem; }
+.route-copy strong { font-size: .62rem; font-weight: 650; line-height: 1; text-transform: uppercase; letter-spacing: .12em; }
+.route-copy small { opacity: .58; font-size: .48rem; line-height: 1; text-transform: uppercase; letter-spacing: .1em; }
+.route-icon { width: 2.35rem; height: 2.35rem; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--rose-50); font-style: normal; transition: transform .3s cubic-bezier(.16,1,.3,1); }
+.route-icon svg { width: 1.18rem; height: 1.18rem; overflow: visible; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.bridge-orbit .route-icon { background: var(--rose-50); color: var(--ink); }
 .route-pending:hover, .route-pending:focus-visible { background: color-mix(in srgb, var(--bronze-500) 28%, transparent); transform: translateY(-2px); }
+.route-pending:hover .route-icon, .route-pending:focus-visible .route-icon { transform: translateY(-.12rem) scale(1.04); }
 .whatsapp-spotlight:disabled, .footer-whatsapp:disabled, .route-pending:disabled { opacity: 1; -webkit-text-fill-color: currentColor; }
 .bridge-sculpture { position: absolute; z-index: -1; width: min(46vw, 39rem); aspect-ratio: 1; right: -8vw; top: 50%; transform: translateY(-50%); opacity: .55; }
 .bridge-sculpture i { position: absolute; inset: 0; display: block; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: 58% 42% 62% 38% / 44% 58% 42% 56%; animation: bridge-morph 12s ease-in-out infinite alternate; }
@@ -384,10 +390,10 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .profile-hours i { width: .22rem; height: .22rem; border-radius: 50%; background: var(--bronze-500); }
 .link-butterfly { display: block; pointer-events: none; }
 .link-butterfly canvas { display: block; width: 100%; height: 100%; filter: sepia(.12) saturate(.9) drop-shadow(0 .75rem 1.2rem rgba(33,25,22,.14)); }
-.link-butterfly-hero { position: absolute; z-index: 1; top: 4.3rem; right: clamp(-.8rem, 3vw, 1.2rem); width: 7rem; aspect-ratio: 1; opacity: .42; animation: link-butterfly-drift 6.5s ease-in-out infinite alternate; }
+.link-butterfly-hero { position: absolute; z-index: 1; top: 4.3rem; right: clamp(-.8rem, 3vw, 1.2rem); width: 7rem; aspect-ratio: 1; opacity: .42; animation: link-butterfly-drift 6.5s cubic-bezier(.45,.05,.55,.95) infinite alternate; }
 
 :root:not(.link-page-ready) .brand-intro ~ .profile-hero [data-link-hero] { opacity: 0; transform: translateY(18px) scale(.985); }
-:root:not(.brand-intro-content-revealing) .brand-intro ~ .profile-hero .link-butterfly-hero { visibility: hidden; }
+.brand-intro ~ .profile-hero .link-butterfly-hero { visibility: hidden; animation-play-state: paused; }
 .link-page-ready [data-link-hero] { animation: link-hero-in 760ms cubic-bezier(.16,1,.3,1) both; }
 .link-page-ready [data-link-hero="brand"] { animation-delay: 240ms; }
 .link-page-ready [data-link-hero="kicker"] { animation-delay: 300ms; }
@@ -459,6 +465,12 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 @keyframes intro-butterfly-flight {
   0% { transform: translate3d(0, 0, 0) rotate(var(--intro-rotation)) scale(var(--intro-scale)); }
   100% { transform: translate3d(var(--intro-exit-x), var(--intro-exit-y), 0) rotate(var(--intro-exit-rotation)) scale(.94); }
+}
+@keyframes intro-butterfly-land {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(var(--intro-rotation)) scale(var(--intro-scale)); }
+  28% { opacity: .92; transform: translate3d(var(--intro-land-x-one), var(--intro-land-y-one), 0) rotate(-13deg) scale(var(--intro-scale)); }
+  72% { opacity: .7; transform: translate3d(var(--intro-land-x-two), var(--intro-land-y-two), 0) rotate(7deg) scale(var(--intro-land-scale)); }
+  100% { opacity: .42; transform: translate3d(var(--intro-land-x), var(--intro-land-y), 0) rotate(0deg) scale(var(--intro-land-scale)); }
 }
 @keyframes intro-copy { to { opacity: .52; } }
 
