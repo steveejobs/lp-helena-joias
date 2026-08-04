@@ -27,22 +27,9 @@ export function BrandIntro({ landingTargetSelector, landingButterfly = 9 }: Bran
       const targetRect = target.getBoundingClientRect();
       const x = targetRect.left + targetRect.width / 2 - (flyerRect.left + flyerRect.width / 2);
       const y = targetRect.top + targetRect.height / 2 - (flyerRect.top + flyerRect.height / 2);
-      const distance = Math.max(Math.hypot(x, y), 1);
-      const arc = Math.min(90, Math.max(32, distance * .18));
-      let normalX = -y / distance;
-      let normalY = x / distance;
-
-      if (normalY > 0) {
-        normalX *= -1;
-        normalY *= -1;
-      }
 
       flyer.style.setProperty("--intro-land-x", `${x.toFixed(2)}px`);
       flyer.style.setProperty("--intro-land-y", `${y.toFixed(2)}px`);
-      flyer.style.setProperty("--intro-land-x-one", `${(x * .28 + normalX * arc).toFixed(2)}px`);
-      flyer.style.setProperty("--intro-land-y-one", `${(y * .28 + normalY * arc).toFixed(2)}px`);
-      flyer.style.setProperty("--intro-land-x-two", `${(x * .72 + normalX * arc * .6).toFixed(2)}px`);
-      flyer.style.setProperty("--intro-land-y-two", `${(y * .72 + normalY * arc * .6).toFixed(2)}px`);
       flyer.style.setProperty("--intro-land-scale", String(target.offsetWidth / Math.max(flyer.offsetWidth, 1)));
     };
 
