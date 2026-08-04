@@ -516,7 +516,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
   .orbit { inset: 7% -13%; }
   .scroll-cue { left: 1.15rem; bottom: 1.3rem; }
   .scroll-cue span { display: none; }
-  [data-reveal] { transform: translateY(1.9rem); clip-path: inset(0 0 11% 0); transition-duration: .48s, .66s, .7s; }
+  [data-reveal] { transform: translateY(1.9rem); transition-duration: .48s, .66s; }
   .manifesto[data-reveal], .movement[data-reveal], .collections-intro[data-reveal] { clip-path: none; }
   [data-reveal="media"] { transform: translateY(2.5rem) scale(.975); }
   .manifesto { min-height: 62svh; padding: 5.3rem 1.25rem; }
