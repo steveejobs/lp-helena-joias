@@ -89,6 +89,8 @@ function ButterflyLoop({ className = "" }: { className?: string }) {
     const sprite = new window.Image();
     let request = 0;
     let lastFrame = -1;
+    let loaded = false;
+    let visible = false;
 
     const draw = (frame: number) => {
       if (frame === lastFrame) return;
@@ -104,13 +106,33 @@ function ButterflyLoop({ className = "" }: { className?: string }) {
       request = window.requestAnimationFrame(animate);
     };
 
+    const syncActivity = () => {
+      const active = loaded && visible && !reduced && !connection?.saveData && document.visibilityState === "visible";
+      if (active && !request) request = window.requestAnimationFrame(animate);
+      if (!active && request) {
+        window.cancelAnimationFrame(request);
+        request = 0;
+      }
+    };
+
     sprite.onload = () => {
       draw(0);
-      if (!reduced && !connection?.saveData) request = window.requestAnimationFrame(animate);
+      loaded = true;
+      syncActivity();
     };
     sprite.src = "/media/butterfly-scroll-sprite-v2.webp";
 
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      syncActivity();
+    }, { rootMargin: "20% 0px" });
+
+    observer.observe(canvas);
+    document.addEventListener("visibilitychange", syncActivity);
+
     return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", syncActivity);
       if (request) window.cancelAnimationFrame(request);
     };
   }, []);
@@ -133,9 +155,6 @@ function ConvergingGallery() {
       return;
     }
     let frame = 0;
-    let target = 0;
-    let current = 0;
-    let previous = performance.now();
 
     const read = () => {
       const rect = section.getBoundingClientRect();
@@ -157,29 +176,15 @@ function ConvergingGallery() {
       section.style.setProperty("--rail-glow", String(.18 + encounter * .42 - dissolve * .1));
     };
 
-    const animate = (time: number) => {
-      const delta = Math.min(48, time - previous);
-      previous = time;
-      const desiredStep = (target - current) * (1 - Math.exp(-delta / 190));
-      const maxStep = delta / 1300;
-      current += Math.max(-maxStep, Math.min(maxStep, desiredStep));
-      if (Math.abs(target - current) < .0003) current = target;
-      paint(current);
-      if (current !== target) frame = window.requestAnimationFrame(animate);
-      else frame = 0;
-    };
-
     const update = () => {
-      target = read();
-      if (!frame) {
-        previous = performance.now();
-        frame = window.requestAnimationFrame(animate);
-      }
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        paint(read());
+      });
     };
 
-    target = read();
-    current = target;
-    paint(current);
+    paint(read());
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     return () => {

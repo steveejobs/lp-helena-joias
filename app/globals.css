@@ -244,6 +244,7 @@ h1 { margin: 0; font-weight: 480; font-size: clamp(4.5rem, 8.1vw, 9rem); line-he
 .gallery-slide.is-active { z-index: 1; opacity: 1; }
 .gallery-slide.is-next { z-index: 2; opacity: var(--story-next-opacity); }
 .gallery-slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gallery-slide.is-active img, .gallery-slide.is-next img { will-change: transform; }
 .gallery-slide.is-active img { transform: scale(var(--story-active-scale)) translateY(var(--story-active-lift)); }
 .gallery-slide.is-next img { transform: scale(var(--story-next-scale)); }
 .gallery-sheen { position: absolute; z-index: 2; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 55%, rgba(255,255,255,.11) 72%, transparent 88%); mix-blend-mode: screen; }

@@ -571,12 +571,8 @@ function ScrollGallery({
     const section = sectionRef.current;
     if (!section) return;
     const slides = Array.from(section.querySelectorAll<HTMLElement>(".gallery-slide"));
-    const compact = window.matchMedia("(max-width: 900px)").matches;
     let frame = 0;
     let measureFrame = 0;
-    let targetProgress = 0;
-    let currentProgress = 0;
-    let previousTime = performance.now();
     let sectionTop = 0;
     let scrollRange = 1;
     let visible = false;
@@ -612,28 +608,13 @@ function ScrollGallery({
       section.style.setProperty("--story-next-scale", String(1.035 - blend * .015));
     };
 
-    const animate = (time: number) => {
-      const delta = Math.min(48, time - previousTime);
-      previousTime = time;
-      const smoothing = 1 - Math.exp(-delta / (compact ? 72 : 92));
-      const desiredStep = (targetProgress - currentProgress) * smoothing;
-      const maxStep = delta / (compact ? 520 : 680);
-      currentProgress += Math.max(-maxStep, Math.min(maxStep, desiredStep));
-
-      if (Math.abs(targetProgress - currentProgress) < .00025) currentProgress = targetProgress;
-      paint(currentProgress);
-
-      if (currentProgress !== targetProgress) frame = window.requestAnimationFrame(animate);
-      else frame = 0;
-    };
-
     const requestUpdate = () => {
       if (!visible) return;
-      targetProgress = readProgress();
-      if (!frame) {
-        previousTime = performance.now();
-        frame = window.requestAnimationFrame(animate);
-      }
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        paint(readProgress());
+      });
     };
 
     const measure = () => {
@@ -641,11 +622,7 @@ function ScrollGallery({
       const rect = section.getBoundingClientRect();
       sectionTop = rect.top + window.scrollY;
       scrollRange = Math.max(rect.height - window.innerHeight, 1);
-      targetProgress = readProgress();
-      if (!frame) {
-        currentProgress = targetProgress;
-        paint(currentProgress);
-      }
+      paint(readProgress());
     };
 
     const requestMeasure = () => {
