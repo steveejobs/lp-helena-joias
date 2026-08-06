@@ -47,7 +47,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-intro-butterflies { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
 .brand-intro-butterfly { position: absolute; display: block; width: clamp(5.6rem, 9vw, 8.2rem); aspect-ratio: 1; transform: rotate(var(--intro-rotation)) scale(var(--intro-scale)); transform-origin: center; will-change: transform; }
 .brand-intro-formation,
-.brand-intro-flight { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 .7rem 1.2rem rgba(153,119,70,.13)); }
+.brand-intro-flight { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; filter: sepia(.28) saturate(1.14) brightness(1.06) contrast(.98) drop-shadow(0 .7rem 1.2rem rgba(153,119,70,.13)); }
 .brand-intro-flight { visibility: hidden; }
 .brand-intro-butterfly-1 { --intro-rotation: -7deg; --intro-scale: .84; --intro-exit-duration: 1.48s; --intro-steer-x: -4vw; --intro-steer-y: -4vh; --intro-path-rotation: -45deg; --intro-exit-x: -42vw; --intro-exit-y: -42vh; --intro-exit-rotation: -49deg; left: 7%; top: 13%; }
 .brand-intro-butterfly-2 { --intro-rotation: 5deg; --intro-scale: .72; --intro-exit-duration: 1.65s; --intro-steer-x: -3.5vw; --intro-steer-y: -4.5vh; --intro-path-rotation: -38deg; --intro-exit-x: -38vw; --intro-exit-y: -48vh; --intro-exit-rotation: -42deg; left: 28%; top: 6%; }
